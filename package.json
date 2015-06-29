@@ -2,7 +2,7 @@
   "name": "restify-clients",
   "version": "1.0.0",
   "main": "lib/index.js",
-  "description": "restify HTTP clients",
+  "description": "HttpClient, StringClient, and JsonClient extracted from restify",
   "homepage": "http://www.restify.com",
   "author": {
     "name": "Alex Liu",
