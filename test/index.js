@@ -81,7 +81,7 @@ function sendWhitespace(req, res, next) {
 }
 
 function requestThatTimesOut(req, res, next) {
-    setTimeout(function() {
+    setTimeout(function () {
         res.send('OK');
         next();
     }, 170);
@@ -129,9 +129,9 @@ function dtrace() {
 
 ///--- Tests
 
-describe('restify-client tests', function() {
+describe('restify-client tests', function () {
 
-    before(function(callback) {
+    before(function (callback) {
         try {
             SERVER = restify.createServer({
                 dtrace: dtrace,
@@ -148,12 +148,12 @@ describe('restify-client tests', function() {
             SERVER.get('/signed', sendSignature);
             SERVER.get('/whitespace/:flavor', sendWhitespace);
 
-            SERVER.get('/json/boom', function(req, res, next) {
+            SERVER.get('/json/boom', function (req, res, next) {
                 res.set('content-type', 'text/html');
                 res.send(200, '<html><head/><body/></html>');
                 next();
             });
-            SERVER.del('/contentLengthAllowed', function(req, res, next) {
+            SERVER.del('/contentLengthAllowed', function (req, res, next) {
                 if (req.header('content-length')) {
                     res.send(200, 'Allowed');
                 } else {
@@ -180,7 +180,7 @@ describe('restify-client tests', function() {
             SERVER.post('/str/:name', sendText);
             SERVER.patch('/str/:name', sendText);
 
-            SERVER.listen(PORT, '127.0.0.1', function() {
+            SERVER.listen(PORT, '127.0.0.1', function () {
                 PORT = SERVER.address().port;
 
                 JSON_CLIENT = clients.createJsonClient({
@@ -217,7 +217,7 @@ describe('restify-client tests', function() {
     });
 
 
-    after(function(callback) {
+    after(function (callback) {
         try {
             JSON_CLIENT.close();
             STR_CLIENT.close();
@@ -230,8 +230,8 @@ describe('restify-client tests', function() {
     });
 
 
-    it('GET json', function(done) {
-        JSON_CLIENT.get('/json/mcavage', function(err, req, res, obj) {
+    it('GET json', function (done) {
+        JSON_CLIENT.get('/json/mcavage', function (err, req, res, obj) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -240,13 +240,13 @@ describe('restify-client tests', function() {
         });
     });
 
-    it('GH-778 GET jsonp', function(done) {
+    it('GH-778 GET jsonp', function (done) {
         // Using variables here to keep lines under 80 chars
         var jsonpUrl = '/json/jsonp?callback=testCallback';
         var expectedResult = 'typeof testCallback === \'function\' && ' +
                              'testCallback({"hello":"jsonp"});';
 
-        JSON_CLIENT.get(jsonpUrl, function(err, req, res) {
+        JSON_CLIENT.get(jsonpUrl, function (err, req, res) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -255,8 +255,8 @@ describe('restify-client tests', function() {
         });
     });
 
-    it('GH-388 GET json, but really HTML', function(done) {
-        JSON_CLIENT.get('/json/boom', function(err, req, res, obj) {
+    it('GH-388 GET json, but really HTML', function (done) {
+        JSON_CLIENT.get('/json/boom', function (err, req, res, obj) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -266,10 +266,10 @@ describe('restify-client tests', function() {
     });
 
 
-    it('GH-115 GET path with spaces', function(done) {
+    it('GH-115 GET path with spaces', function (done) {
         // As of node v0.11, this throws, since it's never valid HTTP
         try {
-            JSON_CLIENT.get('/json/foo bar', function(err, req, res, obj) {
+            JSON_CLIENT.get('/json/foo bar', function (err, req, res, obj) {
                 assert.ok(err);
                 assert.equal(err.code, 'ECONNRESET');
                 done();
@@ -284,8 +284,8 @@ describe('restify-client tests', function() {
     });
 
 
-    it('Check error (404)', function(done) {
-        JSON_CLIENT.get('/' + uuid(), function(err, req, res, obj) {
+    it('Check error (404)', function (done) {
+        JSON_CLIENT.get('/' + uuid(), function (err, req, res, obj) {
             assert.ok(err);
             assert.ok(err.message);
             assert.equal(err.statusCode, 404);
@@ -299,8 +299,8 @@ describe('restify-client tests', function() {
     });
 
 
-    it('HEAD json', function(done) {
-        JSON_CLIENT.head('/json/mcavage', function(err, req, res) {
+    it('HEAD json', function (done) {
+        JSON_CLIENT.head('/json/mcavage', function (err, req, res) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -309,9 +309,9 @@ describe('restify-client tests', function() {
     });
 
 
-    it('POST json', function(done) {
+    it('POST json', function (done) {
         var data = { hello: 'foo' };
-        JSON_CLIENT.post('/json/mcavage', data, function(err, req, res, obj) {
+        JSON_CLIENT.post('/json/mcavage', data, function (err, req, res, obj) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -321,9 +321,9 @@ describe('restify-client tests', function() {
     });
 
 
-    it('POST json empty body object', function(done) {
+    it('POST json empty body object', function (done) {
         var data = {};
-        JSON_CLIENT.post('/json/mcavage', data, function(err, req, res, obj) {
+        JSON_CLIENT.post('/json/mcavage', data, function (err, req, res, obj) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -333,9 +333,9 @@ describe('restify-client tests', function() {
     });
 
 
-    it('PUT json', function(done) {
+    it('PUT json', function (done) {
         var data = { hello: 'foo' };
-        JSON_CLIENT.put('/json/mcavage', data, function(err, req, res, obj) {
+        JSON_CLIENT.put('/json/mcavage', data, function (err, req, res, obj) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -345,9 +345,9 @@ describe('restify-client tests', function() {
     });
 
 
-    it('PATCH json', function(done) {
+    it('PATCH json', function (done) {
         var data = { hello: 'foo' };
-        JSON_CLIENT.patch('/json/mcavage', data, function(err, req, res, obj) {
+        JSON_CLIENT.patch('/json/mcavage', data, function (err, req, res, obj) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -357,8 +357,8 @@ describe('restify-client tests', function() {
     });
 
 
-    it('GH-800 GET json 0', function(done) {
-        JSON_CLIENT.get('/json/zero', function(err, req, res, obj) {
+    it('GH-800 GET json 0', function (done) {
+        JSON_CLIENT.get('/json/zero', function (err, req, res, obj) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -369,8 +369,8 @@ describe('restify-client tests', function() {
     });
 
 
-    it('GH-800 GET json false', function(done) {
-        JSON_CLIENT.get('/json/false', function(err, req, res, obj) {
+    it('GH-800 GET json false', function (done) {
+        JSON_CLIENT.get('/json/false', function (err, req, res, obj) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -381,8 +381,8 @@ describe('restify-client tests', function() {
     });
 
 
-    it('GH-800 GET json null', function(done) {
-        JSON_CLIENT.get('/json/null', function(err, req, res, obj) {
+    it('GH-800 GET json null', function (done) {
+        JSON_CLIENT.get('/json/null', function (err, req, res, obj) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -393,8 +393,8 @@ describe('restify-client tests', function() {
     });
 
 
-    it('GET text', function(done) {
-        STR_CLIENT.get('/str/mcavage', function(err, req, res, data) {
+    it('GET text', function (done) {
+        STR_CLIENT.get('/str/mcavage', function (err, req, res, data) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -404,14 +404,14 @@ describe('restify-client tests', function() {
         });
     });
 
-    it('GET PARTIAL text', function(done) {
+    it('GET PARTIAL text', function (done) {
         var opts = {
             path: '/str/mcavage',
             headers: {
                 Range: 'bytes=0-10'
             }
         };
-        STR_CLIENT.get(opts, function(err, req, res, data) {
+        STR_CLIENT.get(opts, function (err, req, res, data) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -422,8 +422,8 @@ describe('restify-client tests', function() {
     });
 
 
-    it('HEAD text', function(done) {
-        STR_CLIENT.head('/str/mcavage', function(err, req, res) {
+    it('HEAD text', function (done) {
+        STR_CLIENT.head('/str/mcavage', function (err, req, res) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -431,8 +431,8 @@ describe('restify-client tests', function() {
         });
     });
 
-    it('Check error (404)', function(done) {
-        STR_CLIENT.get('/' + uuid(), function(err, req, res, message) {
+    it('Check error (404)', function (done) {
+        STR_CLIENT.get('/' + uuid(), function (err, req, res, message) {
             assert.ok(err);
             assert.ok(err.message);
             assert.equal(err.statusCode, 404);
@@ -444,9 +444,9 @@ describe('restify-client tests', function() {
     });
 
 
-    it('POST text', function(done) {
+    it('POST text', function (done) {
         var body = 'hello=foo';
-        STR_CLIENT.post('/str/mcavage', body, function(err, req, res, data) {
+        STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -457,9 +457,9 @@ describe('restify-client tests', function() {
     });
 
 
-    it('PATCH text', function(done) {
+    it('PATCH text', function (done) {
         var body = 'hello=foo';
-        STR_CLIENT.patch('/str/mcavage', body, function(err, req, res, data) {
+        STR_CLIENT.patch('/str/mcavage', body, function (err, req, res, data) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -470,9 +470,9 @@ describe('restify-client tests', function() {
     });
 
 
-    it('POST text (object)', function(done) {
+    it('POST text (object)', function (done) {
         var body = {hello: 'foo'};
-        STR_CLIENT.post('/str/mcavage', body, function(err, req, res, data) {
+        STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -483,9 +483,9 @@ describe('restify-client tests', function() {
     });
 
 
-    it('POST text empty body string', function(done) {
+    it('POST text empty body string', function (done) {
         var body = '';
-        STR_CLIENT.post('/str/mcavage', body, function(err, req, res, data) {
+        STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -496,9 +496,9 @@ describe('restify-client tests', function() {
     });
 
 
-    it('POST text null body', function(done) {
+    it('POST text null body', function (done) {
         var body = null;
-        STR_CLIENT.post('/str/mcavage', body, function(err, req, res, data) {
+        STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -509,9 +509,9 @@ describe('restify-client tests', function() {
     });
 
 
-    it('POST text empty body object', function(done) {
+    it('POST text empty body object', function (done) {
         var body = {};
-        STR_CLIENT.post('/str/mcavage', body, function(err, req, res, data) {
+        STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -522,9 +522,9 @@ describe('restify-client tests', function() {
     });
 
 
-    it('PUT text', function(done) {
+    it('PUT text', function (done) {
         var body = 'hello=foo';
-        STR_CLIENT.put('/str/mcavage', body, function(err, req, res, data) {
+        STR_CLIENT.put('/str/mcavage', body, function (err, req, res, data) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -534,9 +534,9 @@ describe('restify-client tests', function() {
         });
     });
 
-    it('PUT text empty body string', function(done) {
+    it('PUT text empty body string', function (done) {
         var body = '';
-        STR_CLIENT.put('/str/mcavage', body, function(err, req, res, data) {
+        STR_CLIENT.put('/str/mcavage', body, function (err, req, res, data) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -546,8 +546,8 @@ describe('restify-client tests', function() {
         });
     });
 
-    it('DELETE text', function(done) {
-        STR_CLIENT.del('/str/mcavage', function(err, req, res) {
+    it('DELETE text', function (done) {
+        STR_CLIENT.del('/str/mcavage', function (err, req, res) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -555,7 +555,7 @@ describe('restify-client tests', function() {
         });
     });
 
-    it('DELETE allows content-length', function(done) {
+    it('DELETE allows content-length', function (done) {
         var opts = {
             path: '/contentLengthAllowed',
             headers: {
@@ -563,7 +563,7 @@ describe('restify-client tests', function() {
             }
         };
 
-        STR_CLIENT.del(opts, function(err, req, res, obj) {
+        STR_CLIENT.del(opts, function (err, req, res, obj) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -572,20 +572,20 @@ describe('restify-client tests', function() {
         });
     });
 
-    it('GET raw', function(done) {
-        RAW_CLIENT.get('/str/mcavage', function(connectErr, req) {
+    it('GET raw', function (done) {
+        RAW_CLIENT.get('/str/mcavage', function (connectErr, req) {
             assert.notOk(connectErr);
             assert.ok(req);
 
-            req.on('result', function(err, res) {
+            req.on('result', function (err, res) {
                 assert.notOk(err);
                 res.body = '';
                 res.setEncoding('utf8');
-                res.on('data', function(chunk) {
+                res.on('data', function (chunk) {
                     res.body += chunk;
                 });
 
-                res.on('end', function() {
+                res.on('end', function () {
                     assert.equal(res.body, 'hello mcavage');
                     done();
                 });
@@ -594,28 +594,28 @@ describe('restify-client tests', function() {
     });
 
 
-    it('POST raw', function(done) {
+    it('POST raw', function (done) {
         var opts = {
             path: '/str/mcavage',
             headers: {
                 'content-type': 'application/x-www-form-urlencoded'
             }
         };
-        RAW_CLIENT.post(opts, function(connectErr, req) {
+        RAW_CLIENT.post(opts, function (connectErr, req) {
             assert.notOk(connectErr);
 
             req.write('hello=snoopy');
             req.end();
 
-            req.on('result', function(err, res) {
+            req.on('result', function (err, res) {
                 assert.notOk(err);
                 res.body = '';
                 res.setEncoding('utf8');
-                res.on('data', function(chunk) {
+                res.on('data', function (chunk) {
                     res.body += chunk;
                 });
 
-                res.on('end', function() {
+                res.on('end', function () {
                     assert.equal(res.body, 'hello snoopy');
                     done();
                 });
@@ -623,12 +623,12 @@ describe('restify-client tests', function() {
         });
     });
 
-    it('PR-726 Enable {agent: false} option override per request', function(done) {
+    it('PR-726 Enable {agent: false} option override per request', function (done) {
         var opts = {
             path: '/str/noagent',
             agent: false
         };
-        RAW_CLIENT.get(opts, function(err, req, res) {
+        RAW_CLIENT.get(opts, function (err, req, res) {
             assert.notOk(err);
             assert.notStrictEqual(req.agent, RAW_CLIENT.agent,
                 'request should not use client agent');
@@ -636,7 +636,7 @@ describe('restify-client tests', function() {
         });
     });
 
-    it('GH-20 connectTimeout', function(done) {
+    it('GH-20 connectTimeout', function (done) {
         var client = clients.createClient({
             url: 'http://169.254.1.10',
             type: 'http',
@@ -646,22 +646,22 @@ describe('restify-client tests', function() {
             agent: false
         });
 
-        client.get('/foo', function(err, req) {
+        client.get('/foo', function (err, req) {
             assert.ok(err);
             assert.equal(err.name, 'ConnectTimeoutError');
             done();
         });
     });
 
-    it('requestTimeout', function(done) {
-        TIMEOUT_CLIENT.get('/str/request_timeout', function(err, req, res, obj) {
+    it('requestTimeout', function (done) {
+        TIMEOUT_CLIENT.get('/str/request_timeout', function (err, req, res, obj) {
             assert.ok(err);
             assert.equal(err.name, 'RequestTimeoutError');
             done();
         });
     });
 
-    it('GH-169 PUT json Content-MD5', function(done) {
+    it('GH-169 PUT json Content-MD5', function (done) {
         var msg = {
             _id: '4ff71172bc148900000010a3',
             userId: '4f711b377579dbf65e000001',
@@ -745,7 +745,7 @@ describe('restify-client tests', function() {
             weekdayMonday: true
         };
 
-        JSON_CLIENT.put('/json/md5', msg, function(err, req, res, obj) {
+        JSON_CLIENT.put('/json/md5', msg, function (err, req, res, obj) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -754,19 +754,8 @@ describe('restify-client tests', function() {
     });
 
 
-    it('GH-203 GET json, body is whitespace', function(done) {
-        JSON_CLIENT.get('/whitespace/spaces', function(err, req, res, obj) {
-            assert.notOk(err);
-            assert.ok(req);
-            assert.ok(res);
-            assert.deepEqual(obj, {});
-            done();
-        });
-    });
-
-
-    it('GH-203 GET json, body is tabs', function(done) {
-        JSON_CLIENT.get('/whitespace/tabs', function(err, req, res, obj) {
+    it('GH-203 GET json, body is whitespace', function (done) {
+        JSON_CLIENT.get('/whitespace/spaces', function (err, req, res, obj) {
             assert.notOk(err);
             assert.ok(req);
             assert.ok(res);
@@ -776,7 +765,18 @@ describe('restify-client tests', function() {
     });
 
 
-    it('don\'t sign a request', function(done) {
+    it('GH-203 GET json, body is tabs', function (done) {
+        JSON_CLIENT.get('/whitespace/tabs', function (err, req, res, obj) {
+            assert.notOk(err);
+            assert.ok(req);
+            assert.ok(res);
+            assert.deepEqual(obj, {});
+            done();
+        });
+    });
+
+
+    it('don\'t sign a request', function (done) {
         var client = clients.createClient({
             url: 'http://127.0.0.1:' + PORT,
             type: 'string',
@@ -784,7 +784,7 @@ describe('restify-client tests', function() {
             headers: { 'Gusty-Winds': 'May Exist' },
             agent: false
         });
-        client.get('/signed', function(err, req, res, data) {
+        client.get('/signed', function (err, req, res, data) {
             assert.notOk(err);
             assert.ok(data);
             assert.equal(data, 'request NOT signed');
@@ -793,7 +793,7 @@ describe('restify-client tests', function() {
     });
 
 
-    it('sign a request', function(done) {
+    it('sign a request', function (done) {
         var called = 0;
         var signer = function sign(request) {
             called++;
@@ -818,7 +818,7 @@ describe('restify-client tests', function() {
             headers: { 'Gusty-Winds': 'May Exist' },
             agent: false
         });
-        client.get('/signed', function(err, req, res, data) {
+        client.get('/signed', function (err, req, res, data) {
             assert.notOk(err);
             assert.ok(data);
             assert.equal(called, 1);
@@ -827,7 +827,7 @@ describe('restify-client tests', function() {
         });
     });
 
-    it('secure client connection with timeout', function(done) {
+    it('secure client connection with timeout', function (done) {
         var server = restify.createServer({
             certificate: '-----BEGIN CERTIFICATE-----\n' +
                 'MIICgzCCAewCCQDutc3iIPK88jANBgkqhkiG9w0BAQUFADCBhTELMAkGA1UEBhMC\n' +
@@ -862,7 +862,7 @@ describe('restify-client tests', function() {
                 '-----END RSA PRIVATE KEY-----'
         });
 
-        server.get('/ping', function(req, res) {
+        server.get('/ping', function (req, res) {
             res.end('pong');
         });
         server.listen(8443);
@@ -872,12 +872,12 @@ describe('restify-client tests', function() {
             connectTimeout: 2000,
             rejectUnauthorized: false
         });
-        var timeout = setTimeout(function() {
+        var timeout = setTimeout(function () {
             assert.ok(false, 'timed out');
             done();
         }, 2050);
 
-        client.get('/ping', function(err, req, res, body) {
+        client.get('/ping', function (err, req, res, body) {
             assert.notOk(err);
             clearTimeout(timeout);
             assert.equal(body, 'pong');
@@ -888,11 +888,11 @@ describe('restify-client tests', function() {
     });
 
 
-    it('create JSON client with url instead of opts', function(done) {
+    it('create JSON client with url instead of opts', function (done) {
         var client = clients.createJsonClient('http://127.0.0.1:' + PORT);
         client.agent = false;
 
-        client.get('/json/mcavage', function(err, req, res, obj) {
+        client.get('/json/mcavage', function (err, req, res, obj) {
             assert.notOk(err);
             assert.deepEqual(obj, {hello: 'mcavage'});
             done();
@@ -900,11 +900,11 @@ describe('restify-client tests', function() {
     });
 
 
-    it('create string client with url instead of opts', function(done) {
+    it('create string client with url instead of opts', function (done) {
         var client = clients.createStringClient('http://127.0.0.1:' + PORT);
         client.agent = false;
 
-        client.get('/str/mcavage', function(err, req, res, data) {
+        client.get('/str/mcavage', function (err, req, res, data) {
             assert.notOk(err);
             assert.equal(data, 'hello mcavage');
             done();
@@ -912,22 +912,22 @@ describe('restify-client tests', function() {
     });
 
 
-    it('create http client with url instead of opts', function(done) {
+    it('create http client with url instead of opts', function (done) {
         var client = clients.createHttpClient('http://127.0.0.1:' + PORT);
         client.agent = false;
 
-        client.get('/str/mcavage', function(err, req) {
+        client.get('/str/mcavage', function (err, req) {
             assert.notOk(err);
 
-            req.on('result', function(err2, res) {
+            req.on('result', function (err2, res) {
                 assert.notOk(err2);
                 res.body = '';
                 res.setEncoding('utf8');
-                res.on('data', function(chunk) {
+                res.on('data', function (chunk) {
                     res.body += chunk;
                 });
 
-                res.on('end', function() {
+                res.on('end', function () {
                     assert.equal(res.body, '"hello mcavage"');
                     done();
                 });
@@ -936,21 +936,21 @@ describe('restify-client tests', function() {
     });
 
 
-    it('create base client with url instead of opts', function(done) {
+    it('create base client with url instead of opts', function (done) {
         var client = clients.createClient('http://127.0.0.1:' + PORT);
         client.agent = false;
 
-        client.get('/str/mcavage', function(err, req) {
+        client.get('/str/mcavage', function (err, req) {
             assert.notOk(err);
-            req.on('result', function(err2, res) {
+            req.on('result', function (err2, res) {
                 assert.notOk(err2);
                 res.body = '';
                 res.setEncoding('utf8');
-                res.on('data', function(chunk) {
+                res.on('data', function (chunk) {
                     res.body += chunk;
                 });
 
-                res.on('end', function() {
+                res.on('end', function () {
                     assert.equal(res.body, '"hello mcavage"');
                     done();
                 });
@@ -959,7 +959,7 @@ describe('restify-client tests', function() {
     });
 
 
-    it('GH-738 respect NO_PROXY while setting proxy', function(done) {
+    it('GH-738 respect NO_PROXY while setting proxy', function (done) {
         var origProxy = process.env.https_proxy;
         var origNoProxy = process.env.NO_PROXY;
 

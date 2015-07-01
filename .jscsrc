@@ -1,7 +1,13 @@
 {
     // setup
-    "fileExtensions":  [ ".js" ],
-    "excludeFiles":    [ "./node_modules/**" ],
+    "fileExtensions":   [ ".js" ],
+    "excludeFiles":     [ "./node_modules/**",
+                          "./bin",
+                          "./deps",
+                          "./docs",
+                          "./examples",
+                          "./cover_html"
+                        ],
 
     // general rules
     "safeContextKeyword": [ "self" ],
@@ -10,7 +16,6 @@
         "escape": true,
         "mark": "'"
     },
-    "requireLineFeedAtFileEnd": true,
 
     // alignment rules
     "maximumLineLength": {
@@ -20,6 +25,9 @@
         "allowRegex": true
     },
     "validateIndentation": 4,
+
+    // newline on EOF
+    "requireLineFeedAtFileEnd": true,
 
     // disallow rules
     "disallowImplicitTypeConversion": [
@@ -35,9 +43,6 @@
     "disallowQuotedKeysInObjects": true,
     "disallowSpaceAfterPrefixUnaryOperators": true,
     "disallowSpaceBeforePostfixUnaryOperators": true,
-    "disallowSpacesInFunction": {
-        "beforeOpeningRoundBrace": true
-    },
     "disallowSpacesInCallExpression": true,
     "disallowTrailingComma": true,
     "disallowTrailingWhitespace": true,
@@ -45,7 +50,8 @@
 
     // require rules
     "requireBlocksOnNewline": true,
-    "requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties",
+    // TODO: come back to this rule after we normalize code base
+    // "requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties",
     "requireCapitalizedConstructors": true,
     "requireCurlyBraces": [
         "if",
@@ -70,22 +76,7 @@
     ],
     "requireSemicolons": true,
     "requireSpaceAfterBinaryOperators": true,
-    "requireSpaceAfterKeywords": [
-        "do",
-        "for",
-        "if",
-        "else",
-        "switch",
-        "case",
-        "try",
-        "catch",
-        "while",
-        "return",
-        "typeof",
-        "delete",
-        "new",
-        "void"
-    ],
+    "requireSpaceAfterKeywords": true,
     "requireSpaceBeforeBinaryOperators": true,
     "requireSpaceBeforeBlockStatements": true,
     "requireSpaceBeforeKeywords": [
@@ -94,10 +85,12 @@
         "catch"
     ],
     "requireSpaceBetweenArguments": true,
+    "requireSpacesInAnonymousFunctionExpression": {
+        "beforeOpeningRoundBrace": true
+    },
     "requireSpacesInConditionalExpression": true,
     "requireSpacesInForStatement": true,
     "requireSpacesInFunction": {
         "beforeOpeningCurlyBrace": true
     }
 }
-
