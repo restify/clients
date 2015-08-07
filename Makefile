@@ -1,20 +1,21 @@
 #
 # Directories
 #
-NODE_MODULES   := './node_modules'
+ROOT           := $(shell pwd)
+NODE_MODULES   := $(ROOT)/node_modules
 NODE_BIN       := $(NODE_MODULES)/.bin
 
 
 #
 # Tools and binaries
 #
-ESLINT		:= $(NODE_BIN)/eslint
-JSCS		:= $(NODE_BIN)/jscs
+ESLINT      := $(NODE_BIN)/eslint
+JSCS        := $(NODE_BIN)/jscs
 MOCHA       := $(NODE_BIN)/mocha
 _MOCHA      := $(NODE_BIN)/_mocha
 ISTANBUL    := $(NODE_BIN)/istanbul
 COVERALLS   := $(NODE_BIN)/coveralls
-NPM		    := npm
+NPM         := npm
 
 
 #
@@ -22,10 +23,10 @@ NPM		    := npm
 #
 GIT_HOOK_SRC   = '../../tools/githooks/pre-push'
 GIT_HOOK_DEST  = '.git/hooks/pre-push'
-LIB_FILES  	   = './lib'
-TEST_FILES     = './test'
-COVERAGE_FILES = './coverage'
-LCOV           = './coverage/lcov.info'
+LIB_FILES  	   = $(ROOT)/lib
+TEST_FILES     = $(ROOT)/test
+COVERAGE_FILES = $(ROOT)/coverage
+LCOV           = $(ROOT)/coverage/lcov.info
 
 
 #
@@ -48,17 +49,17 @@ githooks:
 
 
 .PHONY: lint
-lint: node_modules
+lint: node_modules $(LIB_FILES) $(TEST_FILES)
 	$(ESLINT) $(LIB_FILES) $(TEST_FILES)
 
 
 .PHONY: codestyle
-codestyle: node_modules
+codestyle: node_modules $(LIB_FILES) $(TEST_FILES)
 	$(JSCS) $(LIB_FILES) $(TEST_FILES)
 
 
 .PHONY: codestyle-fix
-codestyle-fix: node_modules
+codestyle-fix: node_modules $(LIB_FILES) $(TEST_FILES)
 	$(JSCS) $(LIB_FILES) $(TEST_FILES) --fix
 
 
@@ -72,12 +73,12 @@ test: node_modules
 
 
 .PHONY: coverage
-coverage: node_modules clean-coverage
+coverage: node_modules clean-coverage $(LIB_FILES) $(TEST_FILES)
 	$(ISTANBUL) cover $(_MOCHA) --report lcovonly -- -R spec
 
 
 .PHONY: report-coverage
-report: coverage
+report-coverage: coverage
 	@cat $(LCOV) | $(COVERALLS)
 
 
@@ -94,4 +95,5 @@ clean: clean-coverage
 #
 ## Debug -- print out a a variable via `make print-FOO`
 #
-#print-%  : ; @echo $* = $($*)
+print-%  : ; @echo $* = $($*)
+
