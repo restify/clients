@@ -49,6 +49,7 @@
     "jscs": "^1.13.1",
     "mkdirp": "^0.5.1",
     "mocha": "^2.2.5",
+    "nock": "^2.10.0",
     "restify": "git+https://git@github.com/restify/node-restify.git#master"
   },
   "dependencies": {
