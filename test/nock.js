@@ -8,33 +8,34 @@ var assert = require('chai').assert;
 var nock;
 var clients = require('../lib');
 
-///--- Globals
-
-var PORT = process.env.UNIT_TEST_PORT || 0;
 
 ///--- Tests
 
 describe('restify-client tests against nock', function () {
     before(function () {
-      // Lazy initialization of nock, as it otherwise interferes with the regular tests
-      nock = require('nock');
+        // Lazy initialization of nock, as it otherwise interferes with the
+        // regular tests
+        nock = require('nock');
     });
 
     after(function () {
-      nock.restore();
+        nock.restore();
     });
 
     it('sign the request made against nock', function (done) {
         var signFunction = function (request) {
-          request.setHeader('X-Awesome-Signature', 'ken sent me');
+            request.setHeader('X-Awesome-Signature', 'ken sent me');
         };
 
-        var nockContext = nock('http://127.0.0.1', {allowUnmocked: true})
+        nock('http://127.0.0.1', {allowUnmocked: true})
             .filteringRequestBody(/.*/, '*')
             .get('/nock')
             .reply(200, function (uri, requestBody) {
-              assert.equal(this.req.headers['x-awesome-signature'], 'ken sent me',
-                          'signature header was missing from the request');
+                assert.equal(
+                    this.req.headers['x-awesome-signature'],
+                    'ken sent me',
+                    'signature header was missing from the request'
+                );
             });
 
         var client = clients.createJsonClient({
