@@ -6,6 +6,7 @@
 [![Dependency Status](https://david-dm.org/restify/clients.svg)](https://david-dm.org/restify/clients)
 [![devDependency Status](https://david-dm.org/restify/clients/dev-status.svg)](https://david-dm.org/restify/clients#info=devDependencies)
 [![bitHound Score](https://www.bithound.io/github/restify/clients/badges/score.svg)](https://www.bithound.io/github/restify/clients/master)
+[![NSP Status](https://img.shields.io/badge/NSP%20status-vulnerabilities%20found-red.svg)](https://travis-ci.org/restify/clients)
 
 > HttpClient, StringClient, and JsonClient extracted from restify
 
