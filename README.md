@@ -1,6 +1,6 @@
 # restify-clients
 
-<!-- [![NPM Version](https://img.shields.io/npm/v/errors.svg)](https://npmjs.org/package/errors) -->
+[![NPM Version](https://img.shields.io/npm/v/restify-clients.svg)](https://npmjs.org/package/restify-clients)
 [![Build Status](https://travis-ci.org/restify/clients.svg?branch=master)](https://travis-ci.org/restify/clients)
 [![Coverage Status](https://coveralls.io/repos/restify/clients/badge.svg?branch=master)](https://coveralls.io/r/restify/clients?branch=master)
 [![Dependency Status](https://david-dm.org/restify/clients.svg)](https://david-dm.org/restify/clients)
