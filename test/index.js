@@ -232,7 +232,7 @@ describe('restify-client tests', function () {
 
     it('GET json', function (done) {
         JSON_CLIENT.get('/json/mcavage', function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.deepEqual(obj, {hello: 'mcavage'});
@@ -247,7 +247,7 @@ describe('restify-client tests', function () {
                              'testCallback({"hello":"jsonp"});';
 
         JSON_CLIENT.get(jsonpUrl, function (err, req, res) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.equal(res.body, expectedResult);
@@ -257,7 +257,7 @@ describe('restify-client tests', function () {
 
     it('GH-388 GET json, but really HTML', function (done) {
         JSON_CLIENT.get('/json/boom', function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.deepEqual(obj, {});
@@ -301,7 +301,7 @@ describe('restify-client tests', function () {
 
     it('HEAD json', function (done) {
         JSON_CLIENT.head('/json/mcavage', function (err, req, res) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             done();
@@ -312,7 +312,7 @@ describe('restify-client tests', function () {
     it('POST json', function (done) {
         var data = { hello: 'foo' };
         JSON_CLIENT.post('/json/mcavage', data, function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.deepEqual(obj, {hello: 'foo'});
@@ -324,7 +324,7 @@ describe('restify-client tests', function () {
     it('POST json empty body object', function (done) {
         var data = {};
         JSON_CLIENT.post('/json/mcavage', data, function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.deepEqual(obj, {hello: 'mcavage'});
@@ -336,7 +336,7 @@ describe('restify-client tests', function () {
     it('PUT json', function (done) {
         var data = { hello: 'foo' };
         JSON_CLIENT.put('/json/mcavage', data, function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.deepEqual(obj, {hello: 'foo'});
@@ -348,7 +348,7 @@ describe('restify-client tests', function () {
     it('PATCH json', function (done) {
         var data = { hello: 'foo' };
         JSON_CLIENT.patch('/json/mcavage', data, function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.deepEqual(obj, {hello: 'foo'});
@@ -359,7 +359,7 @@ describe('restify-client tests', function () {
 
     it('GH-800 GET json 0', function (done) {
         JSON_CLIENT.get('/json/zero', function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.deepEqual(obj, {});
@@ -371,7 +371,7 @@ describe('restify-client tests', function () {
 
     it('GH-800 GET json false', function (done) {
         JSON_CLIENT.get('/json/false', function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.deepEqual(obj, {});
@@ -383,7 +383,7 @@ describe('restify-client tests', function () {
 
     it('GH-800 GET json null', function (done) {
         JSON_CLIENT.get('/json/null', function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.deepEqual(obj, {});
@@ -395,7 +395,7 @@ describe('restify-client tests', function () {
 
     it('GET text', function (done) {
         STR_CLIENT.get('/str/mcavage', function (err, req, res, data) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.equal(res.body, data);
@@ -412,7 +412,7 @@ describe('restify-client tests', function () {
             }
         };
         STR_CLIENT.get(opts, function (err, req, res, data) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.equal(res.body, data);
@@ -424,7 +424,7 @@ describe('restify-client tests', function () {
 
     it('HEAD text', function (done) {
         STR_CLIENT.head('/str/mcavage', function (err, req, res) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             done();
@@ -447,7 +447,7 @@ describe('restify-client tests', function () {
     it('POST text', function (done) {
         var body = 'hello=foo';
         STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.equal(res.body, data);
@@ -460,7 +460,7 @@ describe('restify-client tests', function () {
     it('PATCH text', function (done) {
         var body = 'hello=foo';
         STR_CLIENT.patch('/str/mcavage', body, function (err, req, res, data) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.equal(res.body, data);
@@ -473,7 +473,7 @@ describe('restify-client tests', function () {
     it('POST text (object)', function (done) {
         var body = {hello: 'foo'};
         STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.equal(res.body, data);
@@ -486,7 +486,7 @@ describe('restify-client tests', function () {
     it('POST text empty body string', function (done) {
         var body = '';
         STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.equal(res.body, data);
@@ -499,7 +499,7 @@ describe('restify-client tests', function () {
     it('POST text null body', function (done) {
         var body = null;
         STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.equal(res.body, data);
@@ -512,7 +512,7 @@ describe('restify-client tests', function () {
     it('POST text empty body object', function (done) {
         var body = {};
         STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.equal(res.body, data);
@@ -525,7 +525,7 @@ describe('restify-client tests', function () {
     it('PUT text', function (done) {
         var body = 'hello=foo';
         STR_CLIENT.put('/str/mcavage', body, function (err, req, res, data) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.equal(res.body, data);
@@ -537,7 +537,7 @@ describe('restify-client tests', function () {
     it('PUT text empty body string', function (done) {
         var body = '';
         STR_CLIENT.put('/str/mcavage', body, function (err, req, res, data) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.equal(res.body, data);
@@ -548,7 +548,7 @@ describe('restify-client tests', function () {
 
     it('DELETE text', function (done) {
         STR_CLIENT.del('/str/mcavage', function (err, req, res) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             done();
@@ -564,7 +564,7 @@ describe('restify-client tests', function () {
         };
 
         STR_CLIENT.del(opts, function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.deepEqual(obj, 'Allowed');
@@ -574,11 +574,11 @@ describe('restify-client tests', function () {
 
     it('GET raw', function (done) {
         RAW_CLIENT.get('/str/mcavage', function (connectErr, req) {
-            assert.notOk(connectErr);
+            assert.ifError(connectErr);
             assert.ok(req);
 
             req.on('result', function (err, res) {
-                assert.notOk(err);
+                assert.ifError(err);
                 res.body = '';
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
@@ -602,13 +602,13 @@ describe('restify-client tests', function () {
             }
         };
         RAW_CLIENT.post(opts, function (connectErr, req) {
-            assert.notOk(connectErr);
+            assert.ifError(connectErr);
 
             req.write('hello=snoopy');
             req.end();
 
             req.on('result', function (err, res) {
-                assert.notOk(err);
+                assert.ifError(err);
                 res.body = '';
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
@@ -629,7 +629,7 @@ describe('restify-client tests', function () {
             agent: false
         };
         RAW_CLIENT.get(opts, function (err, req, res) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.notStrictEqual(req.agent, RAW_CLIENT.agent,
                 'request should not use client agent');
             done();
@@ -746,7 +746,7 @@ describe('restify-client tests', function () {
         };
 
         JSON_CLIENT.put('/json/md5', msg, function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             done();
@@ -756,7 +756,7 @@ describe('restify-client tests', function () {
 
     it('GH-203 GET json, body is whitespace', function (done) {
         JSON_CLIENT.get('/whitespace/spaces', function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.deepEqual(obj, {});
@@ -767,7 +767,7 @@ describe('restify-client tests', function () {
 
     it('GH-203 GET json, body is tabs', function (done) {
         JSON_CLIENT.get('/whitespace/tabs', function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
             assert.deepEqual(obj, {});
@@ -785,7 +785,7 @@ describe('restify-client tests', function () {
             agent: false
         });
         client.get('/signed', function (err, req, res, data) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(data);
             assert.equal(data, 'request NOT signed');
             done();
@@ -819,7 +819,7 @@ describe('restify-client tests', function () {
             agent: false
         });
         client.get('/signed', function (err, req, res, data) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.ok(data);
             assert.equal(called, 1);
             assert.equal(data, 'ok: Gusty Winds May Exist');
@@ -878,7 +878,7 @@ describe('restify-client tests', function () {
         }, 2050);
 
         client.get('/ping', function (err, req, res, body) {
-            assert.notOk(err);
+            assert.ifError(err);
             clearTimeout(timeout);
             assert.equal(body, 'pong');
             client.close();
@@ -893,7 +893,7 @@ describe('restify-client tests', function () {
         client.agent = false;
 
         client.get('/json/mcavage', function (err, req, res, obj) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.deepEqual(obj, {hello: 'mcavage'});
             done();
         });
@@ -905,7 +905,7 @@ describe('restify-client tests', function () {
         client.agent = false;
 
         client.get('/str/mcavage', function (err, req, res, data) {
-            assert.notOk(err);
+            assert.ifError(err);
             assert.equal(data, 'hello mcavage');
             done();
         });
@@ -917,10 +917,10 @@ describe('restify-client tests', function () {
         client.agent = false;
 
         client.get('/str/mcavage', function (err, req) {
-            assert.notOk(err);
+            assert.ifError(err);
 
             req.on('result', function (err2, res) {
-                assert.notOk(err2);
+                assert.ifError(err2);
                 res.body = '';
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
@@ -941,9 +941,9 @@ describe('restify-client tests', function () {
         client.agent = false;
 
         client.get('/str/mcavage', function (err, req) {
-            assert.notOk(err);
+            assert.ifError(err);
             req.on('result', function (err2, res) {
-                assert.notOk(err2);
+                assert.ifError(err2);
                 res.body = '';
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
