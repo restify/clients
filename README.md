@@ -124,21 +124,22 @@ it will be an `HttpError`.
       version: '*'
     });
 
-Options:
+### API Options:
 
-||**Name**||**Type**||**Description**||
-||accept||String||Accept header to send||
-||connectTimeout||Number||Amount of time to wait for a socket||
-||requestTimeout||Number||Amount of time to wait for the request to finish||
-||dtrace||Object||node-dtrace-provider handle||
-||gzip||Object||Will compress data when sent using `content-encoding: gzip`||
-||headers||Object||HTTP headers to set in all requests||
-||log||Object||[bunyan](https://github.com/trentm/node-bunyan) instance||
-||retry||Object||options to provide to node-retry;"false" disables retry; defaults to 4 retries||
-||signRequest||Function||synchronous callback for interposing headers before request is sent||
-||url||String||Fully-qualified URL to connect to||
-||userAgent||String||user-agent string to use; restify inserts one, but you can override it||
-||version||String||semver string to set the accept-version||
+|Name  | Type   | Description |
+| :--- | :----: | :---- |
+|accept|String|Accept header to send|
+|connectTimeout|Number|Amount of time to wait for a socket|
+|requestTimeout|Number|Amount of time to wait for the request to finish|
+|dtrace|Object|node-dtrace-provider handle|
+|gzip|Object|Will compress data when sent using `content-encoding: gzip`|
+|headers|Object|HTTP headers to set in all requests|
+|log|Object|[bunyan](https://github.com/trentm/node-bunyan) instance|
+|retry|Object|options to provide to node-retry;"false" disables retry; defaults to 4 retries|
+|signRequest|Function|synchronous callback for interposing headers before request is sent|
+|url|String|Fully-qualified URL to connect to|
+|userAgent|String|user-agent string to use; restify inserts one, but you can override it|
+|version|String|semver string to set the accept-version|
 
 #### get(path, callback)
 
