@@ -13,6 +13,8 @@ var uuid   = require('node-uuid');
 
 var restify = require('restify');
 var clients = require('../lib');
+var auditor = require('../lib/helpers/auditor');
+var pkgJson = require('../package');
 
 ///--- Globals
 
@@ -899,6 +901,62 @@ describe('restify-client tests', function () {
         });
     });
 
+    it('create JSON client with auditor on', function (done) {
+
+        // Bunyan stream to capture the logs.
+        function CapturingStream(recs) {
+
+            this.entries = recs;
+        }
+
+        // Capture the bunyan logs as of
+        // https://github.com/trentm/node-bunyan/blob/master/test/raw-stream.test.js#L19-L24
+        CapturingStream.prototype.checkEntriesTest = function checkEntriesTest() {
+
+            assert.equal(this.entries.length, 1);
+        };
+
+        // The write method to add log entries
+        CapturingStream.prototype.write = function write(rec) {
+
+            this.entries.push(rec);
+        };
+
+        // Instances of the log entries and the capturing stream
+        var logEntries = [];
+        var streamConfig = {
+            name: 'capturingStream',
+            level: 'info',
+            stream: new CapturingStream(logEntries),
+            type: 'raw',
+        };
+
+        // the logger instance
+        var logger = bunyan.createLogger({
+            url: 'http://127.0.0.1:' + PORT,
+            name: 'http-json-client',
+              streams: [streamConfig]
+        });
+
+        var httpClientOpts = {
+            userAgent: pkgJson.name + "/" + pkgJson.version,
+            auditor: auditor,
+            log: logger,
+            retry: false
+        };
+
+        var client = clients.createJsonClient(httpClientOpts);
+        client.agent = false;
+
+        client.get('/json/mcavage', function (err, req, res, obj) {
+            err
+            //assert.ok(req);
+            //assert.ok(res);
+
+            // The verification is done in the CapturingStream.checkEntriesTest()
+            done();
+        });
+    });
 
     it('create string client with url instead of opts', function (done) {
         var client = clients.createStringClient('http://127.0.0.1:' + PORT);
