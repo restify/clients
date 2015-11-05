@@ -50,8 +50,8 @@
     "mkdirp": "^0.5.1",
     "mocha": "^2.3.0",
     "nock": "^2.10.0",
+    "nsp": "^2.0.1",
     "restify": "^4.0.3"
-    "nsp": "^1.1.0"
   },
   "dependencies": {
     "assert-plus": "^0.1.5",
