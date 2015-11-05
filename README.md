@@ -1,11 +1,12 @@
 # restify-clients
 
-<!-- [![NPM Version](https://img.shields.io/npm/v/errors.svg)](https://npmjs.org/package/errors) -->
+[![NPM Version](https://img.shields.io/npm/v/restify-clients.svg)](https://npmjs.org/package/restify-clients)
 [![Build Status](https://travis-ci.org/restify/clients.svg?branch=master)](https://travis-ci.org/restify/clients)
 [![Coverage Status](https://coveralls.io/repos/restify/clients/badge.svg?branch=master)](https://coveralls.io/r/restify/clients?branch=master)
 [![Dependency Status](https://david-dm.org/restify/clients.svg)](https://david-dm.org/restify/clients)
 [![devDependency Status](https://david-dm.org/restify/clients/dev-status.svg)](https://david-dm.org/restify/clients#info=devDependencies)
 [![bitHound Score](https://www.bithound.io/github/restify/clients/badges/score.svg)](https://www.bithound.io/github/restify/clients/master)
+[![NSP Status](https://img.shields.io/badge/NSP%20status-vulnerabilities%20found-red.svg)](https://travis-ci.org/restify/clients)
 
 > HttpClient, StringClient, and JsonClient extracted from restify
 
