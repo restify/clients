@@ -53,23 +53,23 @@ githooks:
 
 .PHONY: lint
 lint: node_modules $(LIB_FILES) $(TEST_FILES)
-	$(ESLINT) $(LIB_FILES) $(TEST_FILES)
+	@$(ESLINT) $(LIB_FILES) $(TEST_FILES)
 
 
 .PHONY: codestyle
 codestyle: node_modules $(LIB_FILES) $(TEST_FILES)
-	$(JSCS) $(LIB_FILES) $(TEST_FILES)
+	@$(JSCS) $(LIB_FILES) $(TEST_FILES)
 
 
 .PHONY: codestyle-fix
 codestyle-fix: node_modules $(LIB_FILES) $(TEST_FILES)
-	$(JSCS) $(LIB_FILES) $(TEST_FILES) --fix
+	@$(JSCS) $(LIB_FILES) $(TEST_FILES) --fix
 
 
 .PHONY: nsp
 nsp: node_modules $(NSP)
 	$(NPM) shrinkwrap --dev
-	($(NSP) audit-shrinkwrap || echo 1) | $(NSP_BADGE)
+	@($(NSP) check || echo 1) | $(NSP_BADGE)
 	@rm $(SHRINKWRAP)
 
 
@@ -79,12 +79,12 @@ prepush: node_modules lint codestyle test
 
 .PHONY: test
 test: node_modules
-	$(MOCHA) -R spec
+	@$(MOCHA) -R spec --full-trace
 
 
 .PHONY: coverage
 coverage: node_modules clean-coverage $(LIB_FILES) $(TEST_FILES)
-	$(ISTANBUL) cover $(_MOCHA) --report lcovonly -- -R spec
+	@$(ISTANBUL) cover $(_MOCHA) --report lcovonly -- -R spec
 
 
 .PHONY: report-coverage
