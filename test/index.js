@@ -52,6 +52,12 @@ function sendText(req, res, next) {
     next();
 }
 
+function sendRedirect(req, res, next) {
+    var statusCode = parseInt(req.params.status_code);
+    var path = '/' + req.params.path;
+    res.redirect(statusCode, path, next);
+}
+
 function sendSignature(req, res, next) {
     res.header('content-type', 'text/plain');
     var hdr = req.header('Awesome-Signature');
@@ -171,14 +177,26 @@ describe('restify-client tests', function () {
             SERVER.put('/json/:name', sendJson);
             SERVER.post('/json/:name', sendJson);
             SERVER.patch('/json/:name', sendJson);
+            SERVER.del('/json/:name', sendJson);
+            SERVER.opts('/json/:name', sendJson);
 
             SERVER.get('/str/request_timeout', requestThatTimesOut);
+
             SERVER.del('/str/:name', sendText);
             SERVER.get('/str/:name', sendText);
             SERVER.head('/str/:name', sendText);
             SERVER.put('/str/:name', sendText);
             SERVER.post('/str/:name', sendText);
             SERVER.patch('/str/:name', sendText);
+            SERVER.opts('/str/:name', sendText);
+
+            SERVER.get('/redirect/:status_code/:path', sendRedirect);
+            SERVER.head('/redirect/:status_code/:path', sendRedirect);
+            SERVER.post('/redirect/:status_code/:path', sendRedirect);
+            SERVER.put('/redirect/:status_code/:path', sendRedirect);
+            SERVER.patch('/redirect/:status_code/:path', sendRedirect);
+            SERVER.del('/redirect/:status_code/:path', sendRedirect);
+            SERVER.opts('/redirect/:status_code/:path', sendRedirect);
 
             SERVER.listen(PORT, '127.0.0.1', function () {
                 PORT = SERVER.address().port;
@@ -186,12 +204,14 @@ describe('restify-client tests', function () {
                 JSON_CLIENT = clients.createJsonClient({
                     url: 'http://127.0.0.1:' + PORT,
                     dtrace: dtrace,
-                    retry: false
+                    retry: false,
+                    followRedirects: true
                 });
                 STR_CLIENT = clients.createStringClient({
                     url: 'http://127.0.0.1:' + PORT,
                     dtrace: dtrace,
-                    retry: false
+                    retry: false,
+                    followRedirects: true
                 });
                 RAW_CLIENT = clients.createClient({
                     url: 'http://127.0.0.1:' + PORT,
@@ -995,5 +1015,200 @@ describe('restify-client tests', function () {
             process.env.https_proxy = origProxy;
         }
         process.env.NO_PROXY = origNoProxy;
+    });
+
+    function build302RedirectUrl(numOfRedirects, targetUrl) {
+        var url = targetUrl;
+
+        for (var i = 0; i < numOfRedirects; i++) {
+            url = 'redirect/302/' + encodeURIComponent(url);
+        }
+
+        return url;
+    }
+
+    it('should respect default (5) maxRedirects', function (done) {
+        var url = '/' + build302RedirectUrl(6, 'str/mcavage');
+        STR_CLIENT.get(url, function (err, req, res, data) {
+            assert.equal(err.name, 'TooManyRedirectsError');
+            done();
+        });
+    });
+
+    it('should respect custom maxRedirects', function (done) {
+        var client = clients.createStringClient({
+            url: 'http://127.0.0.1:' + PORT,
+            dtrace: dtrace,
+            retry: false,
+            followRedirects: true,
+            maxRedirects: 2
+        });
+        var url = '/' + build302RedirectUrl(3, 'str/mcavage');
+
+        client.get(url, function (err, req, res, data) {
+            assert.equal(err.name, 'TooManyRedirectsError');
+            client.close();
+            done();
+        });
+    });
+
+    /* 301 and 302 works like 303 for compatibility reasons */
+    describe('follow 301/302/303 redirects', function () {
+        var codes = [301, 302, 303];
+        var readMethods = ['get', 'opts', 'del'];
+        var writeMethods = ['post', 'put', 'patch'];
+
+        codes.forEach(function (code) {
+            readMethods.forEach(function (method) {
+                var testTitle = method.toUpperCase() + ' ' + code + ' ';
+
+                it(testTitle + ' text', function (done) {
+                    STR_CLIENT[method]('/redirect/' + code + '/str%2Fmcavage', function (err, req, res, data) {
+                        assert.ifError(err);
+                        assert.ok(req);
+                        assert.ok(res);
+                        assert.equal(res.body, data);
+                        assert.equal(data, 'hello mcavage');
+                        done();
+                    });
+                });
+
+                it(testTitle + ' json', function (done) {
+                    JSON_CLIENT[method]('/redirect/' + code + '/json%2Fmcavage', function (err, req, res, obj) {
+                        assert.ifError(err);
+                        assert.ok(req);
+                        assert.ok(res);
+                        assert.deepEqual(obj, {hello: 'mcavage'});
+                        done();
+                    });
+                });
+            });
+
+            writeMethods.forEach(function (method) {
+                var testTitle = method.toUpperCase() + ' ' + code + ' ';
+
+                it(testTitle + ' text', function (done) {
+                    var body = 'hello=foo';
+                    STR_CLIENT[method]('/redirect/' + code + '/str%2Fmcavage', body, function (err, req, res, data) {
+                        assert.ifError(err);
+                        assert.ok(req);
+                        assert.ok(res);
+                        assert.equal(res.body, data);
+                        assert.equal(data, 'hello mcavage');
+                        done();
+                    });
+                });
+
+                it(testTitle + ' json', function (done) {
+                    var data = { hello: 'foo' };
+                    JSON_CLIENT[method]('/redirect/' + code + '/json%2Fmcavage', data, function (err, req, res, obj) {
+                        assert.ifError(err);
+                        assert.ok(req);
+                        assert.ok(res);
+                        assert.deepEqual(obj, {hello: 'mcavage'});
+                        done();
+                    });
+                });
+            });
+
+            // do not assert body on head requests
+            it('HEAD ' + code + ' text', function (done) {
+                STR_CLIENT.head('/redirect/' + code + '/str%2Fmcavage', function (err, req, res, data) {
+                    assert.ifError(err);
+                    assert.ok(req);
+                    assert.ok(res);
+                    assert.equal(200, res.statusCode);
+                    done();
+                });
+            });
+
+            it('HEAD ' + code + ' json', function (done) {
+                JSON_CLIENT.head('/redirect/' + code + '/json%2Fmcavage', function (err, req, res, data) {
+                    assert.ifError(err);
+                    assert.ok(req);
+                    assert.ok(res);
+                    assert.equal(200, res.statusCode);
+                    done();
+                });
+            });
+        });
+    });
+
+    describe('follow 307 redirects', function () {
+        var readMethods = ['get', 'opts', 'del'];
+        var writeMethods = ['post', 'put', 'patch'];
+
+        readMethods.forEach(function (method) {
+            var testTitle = method.toUpperCase() + ' 307 ';
+
+            it(testTitle + ' text', function (done) {
+                STR_CLIENT[method]('/redirect/307/str%2Fmcavage', function (err, req, res, data) {
+                    assert.ifError(err);
+                    assert.ok(req);
+                    assert.ok(res);
+                    assert.equal(res.body, data);
+                    assert.equal(data, 'hello mcavage');
+                    done();
+                });
+            });
+
+            it(testTitle + ' json', function (done) {
+                JSON_CLIENT[method]('/redirect/307/json%2Fmcavage', function (err, req, res, obj) {
+                    assert.ifError(err);
+                    assert.ok(req);
+                    assert.ok(res);
+                    assert.deepEqual(obj, {hello: 'mcavage'});
+                    done();
+                });
+            });
+        });
+
+        writeMethods.forEach(function (method) {
+            var testTitle = method.toUpperCase() + ' 307 ';
+
+            it(testTitle + ' text', function (done) {
+                var body = 'hello=foo';
+                STR_CLIENT[method]('/redirect/307/str%2Fmcavage', body, function (err, req, res, data) {
+                    assert.ifError(err);
+                    assert.ok(req);
+                    assert.ok(res);
+                    assert.equal(res.body, data);
+                    assert.equal(data, 'hello foo');
+                    done();
+                });
+            });
+
+            it(testTitle + ' json', function (done) {
+                var data = { hello: 'foo' };
+                JSON_CLIENT[method]('/redirect/307/json%2Fmcavage', data, function (err, req, res, obj) {
+                    assert.ifError(err);
+                    assert.ok(req);
+                    assert.ok(res);
+                    assert.deepEqual(obj, {hello: 'foo'});
+                    done();
+                });
+            });
+        });
+
+        // do not assert body on head requests
+        it('HEAD 307 text', function (done) {
+            STR_CLIENT.head('/redirect/307/str%2Fmcavage', function (err, req, res, data) {
+                assert.ifError(err);
+                assert.ok(req);
+                assert.ok(res);
+                assert.equal(200, res.statusCode);
+                done();
+            });
+        });
+
+        it('HEAD 307 json', function (done) {
+            JSON_CLIENT.head('/redirect/307/json%2Fmcavage', function (err, req, res, data) {
+                assert.ifError(err);
+                assert.ok(req);
+                assert.ok(res);
+                assert.equal(200, res.statusCode);
+                done();
+            });
+        });
     });
 });
