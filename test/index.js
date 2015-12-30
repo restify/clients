@@ -53,7 +53,7 @@ function sendText(req, res, next) {
 }
 
 function sendRedirect(req, res, next) {
-    var statusCode = parseInt(req.params.status_code);
+    var statusCode = parseInt(req.params.status_code, 10);
     var path = '/' + req.params.path;
     res.redirect(statusCode, path, next);
 }
