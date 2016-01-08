@@ -130,6 +130,8 @@ it will be an `HttpError`.
 |Name  | Type   | Description |
 | :--- | :----: | :---- |
 |accept|String|Accept header to send|
+|audit|Boolean|Enable Audit logging|
+|auditor|Function|Function for Audit logging|
 |connectTimeout|Number|Amount of time to wait for a socket|
 |requestTimeout|Number|Amount of time to wait for the request to finish|
 |dtrace|Object|node-dtrace-provider handle|
