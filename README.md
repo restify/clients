@@ -143,6 +143,8 @@ it will be an `HttpError`.
 |url|String|Fully-qualified URL to connect to|
 |userAgent|String|user-agent string to use; restify inserts one, but you can override it|
 |version|String|semver string to set the accept-version|
+|followRedirects|Boolean|Follow redirects from server|
+|maxRedirects|Number|Maximum number of redirects to follow|
 
 #### get(path, callback)
 
