@@ -74,7 +74,7 @@ nsp: node_modules $(NSP)
 
 
 .PHONY: prepush
-prepush: node_modules lint codestyle test
+prepush: node_modules lint codestyle test versioncheck
 
 
 .PHONY: test
@@ -102,8 +102,20 @@ clean: clean-coverage
 	@rm -rf $(NODE_MODULES)
 
 
+# Ensure CHANGES.md and package.json have the same version.
+.PHONY: versioncheck
+versioncheck:
+	@echo version is: $(shell ./node_modules/.bin/json -f package.json version)
+	[[ `./node_modules/.bin/json -f package.json version` \
+		== `grep '^## ' CHANGES.md | head -1 | awk '{print $$2}'` ]]
+
+.PHONY: cutarelease
+cutarelease: versioncheck
+	[[ `git status | tail -n1` == "nothing to commit, working directory clean" ]]
+	./tools/cutarelease.py -p restify-clients -f package.json
+
+
 #
 ## Debug -- print out a a variable via `make print-FOO`
 #
 print-%  : ; @echo $* = $($*)
-
