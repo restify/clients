@@ -1,5 +1,10 @@
 # restify-clients Changelog
 
+## 1.3.1 (not yet released)
+
+(nothing yet)
+
+
 ## 1.3.0
 
 - #65 Export `require('restify-clients').bunyan.serializers` for use in
