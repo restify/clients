@@ -1,6 +1,6 @@
 # restify-clients Changelog
 
-## 1.3.0 (not yet released)
+## 1.3.0
 
 - #65 Export `require('restify-clients').bunyan.serializers` for use in
   creating the Bunyan logger to pass a client constructor.
