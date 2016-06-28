@@ -8,6 +8,7 @@
   [Bunyan](https://github.com/trentm/node-bunyan) logger `log` has the
   serializers required by logging in this module. This fixes a regression
   from restify/node-restify#501.
+- #68 Fix 'make test' on node 6.x.
 
 ## 1.2.1 and earlier
 - #15 Add audit logger (Marcello de Sales)

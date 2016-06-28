@@ -9,6 +9,7 @@ var http = require('http');
 var assert = require('chai').assert;
 var bunyan = require('bunyan');
 var crypto = require('crypto');
+var format = require('util').format;
 var uuid   = require('node-uuid');
 
 var restify = require('restify');
@@ -299,8 +300,9 @@ describe('restify-client tests', function () {
         } catch (err) {
             assert.ok(err);
             assert.equal(err.constructor, TypeError);
-            assert.equal(err.message,
-                'Request path contains unescaped characters.');
+            var errMsgRe = /^Request path contains unescaped characters\.?$/;
+            assert.ok(errMsgRe.test(err.message),
+                format('error message matches %s: %j', errMsgRe, err.message));
             done();
         }
     });
