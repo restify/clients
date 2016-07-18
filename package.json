@@ -67,7 +67,7 @@
     "mime": "^1.3.4",
     "node-uuid": "^1.4.3",
     "once": "^1.3.2",
-    "restify-errors": "^3.0.0",
+    "restify-errors": "^4.2.3",
     "semver": "^5.0.1",
     "tunnel-agent": "^0.4.0"
   }
