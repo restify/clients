@@ -114,6 +114,13 @@ function sendJsonNull(req, res, next) {
     next();
 }
 
+// sends back a body with the contents of the restify-clients-test-header received
+function sendTestHeader(req, res, next) {
+    res.header('content-type', 'json');
+    res.send(200, req.header('restify-clients-test-header', 'missing'));
+    next();
+}
+
 function getLog(name, stream, level) {
     return (bunyan.createLogger({
         level: (process.env.LOG_LEVEL || level || 'fatal'),
@@ -1269,6 +1276,128 @@ describe('restify-client tests', function () {
                 assert.equal(200, res.statusCode);
                 done();
             });
+        });
+    });
+
+    // Shows that the .before and .after functions are called for each client type.
+    describe('before/after hooks for .child()', function () {
+        var _clients = {
+            HttpClient: {
+                creator: clients.createHttpClient
+            }, JsonClient: {
+                creator: clients.createJsonClient
+            }, StringClient: {
+                creator: clients.createStringClient
+            }
+        };
+        var server = restify.createServer({});
+
+        function _getBody(clientType, req, data, cb) {
+            if (clientType === 'HttpClient') {
+                req.on('result', function (err, res) {
+                    var body = '';
+
+                    assert.ifError(err);
+
+                    res.setEncoding('utf8');
+                    res.on('data', function (chunk) {
+                        body += chunk;
+                    });
+
+                    res.on('end', function () {
+                        cb(body.replace(/"/g, ''));
+                    });
+                });
+            } else {
+                cb(data.replace(/"/g, ''));
+            }
+        }
+
+        before(function (callback) {
+            var url = 'http://127.0.0.1';
+
+            server.get('/testheader', sendTestHeader);
+            server.listen();
+            url = url + ':' + server.address().port;
+
+            // create the clients
+            Object.keys(_clients).forEach(function (clientName) {
+                var _client = _clients[clientName];
+                _client.handle = _client.creator({url: url});
+            });
+
+            callback();
+        });
+
+        Object.keys(_clients).forEach(function (clientName) {
+            var _client = _clients[clientName];
+
+            // .child() of {Http,Json,String}Client should be able to use .before and .after
+            it('request from ' + clientName + '.child()', function (done) {
+                var afterRan = false;
+                var beforeRan = false;
+                var childClient;
+
+                childClient = _client.handle.child({
+                    beforeSync: function (opts) {
+                        beforeRan = true;
+                        opts.headers['restify-clients-test-header'] = clientName;
+                    }, afterSync: function (err, req, res) {
+                        assert.ifError(err);
+                        afterRan = true;
+                    }
+                });
+
+                childClient.get('/testheader', function (err, req, res, data) {
+                    assert.ifError(err);
+                    _getBody(clientName, req, data, function (body) {
+                        assert.equal(body, clientName);
+                        assert.equal(beforeRan, true);
+                        assert.ok(afterRan, true);
+
+                        done();
+                    });
+                });
+            });
+
+            // non-child call should not have been modified
+            it('request from ' + clientName, function (done) {
+                _client.handle.get('/testheader', function (err, req, res, data) {
+                    assert.ifError(err);
+                    _getBody(clientName, req, data, function (body) {
+                        assert.equal(body, 'missing');
+                        done();
+                    });
+                });
+            });
+        });
+
+        it('ensure grandchild protection enabled', function (done) {
+            var child;
+
+            child = _clients.JsonClient.handle.child({
+                beforeSync: function (opts) {
+                    console.log('hello world');
+                }
+            });
+
+            assert.throws(function createGrandchild() {
+                child.child({
+                    beforeSync: function (opts) {
+                        console.log('hello hello world');
+                    }
+                });
+            }, /grandchildren not supported/);
+
+            done();
+        });
+
+        after(function (callback) {
+            Object.keys(_clients).forEach(function (clientName) {
+                _clients[clientName].handle.close();
+            });
+            server.close();
+            callback();
         });
     });
 });

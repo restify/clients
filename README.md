@@ -395,6 +395,155 @@ connection with a server.  For example, using the
       });
     });
 
+## Tracing with .child()
+
+This module allows the caller to create a "child" object of any of JsonClient,
+StringClient or HttpClient. To create a `child` object one does:
+
+    childClient = client.child(options);
+
+and uses `childClient` in place of `client`. The options supported are:
+
+|Name  | Type   | Description |
+| :--- | :----: | :---- |
+|afterSync|Function|Function for tracing (run after every request, after the client has received the response)|
+|beforeSync|Function|Function for tracing (run before every request)|
+
+where these hook functions (if passed) will be called before and/or after
+every client request with this child client. These are useful for integrating
+with a tracing framework such as [OpenTracing](http://opentracing.io/), as they
+allow passing in a closure such that all outgoing requests for a given trace can
+be tagged with the appropriate headers.
+
+If passed, the value of the `beforeSync` parameter should be a function with the
+following prototype:
+
+    function beforeSync(opts) {
+
+where `opts` is an object containing the options for the request. Some things
+you might want to do in this beforeSync function include:
+
+ * writing a trace log message indicating that you're making a request
+ * modifying opts.headers to include additional headers in the outbound request
+
+If passed, the value of the `afterSync` parameter should be a function with the
+following prototype:
+
+    function afterSync(err, req, res) {
+
+which takes an error object (if the request failed), and the
+[req](http://restify.com/#request-api) and
+[res](http://restify.com/#response-api) objects as defined in the restify
+documentation. The `afterSync` caller is most useful for logging the fact that a
+request completed and indicating errors or response details to a tracing
+system.
+
+A full example might be:
+
+    var clients = require('restify-clients');
+
+    var client = clients.createJsonClient({url: 'http://127.0.0.1:8080'});
+
+    var childClient1 = client.child({
+        beforeSync: function (opts) {
+            opts.headers['client-number'] = 1;
+        }, afterSync: function (err, req, res) {
+            console.error('code: %d', res.statusCode);
+        }
+    });
+
+    var childClient2 = client.child({
+        beforeSync: function (opts) {
+            opts.headers['client-number'] = 2;
+        }, afterSync: function (err, req, res) {
+            console.error('code: %d', res.statusCode);
+        }
+    });
+
+    // makes a `GET /hello` request with `client-number: 1` header
+    childClient1.get('/hello', function(err, req, res, obj) {
+        console.log('%j', obj);
+    });
+
+    // makes a `GET /hello` request with `client-number: 2` header
+    childClient2.get('/hello', function(err, req, res, obj) {
+        console.log('%j', obj);
+    });
+
+
+where the two clients will have the same base parameters but will include
+different 'client-number' headers in their requests and:
+
+    code: <HTTP status code>
+
+will be written to stderr as each request completes.
+
+The intention here is that you can use this to create a new client that wraps
+some additional information. Especially when you'd like a client to always add
+headers specific to that client. Another example using a restify server:
+
+    var clients = require('restify-clients');
+    var restify = require('restify');
+
+    var exampleClient = clients.createStringClient({url: 'http://0.0.0.0:8080'});
+    var server = restify.createServer({name: 'ExampleApp'});
+
+    server.use(function (req, res, next) {
+        // Add req.exampleClient to every req object so that handlers can use
+        // that as their client and not have to remember to add the request-id
+        // header themselves.
+        req.exampleClient = exampleClient.child({
+            beforeSync: function (opts) {
+                opts.headers['request-id'] = req.getId()
+            }
+        });
+        next();
+    });
+
+    server.get({
+        name: 'GetHello',
+        path: '/hello'
+    }, function (req, res, next) {
+        var client = req.exampleClient;
+
+        // This request will have the 'request-id: ...' header added which
+        // matches the *inbound* request we're handling, because the
+        // req.exampleClient was created here with a beforeSync() function that
+        // adds that to our request for us without modification to this client
+        // call.
+        client.get('/example', function (err, _req, _res, body) {
+            // ... handle results
+        });
+
+        next();
+    });
+
+    server.listen(function () {
+        console.log('listening at %s:%d', server.address().address,
+            server.address().port);
+    });
+
+This shows a restify server where any call to `/hello` results in a call to
+http://0.0.0.0:8080/example with a `request-id:` header added that matches the
+original request this handler is part of.
+
+### NOTES
+
+ * The beforeSync() and afterSync() functions are *sychronous*.
+
+ * It's not possible to call .child() on a client that's already a child.
+   Doing so will throw an assertion indicating that grandchildren are not
+   supported.
+
+ * Child connections will share the same agent and connection pool as the
+   parent object they were .child()ed from. This means only the parent should
+   call .close().
+
+
+## Contributing
+
+Add unit tests for any new or changed functionality. Ensure that lint and style
+
 
 ## Contributing
 
