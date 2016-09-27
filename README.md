@@ -145,6 +145,9 @@ it will be an `HttpError`.
 |version|String|semver string to set the accept-version|
 |followRedirects|Boolean|Follow redirects from server|
 |maxRedirects|Number|Maximum number of redirects to follow|
+|proxy|String|An HTTP proxy URL string (or parsed URL object) to use for requests. If not specified, then the `https_proxy` or `http_proxy` environment variables are used. Pass `proxy: false` to explicitly disable using a proxy (i.e. to ensure a proxy URL is not picked up from environment variables). See the [Proxy](#proxy) section below.|
+|noProxy|String|A comma-separated list of hosts for which to not use a proxy. If not specified, then then `NO_PROXY` environment variable is used. One can pass `noProxy: ''` to explicitly set this empty and ensure a possible environment variable is not used. See the [Proxy](#proxy) section below.|
+
 
 #### get(path, callback)
 
@@ -323,41 +326,66 @@ and note that `read` and `write` probably need to be overridden.
 
 #### Proxy
 
-There are several options for enabling a proxy for the
-http client. The following options are available to set a proxy url:
+A restify client can use an HTTP proxy, either via options to `createClient`
+or via the `http_proxy`, `https_proxy`, and `NO_PROXY` environment variables
+common in many tools (e.g., `curl`).
 
-    // Set the proxy option in the client configuration
     restify.createClient({
-        proxy: 'http://127.0.0.1'
+        proxy: <proxy url string or object>,
+        noProxy: <boolean>
     });
 
-From environment variables:
+The `proxy` option to `createClient` specifies the proxy URL, for example:
 
-    $ export HTTPS_PROXY = 'https://127.0.0.1'
-    $ export HTTP_PROXY = 'http://127.0.0.1'
+    proxy: 'http://user:password@example.com:4321'
 
-There is an option to disable the use of a proxy on a url basis or for
-all urls. This can be enabled by setting an environment variable.
+Or a proxy object can be given. (Warning: the `proxyAuth` field is not what
+a simple `require('url').parse()` will produce if your proxy URL has auth
+info.)
 
-Don't proxy requests to any urls
+    proxy: {
+        protocol: 'http:',
+        host: 'example.com',
+        port: 4321,
+        proxyAuth: 'user:password'
+    }
 
-    $ export NO_PROXY='*'
+Or `proxy: false` can be given to explicitly disable using a proxy -- i.e. to
+ensure a proxy URL is not picked up from environment variables.
 
-Don't proxy requests to localhost
+If not specified, then the following environment variables (in the given order)
+are used to pick up a proxy URL:
 
-    $ export NO_PROXY='127.0.0.1'
+    HTTPS_PROXY
+    https_proxy
+    HTTP_PROXY
+    http_proxy
 
-Don't proxy requests to localhost on port 8000
+Note: A future major version of restify(-clients) might change this environment
+variable behaviour. See the discussion on [this issue](https://github.com/restify/node-restify/issues/878#issuecomment-249673285).
 
-    $ export NO_PROXY='localhost:8000'
 
-Don't proxy requests to multiple IPs
+The `noProxy` option can be used to exclude some hosts from using a given
+proxy. If it is not specified, then the `NO_PROXY` or `no_proxy` environment
+variable is used. Use `noProxy: ''` to override a possible environment variable,
+but not match any hosts.
 
-    $ export NO_PROXY='127.0.0.1, 8.8.8.8'
+The value is a string giving a comma-separated set of host, host-part suffix, or
+the special '*' to indicate all hosts. (Its definition is intended to match
+curl's `NO_PROXY` environment variable.) Some examples:
 
-**Note**: The url being requested must match the full hostname in
-the proxy configuration or NO_PROXY environment variable. DNS
-lookups are not performed to determine the IP address of a hostname.
+
+    $ export NO_PROXY='*'               # don't proxy requests to any urls
+    $ export NO_PROXY='127.0.0.1'       # don't proxy requests the localhost IP
+    $ export NO_PROXY='localhost:8000'  # ... 'localhost' hostname and port 8000
+    $ export NO_PROXY='google.com'      # ... "google.com" and "*.google.com"
+    $ export NO_PROXY='www.google.com'  # ... "www.google.com"
+    $ export NO_PROXY='127.0.0.1, google.com'   # multiple hosts
+
+**Note**: The url being requested must match the full hostname or hostname
+part to a '.': `NO_PROXY=oogle.com` does not match "google.com". DNS lookups are
+not performed to determine the IP address of a hostname.
+
 
 #### basicAuth(username, password)
 
