@@ -418,7 +418,7 @@ be tagged with the appropriate headers.
 If passed, the value of the `beforeSync` parameter should be a function with the
 following prototype:
 
-    function beforeSync(opts) {
+    function beforeSync(opts, ctx) {
 
 where `opts` is an object containing the options for the request. Some things
 you might want to do in this beforeSync function include:
@@ -426,17 +426,22 @@ you might want to do in this beforeSync function include:
  * writing a trace log message indicating that you're making a request
  * modifying opts.headers to include additional headers in the outbound request
 
+The `ctx` option is an empty object which will also be passed to afterSync().
+The beforeSync() function can add any data specific to this request that it
+wants afterSync() to have for this request by attaching it to this object.
+
 If passed, the value of the `afterSync` parameter should be a function with the
 following prototype:
 
-    function afterSync(err, req, res) {
+    function afterSync(err, req, res, ctx) {
 
 which takes an error object (if the request failed), and the
 [req](http://restify.com/#request-api) and
 [res](http://restify.com/#response-api) objects as defined in the restify
-documentation. The `afterSync` caller is most useful for logging the fact that a
-request completed and indicating errors or response details to a tracing
-system.
+documentation. The `ctx` option is the same context object that was passed to
+the `beforeSync` handler for this request (empty Object by default). The
+`afterSync` caller is most useful for logging the fact that a request completed
+and indicating errors or response details to a tracing system.
 
 A full example might be:
 
@@ -445,17 +450,17 @@ A full example might be:
     var client = clients.createJsonClient({url: 'http://127.0.0.1:8080'});
 
     var childClient1 = client.child({
-        beforeSync: function (opts) {
+        beforeSync: function (opts, ctx) {
             opts.headers['client-number'] = 1;
-        }, afterSync: function (err, req, res) {
+        }, afterSync: function (err, req, res, ctx) {
             console.error('code: %d', res.statusCode);
         }
     });
 
     var childClient2 = client.child({
-        beforeSync: function (opts) {
+        beforeSync: function (opts, ctx) {
             opts.headers['client-number'] = 2;
-        }, afterSync: function (err, req, res) {
+        }, afterSync: function (err, req, res, ctx) {
             console.error('code: %d', res.statusCode);
         }
     });

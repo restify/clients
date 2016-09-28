@@ -1339,11 +1339,13 @@ describe('restify-client tests', function () {
                 var childClient;
 
                 childClient = _client.handle.child({
-                    beforeSync: function (opts) {
+                    beforeSync: function (opts, ctx) {
                         beforeRan = true;
                         opts.headers['restify-clients-test-header'] = clientName;
-                    }, afterSync: function (err, req, res) {
+                        ctx.helloFromBefore = 'hello';
+                    }, afterSync: function (err, req, res, ctx) {
                         assert.ifError(err);
+                        assert.equal(ctx.helloFromBefore, 'hello');
                         afterRan = true;
                     }
                 });
