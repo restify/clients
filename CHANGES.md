@@ -2,8 +2,8 @@
 
 ## 1.3.1 (not yet released)
 
-(nothing yet)
-
+- #65 accidentally didn't work. Fix that to correctly export
+  `.bunyan.serializers`.
 
 ## 1.3.0
 
