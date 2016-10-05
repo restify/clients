@@ -1,6 +1,8 @@
 # restify-clients Changelog
 
-## 1.3.1 (not yet released)
+## not yet released
+
+## 1.3.1
 
 - #65 accidentally didn't work. Fix that to correctly export
   `.bunyan.serializers`.
