@@ -149,6 +149,13 @@ describe('restify-client bunyan usage tests', function () {
     });
 
     it('using restify-clients exported "bunyan.serializers"', function (done) {
+        assert.ok(clients.bunyan.serializers);
+        assert.ok(clients.bunyan.serializers.err);
+        assert.ok(clients.bunyan.serializers.req);
+        assert.ok(clients.bunyan.serializers.res);
+        assert.ok(clients.bunyan.serializers.client_req);
+        assert.ok(clients.bunyan.serializers.client_res);
+
         var capture = new BunyanRecordCapturer();
         var log = bunyan.createLogger({
             name: 'client',
