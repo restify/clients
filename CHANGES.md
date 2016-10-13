@@ -2,9 +2,15 @@
 
 ## not yet released
 
+## 1.3.2
+
 - Switch back to restify-errors@3 to fix backward incompatiblity in
   `<err>.code` for some error classes. See
   <https://github.com/restify/clients/pull/42> for discussion.
+- Update to node-uuid 1.4.6 or greater to get a security fix
+  (https://nodesecurity.io/advisories/uuid_insecure-entropy-source-mathrandom)
+  though the only current usage in restify-clients isn't anything
+  exploitable. Also update some other deps.
 
 ## 1.3.1
 
