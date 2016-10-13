@@ -2,7 +2,15 @@
 
 ## not yet released
 
+- Switch back to restify-errors@3 to fix backward incompatiblity in
+  `<err>.code` for some error classes. See
+  <https://github.com/restify/clients/pull/42> for discussion.
+
 ## 1.3.1
+
+Note: *Bad release.* This release introduced an update from restify-errors@3 to
+restify-errors@4 which included a backward incompatible change in `<err>.code`
+for created errors. Switch to version 1.3.2 or greater.
 
 - #65 accidentally didn't work. Fix that to correctly export
   `.bunyan.serializers`.
