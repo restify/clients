@@ -2,7 +2,15 @@
 
 ## not yet released
 
+## 1.3.3
+
+- Correct usage of `assert.number` (and variants) for update from
+  assert-plus@0.1 to 1.0.
+
 ## 1.3.2
+
+Note: *Bad release.* The changes for the assert-plus upgrade broke
+creating a client without a given `options.retry.maxTimeout`.
 
 - Switch back to restify-errors@3 to fix backward incompatiblity in
   `<err>.code` for some error classes. See
