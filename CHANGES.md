@@ -2,6 +2,20 @@
 
 ## not yet released
 
+- restify/node-restify#878 Improved HTTP proxy handling.
+    - There is a new `options.noProxy` option to `create*Client` that overrides
+      the `NO_PROXY` envvar.
+    - `options.proxy` overrides `*_proxy` environment variables (e.g.
+      `HTTPS_PROXY`, `http_proxy`).
+    - Compatibility note: To maintain backward compatibility in 1.x, any of
+      these environment variables (in the order shown, first wins) are used to
+      proxy for http or https URLs: `HTTPS_PROXY`, `https_proxy`, `HTTP_PROXY`,
+      `http_proxy`. In a future major version, behaviour might be changed
+      to ignore `HTTPS_PROXY` and `https_proxy` environment variables when
+      proxying a *http* URL. See
+      <https://github.com/restify/node-restify/issues/878#issuecomment-249673285>
+      for discussion.
+
 ## 1.3.3
 
 - Correct usage of `assert.number` (and variants) for update from
