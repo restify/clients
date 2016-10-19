@@ -2,6 +2,8 @@
 
 ## not yet released
 
+## 1.4.0
+
 - Update bunyan and dtrace-provider deps to avoid some deprecation warnings
   with node 6 in some cases. See
   <https://github.com/chrisa/node-dtrace-provider/issues/74> for deeper
