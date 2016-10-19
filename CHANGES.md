@@ -2,6 +2,10 @@
 
 ## not yet released
 
+- Update bunyan and dtrace-provider deps to avoid some deprecation warnings
+  with node 6 in some cases. See
+  <https://github.com/chrisa/node-dtrace-provider/issues/74> for deeper
+  details.
 - restify/node-restify#878 Improved HTTP proxy handling.
     - There is a new `options.noProxy` option to `create*Client` that overrides
       the `NO_PROXY` envvar.
