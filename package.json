@@ -59,7 +59,7 @@
   "dependencies": {
     "assert-plus": "^1.0.0",
     "backoff": "^2.4.1",
-    "bunyan": "^1.8.3",
+    "bunyan": "^1.8.4",
     "dtrace-provider": "^0.7.0",
     "keep-alive-agent": "0.0.1",
     "lodash": "^4.7.0",
