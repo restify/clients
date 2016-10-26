@@ -2,6 +2,8 @@
 
 ## not yet released
 
+## 1.4.1
+
 - #90 Fix `<jsonclient>.post(...)` without a body argument.
 
 ## 1.4.0
