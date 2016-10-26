@@ -356,6 +356,16 @@ describe('restify-client tests', function () {
         });
     });
 
+    it('POST json without body arg', function (done) {
+        JSON_CLIENT.post('/json/mcavage', function (err, req, res, obj) {
+            assert.ifError(err);
+            assert.ok(req);
+            assert.ok(res);
+            assert.deepEqual(obj, {hello: 'mcavage'});
+            done();
+        });
+    });
+
 
     it('PUT json', function (done) {
         var data = { hello: 'foo' };

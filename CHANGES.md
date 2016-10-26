@@ -2,6 +2,8 @@
 
 ## not yet released
 
+- #90 Fix `<jsonclient>.post(...)` without a body argument.
+
 ## 1.4.0
 
 - Update bunyan and dtrace-provider deps to avoid some deprecation warnings
