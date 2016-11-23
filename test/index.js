@@ -10,7 +10,7 @@ var assert = require('chai').assert;
 var bunyan = require('bunyan');
 var crypto = require('crypto');
 var format = require('util').format;
-var uuid   = require('node-uuid');
+var uuid   = require('uuid');
 
 var restify = require('restify');
 var clients = require('../lib');
