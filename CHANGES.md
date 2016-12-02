@@ -2,6 +2,9 @@
 
 ## not yet released
 
+Add a `safeStringify` option to the JSON client to safely stringify request
+bodies that may be circular.
+
 ## 1.4.1
 
 - #90 Fix `<jsonclient>.post(...)` without a body argument.

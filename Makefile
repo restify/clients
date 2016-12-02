@@ -107,8 +107,8 @@ clean: clean-coverage
 .PHONY: versioncheck
 versioncheck: | node_modules
 	@echo version is: $(shell cat package.json | $(JSON) version)
-	[[ `cat package.json | $(JSON) version` \
-	    == `grep '^## ' CHANGES.md | head -2 | tail -1 | awk '{print $$2}'` ]]
+	[ `cat package.json | $(JSON) version` \
+	    = `grep '^## ' CHANGES.md | head -2 | tail -1 | awk '{print $$2}'` ]
 
 # Confirm, then tag and publish the current version.
 .PHONY: cutarelease
