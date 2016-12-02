@@ -2,6 +2,8 @@
 
 ## not yet released
 
+## 1.5.0
+
 Add a `safeStringify` option to the JSON client to safely stringify request
 bodies that may be circular.
 
