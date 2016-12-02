@@ -12,7 +12,7 @@ var url = require('url');
 var clients = require('../lib');
 
 
-///--- Globals
+// --- Globals
 
 var PORT = process.env.UNIT_TEST_PORT || 0;
 var PROXYSERVER;
@@ -20,7 +20,7 @@ var PROXYURL;
 var PROXIED = [];
 
 
-///--- Helpers
+// --- Helpers
 
 function stripProcessEnv() {
     // Ensure envvars don't get in the way.
@@ -37,7 +37,7 @@ function stripProcessEnv() {
 }
 
 
-///--- Tests
+// --- Tests
 
 describe('restify-client proxy tests', function () {
 

@@ -16,7 +16,7 @@ var clients = require('../lib');
 var auditor = require('../lib/helpers/auditor');
 var pkgJson = require('../package');
 
-///--- Globals
+// --- Globals
 
 var PORT = process.env.UNIT_TEST_PORT || 0;
 var JSON_CLIENT;
@@ -26,7 +26,7 @@ var TIMEOUT_CLIENT;
 var SERVER;
 
 
-///--- Helpers
+// --- Helpers
 
 function sendJson(req, res, next) {
     res.send({hello: req.params.hello || req.params.name || null});
@@ -137,7 +137,7 @@ function dtrace() {
     return (dtp);
 }
 
-///--- Tests
+// --- Tests
 
 describe('restify-client tests', function () {
 

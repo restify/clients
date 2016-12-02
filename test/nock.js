@@ -7,7 +7,7 @@ var nock;
 var clients = require('../lib');
 
 
-///--- Tests
+// --- Tests
 
 describe('restify-client tests against nock', function () {
     before(function () {

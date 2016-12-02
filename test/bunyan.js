@@ -11,13 +11,13 @@ var restify = require('restify');
 var clients = require('../lib');
 
 
-///--- Globals
+// --- Globals
 
 var PORT = process.env.UNIT_TEST_PORT || 0;
 var SERVER;
 
 
-///--- Helpers
+// --- Helpers
 
 function sendJsonPong(req, res, next) {
     res.header('content-type', 'json');
@@ -64,7 +64,7 @@ function assertCreateClientAndValidLog(log, capture, done) {
 }
 
 
-///--- Tests
+// --- Tests
 
 describe('restify-client bunyan usage tests', function () {
 
