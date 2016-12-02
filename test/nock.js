@@ -1,6 +1,4 @@
 // Copyright 2012 Mark Cavage <mcavage@gmail.com> All rights reserved.
-/* eslint-disable no-console, no-undefined */
-// jscs:disable maximumLineLength
 
 'use strict';
 
@@ -9,7 +7,7 @@ var nock;
 var clients = require('../lib');
 
 
-///--- Tests
+// --- Tests
 
 describe('restify-client tests against nock', function () {
     before(function () {

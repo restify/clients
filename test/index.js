@@ -1,6 +1,5 @@
 // Copyright 2012 Mark Cavage <mcavage@gmail.com> All rights reserved.
 /* eslint-disable no-console, no-undefined */
-// jscs:disable maximumLineLength
 
 'use strict';
 
@@ -17,7 +16,7 @@ var clients = require('../lib');
 var auditor = require('../lib/helpers/auditor');
 var pkgJson = require('../package');
 
-///--- Globals
+// --- Globals
 
 var PORT = process.env.UNIT_TEST_PORT || 0;
 var JSON_CLIENT;
@@ -27,7 +26,7 @@ var TIMEOUT_CLIENT;
 var SERVER;
 
 
-///--- Helpers
+// --- Helpers
 
 function sendJson(req, res, next) {
     res.send({hello: req.params.hello || req.params.name || null});
@@ -41,9 +40,11 @@ function sendText(req, res, next) {
     if (req.headers.range) {
         var matched = req.headers.range.match(/bytes=([0-9]+)-([0-9]*)/);
         var start = parseInt(matched[1], 10);
+        /* eslint-disable no-undefined */
         var length = ((matched[2]) ?
                       parseInt(matched[2], 10) - start :
                       undefined);
+        /* eslint-enable no-undefined */
         var hash = crypto.createHash('md5');
         hash.update(text, 'utf8');
         res.header('content-md5', hash.digest('base64'));
@@ -136,7 +137,7 @@ function dtrace() {
     return (dtp);
 }
 
-///--- Tests
+// --- Tests
 
 describe('restify-client tests', function () {
 
@@ -657,7 +658,8 @@ describe('restify-client tests', function () {
         });
     });
 
-    it('PR-726 Enable {agent: false} option override per request', function (done) {
+    it('PR-726 Enable {agent: false} option override per request',
+        function (done) {
         var opts = {
             path: '/str/noagent',
             agent: false
@@ -688,7 +690,8 @@ describe('restify-client tests', function () {
     });
 
     it('requestTimeout', function (done) {
-        TIMEOUT_CLIENT.get('/str/request_timeout', function (err, req, res, obj) {
+        TIMEOUT_CLIENT.get('/str/request_timeout',
+            function (err, req, res, obj) {
             assert.ok(err);
             assert.equal(err.name, 'RequestTimeoutError');
             done();
@@ -863,6 +866,7 @@ describe('restify-client tests', function () {
 
     it('secure client connection with timeout', function (done) {
         var server = restify.createServer({
+            // jscs:disable maximumLineLength
             certificate: '-----BEGIN CERTIFICATE-----\n' +
                 'MIICgzCCAewCCQDutc3iIPK88jANBgkqhkiG9w0BAQUFADCBhTELMAkGA1UEBhMC\n' +
                 'VVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28x\n' +
@@ -894,6 +898,7 @@ describe('restify-client tests', function () {
                 'eMp1l9fa7M+ndvKiu2ECQGv4W2+yqlbD3Q3Dr14hiWaiYss5350Ohr5HiZZw2L3i\n' +
                 's35vQZaHqRxUVZjOi6/MTCZmqvg/RpaVQYHiJHvxGzw=\n' +
                 '-----END RSA PRIVATE KEY-----'
+            // jscs:enable maximumLineLength
         });
 
         server.get('/ping', function (req, res) {
@@ -942,9 +947,11 @@ describe('restify-client tests', function () {
         }
 
         // Capture the bunyan logs as of
-        // https://github.com/trentm/node-bunyan/blob/master/test/raw-stream.test.js#L19-L24
-        CapturingStream.prototype.checkEntriesTest = function checkEntriesTest() {
-
+        // jscs:disable maximumLineLength
+        // github.com/trentm/node-bunyan/blob/master/test/raw-stream.test.js#L19-L24
+        // jscs:enable maximumLineLength
+        CapturingStream.prototype.checkEntriesTest =
+            function checkEntriesTest() {
             assert.equal(this.entries.length, 1);
         };
 
@@ -982,10 +989,8 @@ describe('restify-client tests', function () {
 
         client.get('/json/mcavage', function (err, req, res, obj) {
             err;
-            //assert.ok(req);
-            //assert.ok(res);
-
-            // The verification is done in the CapturingStream.checkEntriesTest()
+            // The verification is done in the
+            // CapturingStream.checkEntriesTest()
             done();
         });
     });
@@ -1058,27 +1063,30 @@ describe('restify-client tests', function () {
         var clientWithProxy = clients.createHttpClient('http://10.3.100.207');
         assert.ok(clientWithProxy.proxy);
 
-        //Blanket wildcard
+        // Blanket wildcard
         process.env.NO_PROXY = '*';
-        var clientWithoutProxy = clients.createHttpClient('http://192.168.2.1:');
+        var clientWithoutProxy =
+            clients.createHttpClient('http://192.168.2.1:');
         assert.equal(false, clientWithoutProxy.proxy);
 
-        //Multiple addresses
+        // Multiple addresses
         process.env.NO_PROXY = '192.168.2.1, 192.168.2.2';
         clientWithoutProxy = clients.createHttpClient('http://192.168.2.1:');
         assert.equal(false, clientWithoutProxy.proxy);
         clientWithoutProxy = clients.createHttpClient('http://192.168.2.2:');
         assert.equal(false, clientWithoutProxy.proxy);
 
-        //Port specificity
+        // Port specificity
         process.env.NO_PROXY = '192.168.2.1:8080';
-        clientWithoutProxy = clients.createHttpClient('http://192.168.2.1:8080');
+        clientWithoutProxy =
+            clients.createHttpClient('http://192.168.2.1:8080');
         clientWithProxy = clients.createHttpClient('http://192.168.2.1');
         assert.ok(clientWithProxy.proxy);
         assert.equal(false, clientWithoutProxy.proxy);
         done();
 
-        //Setting process.env.https_proxy to undefined, converts it to 'undefined'
+        // Setting process.env.https_proxy to undefined, converts it to
+        // 'undefined'
         if (typeof (origProxy) === 'undefined') {
             delete process.env.https_proxy;
         } else {
@@ -1133,7 +1141,8 @@ describe('restify-client tests', function () {
                 var testTitle = method.toUpperCase() + ' ' + code + ' ';
 
                 it(testTitle + ' text', function (done) {
-                    STR_CLIENT[method]('/redirect/' + code + '/str%2Fmcavage', function (err, req, res, data) {
+                    STR_CLIENT[method]('/redirect/' + code + '/str%2Fmcavage',
+                        function (err, req, res, data) {
                         assert.ifError(err);
                         assert.ok(req);
                         assert.ok(res);
@@ -1144,7 +1153,8 @@ describe('restify-client tests', function () {
                 });
 
                 it(testTitle + ' json', function (done) {
-                    JSON_CLIENT[method]('/redirect/' + code + '/json%2Fmcavage', function (err, req, res, obj) {
+                    JSON_CLIENT[method]('/redirect/' + code + '/json%2Fmcavage',
+                        function (err, req, res, obj) {
                         assert.ifError(err);
                         assert.ok(req);
                         assert.ok(res);
@@ -1159,7 +1169,8 @@ describe('restify-client tests', function () {
 
                 it(testTitle + ' text', function (done) {
                     var body = 'hello=foo';
-                    STR_CLIENT[method]('/redirect/' + code + '/str%2Fmcavage', body, function (err, req, res, data) {
+                    STR_CLIENT[method]('/redirect/' + code + '/str%2Fmcavage',
+                        body, function (err, req, res, data) {
                         assert.ifError(err);
                         assert.ok(req);
                         assert.ok(res);
@@ -1171,7 +1182,8 @@ describe('restify-client tests', function () {
 
                 it(testTitle + ' json', function (done) {
                     var data = { hello: 'foo' };
-                    JSON_CLIENT[method]('/redirect/' + code + '/json%2Fmcavage', data, function (err, req, res, obj) {
+                    JSON_CLIENT[method]('/redirect/' + code + '/json%2Fmcavage',
+                        data, function (err, req, res, obj) {
                         assert.ifError(err);
                         assert.ok(req);
                         assert.ok(res);
@@ -1183,7 +1195,8 @@ describe('restify-client tests', function () {
 
             // do not assert body on head requests
             it('HEAD ' + code + ' text', function (done) {
-                STR_CLIENT.head('/redirect/' + code + '/str%2Fmcavage', function (err, req, res, data) {
+                STR_CLIENT.head('/redirect/' + code + '/str%2Fmcavage',
+                    function (err, req, res, data) {
                     assert.ifError(err);
                     assert.ok(req);
                     assert.ok(res);
@@ -1193,7 +1206,8 @@ describe('restify-client tests', function () {
             });
 
             it('HEAD ' + code + ' json', function (done) {
-                JSON_CLIENT.head('/redirect/' + code + '/json%2Fmcavage', function (err, req, res, data) {
+                JSON_CLIENT.head('/redirect/' + code + '/json%2Fmcavage',
+                    function (err, req, res, data) {
                     assert.ifError(err);
                     assert.ok(req);
                     assert.ok(res);
@@ -1212,7 +1226,8 @@ describe('restify-client tests', function () {
             var testTitle = method.toUpperCase() + ' 307 ';
 
             it(testTitle + ' text', function (done) {
-                STR_CLIENT[method]('/redirect/307/str%2Fmcavage', function (err, req, res, data) {
+                STR_CLIENT[method]('/redirect/307/str%2Fmcavage',
+                    function (err, req, res, data) {
                     assert.ifError(err);
                     assert.ok(req);
                     assert.ok(res);
@@ -1223,7 +1238,8 @@ describe('restify-client tests', function () {
             });
 
             it(testTitle + ' json', function (done) {
-                JSON_CLIENT[method]('/redirect/307/json%2Fmcavage', function (err, req, res, obj) {
+                JSON_CLIENT[method]('/redirect/307/json%2Fmcavage',
+                    function (err, req, res, obj) {
                     assert.ifError(err);
                     assert.ok(req);
                     assert.ok(res);
@@ -1238,7 +1254,8 @@ describe('restify-client tests', function () {
 
             it(testTitle + ' text', function (done) {
                 var body = 'hello=foo';
-                STR_CLIENT[method]('/redirect/307/str%2Fmcavage', body, function (err, req, res, data) {
+                STR_CLIENT[method]('/redirect/307/str%2Fmcavage', body,
+                    function (err, req, res, data) {
                     assert.ifError(err);
                     assert.ok(req);
                     assert.ok(res);
@@ -1250,7 +1267,8 @@ describe('restify-client tests', function () {
 
             it(testTitle + ' json', function (done) {
                 var data = { hello: 'foo' };
-                JSON_CLIENT[method]('/redirect/307/json%2Fmcavage', data, function (err, req, res, obj) {
+                JSON_CLIENT[method]('/redirect/307/json%2Fmcavage', data,
+                    function (err, req, res, obj) {
                     assert.ifError(err);
                     assert.ok(req);
                     assert.ok(res);
@@ -1262,7 +1280,8 @@ describe('restify-client tests', function () {
 
         // do not assert body on head requests
         it('HEAD 307 text', function (done) {
-            STR_CLIENT.head('/redirect/307/str%2Fmcavage', function (err, req, res, data) {
+            STR_CLIENT.head('/redirect/307/str%2Fmcavage',
+                function (err, req, res, data) {
                 assert.ifError(err);
                 assert.ok(req);
                 assert.ok(res);
@@ -1272,7 +1291,8 @@ describe('restify-client tests', function () {
         });
 
         it('HEAD 307 json', function (done) {
-            JSON_CLIENT.head('/redirect/307/json%2Fmcavage', function (err, req, res, data) {
+            JSON_CLIENT.head('/redirect/307/json%2Fmcavage',
+                function (err, req, res, data) {
                 assert.ifError(err);
                 assert.ok(req);
                 assert.ok(res);

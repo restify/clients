@@ -77,6 +77,7 @@
     ],
     "requireSemicolons": true,
     "requireSpaceAfterBinaryOperators": true,
+    "requireSpaceAfterLineComment": true,
     "requireSpaceAfterKeywords": true,
     "requireSpaceBeforeBinaryOperators": true,
     "requireSpaceBeforeBlockStatements": true,
