@@ -139,6 +139,7 @@ it will be an `HttpError`.
 |headers|Object|HTTP headers to set in all requests|
 |log|Object|[bunyan](https://github.com/trentm/node-bunyan) instance|
 |retry|Object|options to provide to node-retry;"false" disables retry; defaults to 4 retries|
+|safeStringify|Boolean|Safely serialize JSON objects, i.e. circular dependencies|
 |signRequest|Function|synchronous callback for interposing headers before request is sent|
 |url|String|Fully-qualified URL to connect to|
 |userAgent|String|user-agent string to use; restify inserts one, but you can override it|

@@ -23,6 +23,7 @@ var JSON_CLIENT;
 var STR_CLIENT;
 var RAW_CLIENT;
 var TIMEOUT_CLIENT;
+var SAFE_STRINGIFY_CLIENT;
 var SERVER;
 
 
@@ -225,11 +226,17 @@ describe('restify-client tests', function () {
                         accept: 'text/plain'
                     }
                 });
-
                 TIMEOUT_CLIENT = clients.createStringClient({
                     url: 'http://127.0.0.1:' + PORT,
                     requestTimeout: 150,
                     retry: false
+                });
+                SAFE_STRINGIFY_CLIENT = clients.createJsonClient({
+                    url: 'http://127.0.0.1:' + PORT,
+                    dtrace: dtrace,
+                    retry: false,
+                    followRedirects: true,
+                    safeStringify: true
                 });
 
                 process.nextTick(callback);
@@ -246,6 +253,8 @@ describe('restify-client tests', function () {
             JSON_CLIENT.close();
             STR_CLIENT.close();
             RAW_CLIENT.close();
+            TIMEOUT_CLIENT.close();
+            SAFE_STRINGIFY_CLIENT.close();
             SERVER.close(callback);
         } catch (e) {
             console.error(e.stack);
@@ -345,6 +354,21 @@ describe('restify-client tests', function () {
         });
     });
 
+    it('POST with circular JSON', function (done) {
+        var data = {
+            hello: 'foo'
+        };
+        data.data = data;
+
+        SAFE_STRINGIFY_CLIENT.post('/json/mcavage', data,
+            function (err, req, res, obj) {
+            assert.ifError(err);
+            assert.ok(req);
+            assert.ok(res);
+            assert.deepEqual(obj, {hello: 'foo'});
+            done();
+        });
+    });
 
     it('POST json empty body object', function (done) {
         var data = {};
