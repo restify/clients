@@ -1,6 +1,3 @@
-/* eslint-disable no-console, no-undefined */
-// jscs:disable maximumLineLength
-
 /*
  * Test handling for Bunyan logging in restify-clients.
  */
@@ -84,7 +81,9 @@ describe('restify-client bunyan usage tests', function () {
                 setImmediate(callback);
             });
         } catch (e) {
+            /* eslint-disable no-console*/
             console.error(e.stack);
+            /* eslint-enable no-console*/
             process.exit(1);
         }
     });
@@ -94,7 +93,9 @@ describe('restify-client bunyan usage tests', function () {
         try {
             SERVER.close(callback);
         } catch (e) {
+            /* eslint-disable no-console*/
             console.error(e.stack);
+            /* eslint-enable no-console*/
             process.exit(1);
         }
     });

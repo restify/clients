@@ -1,6 +1,3 @@
-/* eslint-disable no-console, no-undefined */
-// jscs:disable maximumLineLength
-
 /*
  * Test handling for restify-clients' HTTP proxy handling.
  */
@@ -47,9 +44,10 @@ describe('restify-client proxy tests', function () {
     before(function (callback) {
         try {
             // A forward-proxy adapted from
-            // JSSTYLED
+            // jscs:disable maximumLineLength
             // <https://github.com/nodejitsu/node-http-proxy/blob/master/examples/http/reverse-proxy.js>
             // (where it is incorrectly named a "reverse" proxy).
+            // jscs:enable maximumLineLength
             PROXYSERVER = http.createServer();
 
             PROXYSERVER.on('connect', function (req, socket) {
@@ -72,7 +70,9 @@ describe('restify-client proxy tests', function () {
                 setImmediate(callback);
             });
         } catch (e) {
+            /* eslint-disable no-console */
             console.error(e.stack);
+            /* eslint-enable no-console */
             process.exit(1);
         }
     });
@@ -81,7 +81,9 @@ describe('restify-client proxy tests', function () {
         try {
             PROXYSERVER.close(callback);
         } catch (e) {
+            /* eslint-disable no-console */
             console.error(e.stack);
+            /* eslint-enable no-console */
             process.exit(1);
         }
     });
