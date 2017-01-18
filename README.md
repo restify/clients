@@ -51,45 +51,51 @@ field, which is use *on each retry*.  The default is not to set a
 Here's an example of hitting the
 [Joyent CloudAPI](https://api.us-east-1.joyent.com):
 
-    var restify = require('restify');
+```javascript
+var restify = require('restify');
 
-    // Creates a JSON client
-    var client = restify.createJsonClient({
-      url: 'https://us-east-1.api.joyent.com'
-    });
+// Creates a JSON client
+var client = restify.createJsonClient({
+  url: 'https://us-east-1.api.joyent.com'
+});
 
 
-    client.basicAuth('$login', '$password');
-    client.get('/my/machines', function(err, req, res, obj) {
-      assert.ifError(err);
+client.basicAuth('$login', '$password');
+client.get('/my/machines', function(err, req, res, obj) {
+  assert.ifError(err);
 
-      console.log(JSON.stringify(obj, null, 2));
-    });
+  console.log(JSON.stringify(obj, null, 2));
+});
+```
 
 As a short-hand, a client can be initialized with a string-URL rather than
 an options object:
 
-    var restify = require('restify');
+```javascript
+var restify = require('restify');
 
-    var client = restify.createJsonClient('https://us-east-1.api.joyent.com');
+var client = restify.createJsonClient('https://us-east-1.api.joyent.com');
+```
 
 Note that all further documentation refers to the "short-hand" form of
 methods like `get/put/del` which take a string path.  You can also
 pass in an object to any of those methods with extra params (notably
 headers):
 
-    var options = {
-      path: '/foo/bar',
-      headers: {
-        'x-foo': 'bar'
-      },
-      retry: {
-        'retries': 0
-      },
-      agent: false
-    };
+```javascript
+var options = {
+  path: '/foo/bar',
+  headers: {
+    'x-foo': 'bar'
+  },
+  retry: {
+    'retries': 0
+  },
+  agent: false
+};
 
-    client.get(options, function(err, req, res) { .. });
+client.get(options, function(err, req, res) { .. });
+```
 
 If you need to interpose additional headers in the request before it is sent on
 to the server, you can provide a synchronous callback function as the
@@ -120,10 +126,12 @@ it will be an `HttpError`.
 
 #### createJsonClient(options)
 
-    var client = restify.createJsonClient({
-      url: 'https://api.us-east-1.joyent.com',
-      version: '*'
-    });
+```javascript
+var client = restify.createJsonClient({
+  url: 'https://api.us-east-1.joyent.com',
+  version: '*'
+});
+```    
 
 ### API Options:
 
@@ -155,48 +163,58 @@ it will be an `HttpError`.
 Performs an HTTP get; if no payload was returned, `obj` defaults to
 `{}` for you (so you don't get a bunch of null pointer errors).
 
-    client.get('/foo/bar', function(err, req, res, obj) {
-      assert.ifError(err);
-      console.log('%j', obj);
-    });
+```javascript
+client.get('/foo/bar', function(err, req, res, obj) {
+  assert.ifError(err);
+  console.log('%j', obj);
+});
+```
 
 #### head(path, callback)
 
 Just like `get`, but without `obj`:
 
-    client.head('/foo/bar', function(err, req, res) {
-      assert.ifError(err);
-      console.log('%d -> %j', res.statusCode, res.headers);
-    });
+```javascript
+client.head('/foo/bar', function(err, req, res) {
+  assert.ifError(err);
+  console.log('%d -> %j', res.statusCode, res.headers);
+});
+```
 
 #### post(path, object, callback)
 
 Takes a complete object to serialize and send to the server.
 
-    client.post('/foo', { hello: 'world' }, function(err, req, res, obj) {
-      assert.ifError(err);
-      console.log('%d -> %j', res.statusCode, res.headers);
-      console.log('%j', obj);
-    });
+```javascript
+client.post('/foo', { hello: 'world' }, function(err, req, res, obj) {
+  assert.ifError(err);
+  console.log('%d -> %j', res.statusCode, res.headers);
+  console.log('%j', obj);
+});
+```
 
 #### put(path, object, callback)
 
 Just like `post`:
 
-    client.put('/foo', { hello: 'world' }, function(err, req, res, obj) {
-      assert.ifError(err);
-      console.log('%d -> %j', res.statusCode, res.headers);
-      console.log('%j', obj);
-    });
+```javascript
+client.put('/foo', { hello: 'world' }, function(err, req, res, obj) {
+  assert.ifError(err);
+  console.log('%d -> %j', res.statusCode, res.headers);
+  console.log('%j', obj);
+});
+```
 
 #### del(path, callback)
 
 `del` doesn't take content, since you know, it should't:
 
-    client.del('/foo/bar', function(err, req, res) {
-      assert.ifError(err);
-      console.log('%d -> %j', res.statusCode, res.headers);
-    });
+```javascript
+client.del('/foo/bar', function(err, req, res) {
+  assert.ifError(err);
+  console.log('%d -> %j', res.statusCode, res.headers);
+});
+```
 
 ### StringClient
 
@@ -212,57 +230,69 @@ put/post) and `parse` method (for all HTTP bodies), and that's it.
 
 #### createStringClient(options)
 
-    var client = restify.createStringClient({
-      url: 'https://example.com'
-    })
+```javascript
+var client = restify.createStringClient({
+  url: 'https://example.com'
+});
+```
 
 #### get(path, callback)
 
 Performs an HTTP get; if no payload was returned, `data` defaults to
 `''` for you (so you don't get a bunch of null pointer errors).
 
-    client.get('/foo/bar', function(err, req, res, data) {
-      assert.ifError(err);
-      console.log('%s', data);
-    });
+```javascript
+client.get('/foo/bar', function(err, req, res, data) {
+  assert.ifError(err);
+  console.log('%s', data);
+});
+```
 
 #### head(path, callback)
 
 Just like `get`, but without `data`:
 
-    client.head('/foo/bar', function(err, req, res) {
-      assert.ifError(err);
-      console.log('%d -> %j', res.statusCode, res.headers);
-    });
+```javascript
+client.head('/foo/bar', function(err, req, res) {
+  assert.ifError(err);
+  console.log('%d -> %j', res.statusCode, res.headers);
+});
+```
 
 #### post(path, object, callback)
 
 Takes a complete object to serialize and send to the server.
 
-    client.post('/foo', { hello: 'world' }, function(err, req, res, data) {
-      assert.ifError(err);
-      console.log('%d -> %j', res.statusCode, res.headers);
-      console.log('%s', data);
-    });
+```javascript
+client.post('/foo', { hello: 'world' }, function(err, req, res, data) {
+  assert.ifError(err);
+  console.log('%d -> %j', res.statusCode, res.headers);
+  console.log('%s', data);
+});
+```
 
 #### put(path, object, callback)
 
 Just like `post`:
 
-    client.put('/foo', { hello: 'world' }, function(err, req, res, data) {
-      assert.ifError(err);
-      console.log('%d -> %j', res.statusCode, res.headers);
-      console.log('%s', data);
-    });
+```javascript
+client.put('/foo', { hello: 'world' }, function(err, req, res, data) {
+  assert.ifError(err);
+  console.log('%d -> %j', res.statusCode, res.headers);
+  console.log('%s', data);
+});
+```
 
 #### del(path, callback)
 
 `del` doesn't take content, since you know, it should't:
 
-    client.del('/foo/bar', function(err, req, res) {
-      assert.ifError(err);
-      console.log('%d -> %j', res.statusCode, res.headers);
-    });
+```javascript
+client.del('/foo/bar', function(err, req, res) {
+  assert.ifError(err);
+  console.log('%d -> %j', res.statusCode, res.headers);
+});
+```
 
 ### HttpClient
 
@@ -274,49 +304,53 @@ named `result` and not `response` (because
 [Event 'response'](http://nodejs.org/docs/latest/api/all.html#event_response_)
 is already used).
 
-    client = restify.createClient({
-      url: 'http://127.0.0.1'
+```javascript
+client = restify.createClient({
+  url: 'http://127.0.0.1'
+});
+
+client.get('/str/mcavage', function(err, req) {
+  assert.ifError(err); // connection error
+
+  req.on('result', function(err, res) {
+    assert.ifError(err); // HTTP status code >= 400
+
+    res.body = '';
+    res.setEncoding('utf8');
+    res.on('data', function(chunk) {
+      res.body += chunk;
     });
 
-    client.get('/str/mcavage', function(err, req) {
-      assert.ifError(err); // connection error
-
-      req.on('result', function(err, res) {
-        assert.ifError(err); // HTTP status code >= 400
-
-        res.body = '';
-        res.setEncoding('utf8');
-        res.on('data', function(chunk) {
-          res.body += chunk;
-        });
-
-        res.on('end', function() {
-          console.log(res.body);
-        });
-      });
+    res.on('end', function() {
+      console.log(res.body);
     });
+  });
+});
+```
 
 Or a write:
 
-    client.post(opts, function(err, req) {
-      assert.ifError(connectErr);
+```javascript
+client.post(opts, function(err, req) {
+  assert.ifError(connectErr);
 
-      req.on('result', function(err, res) {
-        assert.ifError(err);
-        res.body = '';
-        res.setEncoding('utf8');
-        res.on('data', function(chunk) {
-          res.body += chunk;
-        });
-
-        res.on('end', function() {
-          console.log(res.body);
-        });
-      });
-
-      req.write('hello world');
-      req.end();
+  req.on('result', function(err, res) {
+    assert.ifError(err);
+    res.body = '';
+    res.setEncoding('utf8');
+    res.on('data', function(chunk) {
+      res.body += chunk;
     });
+
+    res.on('end', function() {
+      console.log(res.body);
+    });
+  });
+
+  req.write('hello world');
+  req.end();
+});
+```
 
 Note that get/head/del all call `req.end()` for you, so you can't
 write data over those. Otherwise, all the same methods exist as
@@ -331,25 +365,31 @@ A restify client can use an HTTP proxy, either via options to `createClient`
 or via the `http_proxy`, `https_proxy`, and `NO_PROXY` environment variables
 common in many tools (e.g., `curl`).
 
-    restify.createClient({
-        proxy: <proxy url string or object>,
-        noProxy: <boolean>
-    });
+```javascript
+restify.createClient({
+  proxy: <proxy url string or object>,
+  noProxy: <boolean>
+});
+```
 
 The `proxy` option to `createClient` specifies the proxy URL, for example:
 
-    proxy: 'http://user:password@example.com:4321'
+```javascript
+proxy: 'http://user:password@example.com:4321'
+```
 
 Or a proxy object can be given. (Warning: the `proxyAuth` field is not what
 a simple `require('url').parse()` will produce if your proxy URL has auth
 info.)
 
-    proxy: {
-        protocol: 'http:',
-        host: 'example.com',
-        port: 4321,
-        proxyAuth: 'user:password'
-    }
+```javascript
+proxy: {
+  protocol: 'http:',
+  host: 'example.com',
+  port: 4321,
+  proxyAuth: 'user:password'
+}
+```
 
 Or `proxy: false` can be given to explicitly disable using a proxy -- i.e. to
 ensure a proxy URL is not picked up from environment variables.
@@ -393,7 +433,9 @@ not performed to determine the IP address of a hostname.
 Since it hasn't been mentioned yet, this convenience method (available
 on all clients), just sets the `Authorization` header for all HTTP requests:
 
-    client.basicAuth('mark', 'mysupersecretpassword');
+```javascript
+client.basicAuth('mark', 'mysupersecretpassword');
+```
 
 #### Upgrades
 
@@ -403,26 +445,28 @@ and `head`.  You can use this functionality to establish a WebSockets
 connection with a server.  For example, using the
 [watershed](https://github.com/jclulow/node-watershed) library:
 
-    var ws = new Watershed();
-    var wskey = ws.generateKey();
-    var options = {
-      path: '/websockets/attach',
-      headers: {
-        connection: 'upgrade',
-        upgrade: 'websocket',
-        'sec-websocket-key': wskey,
-      }
-    };
-    client.get(options, function(err, res, socket, head) {
-      res.once('upgradeResult', function(err2, res2, socket2, head2) {
-        var shed = ws.connect(res2, socket2, head2, wskey);
-        shed.on('text', function(msg) {
-          console.log('message from server: ' + msg);
-          shed.end();
-        });
-        shed.send('greetings program');
-      });
+```javascript
+var ws = new Watershed();
+var wskey = ws.generateKey();
+var options = {
+  path: '/websockets/attach',
+  headers: {
+    connection: 'upgrade',
+    upgrade: 'websocket',
+    'sec-websocket-key': wskey,
+  }
+};
+client.get(options, function(err, res, socket, head) {
+  res.once('upgradeResult', function(err2, res2, socket2, head2) {
+    var shed = ws.connect(res2, socket2, head2, wskey);
+    shed.on('text', function(msg) {
+      console.log('message from server: ' + msg);
+      shed.end();
     });
+    shed.send('greetings program');
+  });
+});
+```
 
 
 ## Contributing
@@ -453,3 +497,4 @@ make codestyle-fix
 Copyright (c) 2015 Alex Liu
 
 Licensed under the MIT license.
+
