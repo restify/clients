@@ -26,6 +26,44 @@ var TIMEOUT_CLIENT;
 var SAFE_STRINGIFY_CLIENT;
 var SERVER;
 
+// Self-signed cert valid until year 2117 with
+// CN=does.not.exist.com/emailAddress=support@restify.com
+var CERTIFICATE = '-----BEGIN CERTIFICATE-----\n' +
+    'MIIDDDCCAnWgAwIBAgIJAPKmGJ2jaQDGMA0GCSqGSIb3DQEBCwUAMIGdMQswCQYD\n' +
+    'VQQGEwJVUzERMA8GA1UECAwITmV3IFlvcmsxETAPBgNVBAcMCE5ldyBZb3JrMRAw\n' +
+    'DgYDVQQKDAdSZXN0aWZ5MRUwEwYDVQQLDAxSZXN0aWZ5IHRlYW0xGzAZBgNVBAMM\n' +
+    'EmRvZXMubm90LmV4aXN0LmNvbTEiMCAGCSqGSIb3DQEJARYTc3VwcG9ydEByZXN0\n' +
+    'aWZ5LmNvbTAgFw0xNzAyMjAwOTM5MjBaGA8yMTE3MDEyNzA5MzkyMFowgZ0xCzAJ\n' +
+    'BgNVBAYTAlVTMREwDwYDVQQIDAhOZXcgWW9yazERMA8GA1UEBwwITmV3IFlvcmsx\n' +
+    'EDAOBgNVBAoMB1Jlc3RpZnkxFTATBgNVBAsMDFJlc3RpZnkgdGVhbTEbMBkGA1UE\n' +
+    'AwwSZG9lcy5ub3QuZXhpc3QuY29tMSIwIAYJKoZIhvcNAQkBFhNzdXBwb3J0QHJl\n' +
+    'c3RpZnkuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDWTKNlj7l5vLfP\n' +
+    'Som+Jep4SH7HiMen8XS+1AGt3aPZcZltCIEG6sw476axSKMY7OsLjT+kh0CnVHUg\n' +
+    'omL5914bQ/qC8tNhDIAq6K3tBzrpC63mXsA0of7AmjzX67uWga1h1yPJblxIJCiP\n' +
+    'Zbnp1mqOoL6uEFt7LW4paodYZ7IiEwIDAQABo1AwTjAdBgNVHQ4EFgQUiJpUOX0/\n' +
+    'eByG4CXweHQSnxMdHfMwHwYDVR0jBBgwFoAUiJpUOX0/eByG4CXweHQSnxMdHfMw\n' +
+    'DAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOBgQCAOvadZfRO9t8Yo3/0ZIxJ\n' +
+    'nMRLOdnT/zQU9b2Lw5zz4bN+eiQJNGtgeqv8Wuh96v4T+v8GHoyG7v39gC6MMowd\n' +
+    'k+ptCNcj4UITWG9Wwr/YY15h+eOZXnRNolZDf9Ba1+EE6RxqT7ujckNSB0kOXets\n' +
+    'NVyLhnmxQt4jDzmvdR7C+A==\n' +
+    '-----END CERTIFICATE-----';
+var KEY = '-----BEGIN PRIVATE KEY-----\n' +
+    'MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBANZMo2WPuXm8t89K\n' +
+    'ib4l6nhIfseIx6fxdL7UAa3do9lxmW0IgQbqzDjvprFIoxjs6wuNP6SHQKdUdSCi\n' +
+    'Yvn3XhtD+oLy02EMgCrore0HOukLreZewDSh/sCaPNfru5aBrWHXI8luXEgkKI9l\n' +
+    'uenWao6gvq4QW3stbilqh1hnsiITAgMBAAECgYEAu9sO2Xb2VlsynkpvGPrP4YVb\n' +
+    'bbrfmr81YhsjJbDHc1P79PKheNjXEYozi/Fq1+zH1qaJhcbyzDxjOKphLVLFcHIH\n' +
+    'Dv8UD1r+qRYMGrhtEp5drHx3LnRPzIMD4iUuU+IUD8MbccJKHwLVXymD4HWAknw/\n' +
+    'boxrXTy0SlYcBTQtpcECQQD31apWmR29g6Sr67Djg2dsZ0WWt0roEt+UQIEw78mL\n' +
+    'dktlldvFKPbNyx7GKSxFjvnap503JJx/vomeMNUQ89mxAkEA3VwfkVmhrtYBg+YR\n' +
+    'KbvAtFoI6OLjz5Xow62M+Q3Mg61aFxCDcp+RMnuyT3e9/xP1iaYMRvniyWDGNSI6\n' +
+    'lGAlAwJAYmDXiB6ptpPuJyydAAMmZ9qqvgQuYOc1ByV/4wwcZhbkIQQWxDHZnqFV\n' +
+    'qvWnFEmIFurYNo567R6WhEwAGAWkUQJABkoFw5VuWI9P/7Vbq3ngIb+lHSjFHDLA\n' +
+    'KD8YEENqGhukwZ8AfRM3ht2o1UUrqsGgakbDdojG/r23I+9TBsAsjQJBAITHdSJp\n' +
+    'J1c1NopSISDLPFjAengkkh5O8ZRk5fKomA9AcbyeLCEIraW1qWjXLyEvdMA42fa9\n' +
+    '8O3F+9khYj53znU=\n' +
+    '-----END PRIVATE KEY-----';
+
 
 // --- Helpers
 
@@ -890,39 +928,8 @@ describe('restify-client tests', function () {
 
     it('secure client connection with timeout', function (done) {
         var server = restify.createServer({
-            // jscs:disable maximumLineLength
-            certificate: '-----BEGIN CERTIFICATE-----\n' +
-                'MIICgzCCAewCCQDutc3iIPK88jANBgkqhkiG9w0BAQUFADCBhTELMAkGA1UEBhMC\n' +
-                'VVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28x\n' +
-                'FTATBgNVBAoMDEpveWVudCwgSW5jLjEPMA0GA1UECwwGUG9ydGFsMSEwHwYJKoZI\n' +
-                'hvcNAQkBFhJzdXBwb3J0QGpveWVudC5jb20wHhcNMTMxMjAyMjI0NjU3WhcNMTQx\n' +
-                'MjAyMjI0NjU3WjCBhTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWEx\n' +
-                'FjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xFTATBgNVBAoMDEpveWVudCwgSW5jLjEP\n' +
-                'MA0GA1UECwwGUG9ydGFsMSEwHwYJKoZIhvcNAQkBFhJzdXBwb3J0QGpveWVudC5j\n' +
-                'b20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANAWr+pYW+AEP4vC48fByPa2\n' +
-                'Fw0h8FSSgVO2zHyibH9S6nSFaNSLeHRofFdK+cD7IRt4A6jxp57IItNwjFiNNMjF\n' +
-                'CS5NXKIdPE6HMlb1X7ae+/nN3xRy5321Bi8yQZI6p6b9ATwP8mGBcvx4ta165YFt\n' +
-                'M2FmaYWLSNbHIwCxTQMJAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAXFT1q/uB3/fg\n' +
-                'Iq7iZ6R7q7tBYtd9ttQKp8by8jVToIXP4jUEWZ7vE9TZ1/Wm8ZHxlAPjZtN+rsmS\n' +
-                'LvgDV22T/s0LgSrdbB/rpYgjsJarlAGfbUYQ6gZKvCMSiZI7oJfl89HDT3PgCtSx\n' +
-                'RqHcNabt4hoSccUuACJ1FXkszJ312fA=\n' +
-                '-----END CERTIFICATE-----',
-            key: '-----BEGIN RSA PRIVATE KEY-----\n' +
-                'MIICXAIBAAKBgQDQFq/qWFvgBD+LwuPHwcj2thcNIfBUkoFTtsx8omx/Uup0hWjU\n' +
-                'i3h0aHxXSvnA+yEbeAOo8aeeyCLTcIxYjTTIxQkuTVyiHTxOhzJW9V+2nvv5zd8U\n' +
-                'cud9tQYvMkGSOqem/QE8D/JhgXL8eLWteuWBbTNhZmmFi0jWxyMAsU0DCQIDAQAB\n' +
-                'AoGBAJvz9OHAWRMae/mmFYqXfKMSM1J/Vhw8NLrl7HmYTZJbNSYg+kEZSiyMRmwx\n' +
-                '3963F8f7eVq7yfFhc2BeIIEZSy23J9QJCqVIqzl6m2URP4+Dw7ZS2iWIsiPyy+L8\n' +
-                'v8CXPQhRGouOXxU6h7WHpfw+Xy+WPVmIVARMi4UpmmOE52eBAkEA6gui4nD841Ds\n' +
-                'UEQDMuxNpCf+B20BWKkt8PNODY1HS4rBVCh81oMbaV7VDSabZM7Ba4wrmTAhb1Sc\n' +
-                'm7bc/YOb0QJBAOObuVTMCbJ7WZhAPHVYhGS5ptuL9fkktj2BPDcf/3KyuDsM6oVw\n' +
-                'Rs9kUfQrSV+w7YALqxWzNCUgzq+qLYPaGbkCQF5hKuIdph0UuPb1NkUGvZiA+BOO\n' +
-                'hYh3UKtlsggM/L8dyTBi01S9sgQf1dJjyy4vohf4gmxX2GPIvw6cAynINMECQEjc\n' +
-                '7TOMLf6JJmFrDu+x6pAkLppR7+hWLFD8Mj6ja69YL0oYFGurSb/Sqbm0scSEa0N2\n' +
-                'eMp1l9fa7M+ndvKiu2ECQGv4W2+yqlbD3Q3Dr14hiWaiYss5350Ohr5HiZZw2L3i\n' +
-                's35vQZaHqRxUVZjOi6/MTCZmqvg/RpaVQYHiJHvxGzw=\n' +
-                '-----END RSA PRIVATE KEY-----'
-            // jscs:enable maximumLineLength
+            certificate: CERTIFICATE,
+            key: KEY
         });
 
         server.get('/ping', function (req, res) {
@@ -950,6 +957,40 @@ describe('restify-client tests', function () {
         });
     });
 
+    it('secure client connection with server identity check', function (done) {
+        var server = restify.createServer({
+            certificate: CERTIFICATE,
+            key: KEY
+        });
+
+        server.get('/ping', function (req, res) {
+            res.end('pong');
+        });
+        server.listen(8443);
+
+        var client = clients.createStringClient({
+            url: 'https://127.0.0.1:8443',
+            connectTimeout: 2000,
+            ca: CERTIFICATE,
+            checkServerIdentity: function (servername, cert) {
+                // servername = "127.0.0.1", cert is Object
+                return undefined;
+            }
+        });
+        var timeout = setTimeout(function () {
+            assert.ok(false, 'timed out');
+            done();
+        }, 2050);
+
+        client.get('/ping', function (err, req, res, body) {
+            assert.ifError(err);
+            clearTimeout(timeout);
+            assert.equal(body, 'pong');
+            client.close();
+            server.close();
+            done();
+        });
+    });
 
     it('create JSON client with url instead of opts', function (done) {
         var client = clients.createJsonClient('http://127.0.0.1:' + PORT);
