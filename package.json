@@ -54,7 +54,7 @@
     "mocha": "^2.3.3",
     "nock": "^8.0.0",
     "nsp": "^2.0.1",
-    "restify": "^4.0.3"
+    "restify": "^4.1.0"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
