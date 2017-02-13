@@ -9,9 +9,10 @@ var assert = require('chai').assert;
 var bunyan = require('bunyan');
 var crypto = require('crypto');
 var format = require('util').format;
-var uuid   = require('uuid');
-
 var restify = require('restify');
+var uuid   = require('uuid');
+var verror = require('verror');
+
 var clients = require('../lib');
 var auditor = require('../lib/helpers/auditor');
 var pkgJson = require('../package');
@@ -752,9 +753,21 @@ describe('restify-client tests', function () {
             agent: false
         });
 
-        client.get('/foo', function (err, req) {
-            assert.ok(err);
+        client.get({
+            path: '/foo',
+            query: { a: 1 }
+        }, function (err, req) {
+            assert.isTrue(err instanceof Error);
             assert.equal(err.name, 'ConnectTimeoutError');
+            assert.equal(
+                err.message,
+                'GET request to http://169.254.1.10/foo?a=1 failed to ' +
+                'obtain connected socket within 100ms'
+            );
+            assert.deepEqual(verror.info(err), {
+                fullUrl: 'http://169.254.1.10/foo?a=1',
+                connectTimeout: 100
+            });
             done();
         });
     });
@@ -762,8 +775,18 @@ describe('restify-client tests', function () {
     it('requestTimeout', function (done) {
         TIMEOUT_CLIENT.get('/str/request_timeout',
             function (err, req, res, obj) {
-            assert.ok(err);
+            assert.isTrue(err instanceof Error);
             assert.equal(err.name, 'RequestTimeoutError');
+            assert.equal(
+                err.message,
+                'GET request to ' +
+                'http://127.0.0.1:' + PORT + '/str/request_timeout ' +
+                'failed to complete within 150ms'
+            );
+            assert.deepEqual(verror.info(err), {
+                fullUrl: 'http://127.0.0.1:' + PORT + '/str/request_timeout',
+                requestTimeout: 150
+            });
             done();
         });
     });
