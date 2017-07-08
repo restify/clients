@@ -10,4 +10,3 @@ node_js:
 after_success:
     - make report-coverage
     - make nsp
-
