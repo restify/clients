@@ -1,6 +1,6 @@
 {
   "name": "restify-clients",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "main": "lib/index.js",
   "description": "HttpClient, StringClient, and JsonClient extracted from restify",
   "homepage": "http://www.restify.com",
@@ -44,32 +44,32 @@
     "test": "make test"
   },
   "devDependencies": {
-    "chai": "^3.4.0",
+    "chai": "^4.0.2",
     "coveralls": "^2.11.4",
-    "eslint": "^3.1.0",
+    "eslint": "^4.1.1",
     "istanbul": "^0.4.0",
     "jscs": "^3.0.0",
     "json": "^9.0.4",
     "mkdirp": "^0.5.1",
-    "mocha": "^2.3.3",
-    "nock": "^8.0.0",
+    "mocha": "^3.4.2",
+    "nock": "^9.0.13",
     "nsp": "^2.0.1",
-    "restify": "^4.0.3"
+    "restify": "^4.3.0"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
     "backoff": "^2.4.1",
     "bunyan": "^1.8.3",
-    "dtrace-provider": "^0.7.0",
+    "dtrace-provider": "^0.8.3",
     "fast-safe-stringify": "^1.1.3",
     "keep-alive-agent": "0.0.1",
     "lodash": "^4.7.0",
     "lru-cache": "^4.0.1",
     "mime": "^1.3.4",
     "once": "^1.3.2",
-    "restify-errors": "^3.1.0",
+    "restify-errors": "^4.3.0",
     "semver": "^5.0.1",
-    "tunnel-agent": "^0.4.0",
+    "tunnel-agent": "^0.6.0",
     "uuid": "^3.0.1"
   }
 }
