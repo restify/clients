@@ -52,10 +52,10 @@ Here's an example of hitting the
 [Joyent CloudAPI](https://api.us-east-1.joyent.com):
 
 ```javascript
-var restify = require('restify');
+var clients = require('restify-clients');
 
 // Creates a JSON client
-var client = restify.createJsonClient({
+var client = clients.createJsonClient({
   url: 'https://us-east-1.api.joyent.com'
 });
 
@@ -72,9 +72,9 @@ As a short-hand, a client can be initialized with a string-URL rather than
 an options object:
 
 ```javascript
-var restify = require('restify');
+var clients = require('restify-clients');
 
-var client = restify.createJsonClient('https://us-east-1.api.joyent.com');
+var client = clients.createJsonClient('https://us-east-1.api.joyent.com');
 ```
 
 Note that all further documentation refers to the "short-hand" form of
