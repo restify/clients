@@ -2,6 +2,16 @@
 
 ## not yet released
 
+## 1.5.2
+
+- Switch back to restify-errors@3 to fix backward incompatiblity in
+  `<err>.code` for some error classes.
+
+## 1.5.1
+
+Note: *Bad Release*. `restify-errors` was erroneously updated, breaking
+the API.
+
 ## 1.5.0
 
 Add a `safeStringify` option to the JSON client to safely stringify request
