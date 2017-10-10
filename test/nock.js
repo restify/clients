@@ -44,5 +44,23 @@ describe('restify-client tests against nock', function () {
         client.get('/nock', done);
     });
 
+    it('reject with promise interface', function (done) {
+        var nockErr = new Error('My Error');
+
+        nock('http://127.0.0.1', {allowUnmocked: true})
+            .get('/nock')
+            .replyWithError(nockErr);
+
+        var client = clients.createJsonClient({
+            url: 'http://127.0.0.1'
+        });
+
+        client.get('/nock')
+            .catch(function (err) {
+                assert.equal(err, nockErr);
+                done();
+            });
+    });
+
 });
 

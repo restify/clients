@@ -273,6 +273,15 @@ describe('restify-client tests', function () {
         });
     });
 
+    it('GET json via Promise interface', function () {
+        return JSON_CLIENT.get('/json/mcavage')
+            .then(function (result) {
+                assert.ok(result.req);
+                assert.ok(result.res);
+                assert.deepEqual(result.obj, {hello: 'mcavage'});
+            });
+    });
+
     it('GH-778 GET jsonp', function (done) {
         // Using variables here to keep lines under 80 chars
         var jsonpUrl = '/json/jsonp?callback=testCallback';
@@ -352,6 +361,16 @@ describe('restify-client tests', function () {
             assert.deepEqual(obj, {hello: 'foo'});
             done();
         });
+    });
+
+    it('POST json via Promise interface', function () {
+        var data = { hello: 'foo' };
+        return JSON_CLIENT.post('/json/mcavage', data)
+            .then(function (result) {
+                assert.ok(result.req);
+                assert.ok(result.res);
+                assert.deepEqual(result.obj, {hello: 'foo'});
+            });
     });
 
     it('POST with circular JSON', function (done) {
@@ -461,6 +480,16 @@ describe('restify-client tests', function () {
             assert.equal(data, 'hello mcavage');
             done();
         });
+    });
+
+    it('GET text via Promise interface', function () {
+        return STR_CLIENT.get('/str/mcavage')
+            .then(function (result) {
+                assert.ok(result.req);
+                assert.ok(result.res);
+                assert.equal(result.res.body, result.data);
+                assert.equal(result.data, 'hello mcavage');
+            });
     });
 
     it('GET PARTIAL text', function (done) {
