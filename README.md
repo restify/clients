@@ -124,6 +124,20 @@ restify HTTP errors).  If `obj` looks like a `RestError`:
 then `err` gets "upconverted" into a `RestError` for you.  Otherwise
 it will be an `HttpError`.
 
+**Promise interface:**
+
+Without passing a callback as a last parameter to the method call, it returns 
+a Promise.  
+
+This returned Promise will be resolved with the same arguments as the callback 
+version would, except that arguments will be wrapped in an object, for example:
+
+```js
+client.get('/foo/bar')
+  .then(function({ req, res, obj }) {})
+  .catch(function(err) {});
+```
+
 #### createJsonClient(options)
 
 ```javascript
@@ -227,6 +241,20 @@ downloads as `text/plain`.  To extend a `StringClient`, take a look at
 the source for `JsonClient`. Effectively, you extend it, and set the
 appropriate options in the constructor and implement a `write` (for
 put/post) and `parse` method (for all HTTP bodies), and that's it.
+
+**Promise interface:**
+
+Without passing a callback as a last parameter to the method call, it returns 
+a Promise.  
+
+This returned Promise will be resolved with the same arguments as the callback 
+version would, except that arguments will be wrapped in an object, for example:
+
+```js
+client.get('/foo/bar')
+  .then(function({ req, res, data }) {})
+  .catch(function(err) {});
+```
 
 #### createStringClient(options)
 
