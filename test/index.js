@@ -283,6 +283,56 @@ describe('restify-client tests', function () {
         }
     });
 
+    describe('req.getTimings()', function () {
+        var TIMINGS_CLIENT_IP;
+        var TIMINGS_CLIENT_HOST;
+
+        beforeEach(function () {
+            TIMINGS_CLIENT_IP = clients.createJsonClient({
+                url: 'http://127.0.0.1:' + PORT,
+                retry: false
+            });
+            TIMINGS_CLIENT_HOST = clients.createJsonClient({
+                url: 'http://localhost:' + PORT,
+                retry: false
+            });
+        });
+
+        afterEach(function () {
+            TIMINGS_CLIENT_IP.close();
+            TIMINGS_CLIENT_HOST.close();
+        });
+
+        it('returns timings with IP', function (done) {
+            TIMINGS_CLIENT_IP.get('/json/mcavage', function (err, req, res) {
+                assert.ifError(err);
+                var timings = req.getTimings();
+                assert.isObject(timings);
+                assert.isNull(timings.dnsLookup);
+                assert.isNull(timings.tlsHandshake);
+                assert.isNumber(timings.tcpConnection);
+                assert.isNumber(timings.firstByte);
+                assert.isNumber(timings.contentTransfer);
+                assert.isNumber(timings.total);
+                done();
+            });
+        });
+
+        it('returns timings with Host', function (done) {
+            TIMINGS_CLIENT_HOST.get('/json/mcavage', function (err, req, res) {
+                assert.ifError(err);
+                var timings = req.getTimings();
+                assert.isObject(timings);
+                assert.isNumber(timings.dnsLookup);
+                assert.isNull(timings.tlsHandshake);
+                assert.isNumber(timings.tcpConnection);
+                assert.isNumber(timings.firstByte);
+                assert.isNumber(timings.contentTransfer);
+                assert.isNumber(timings.total);
+                done();
+            });
+        });
+    });
 
     it('GET json', function (done) {
         JSON_CLIENT.get('/json/mcavage', function (err, req, res, obj) {
