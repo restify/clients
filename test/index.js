@@ -116,7 +116,8 @@ function sendJsonNull(req, res, next) {
     next();
 }
 
-// sends back a body with the contents of the restify-clients-test-header received
+// sends back a body with the contents of the restify-clients-test-header
+// received
 function sendTestHeader(req, res, next) {
     res.header('content-type', 'json');
     res.send(200, req.header('restify-clients-test-header', 'missing'));
@@ -1333,7 +1334,8 @@ describe('restify-client tests', function () {
         });
     });
 
-    // Shows that the .before and .after functions are called for each client type.
+    // Shows that the .before and .after functions are called for each client
+    // type.
     describe('before/after hooks', function () {
         var _clients = {
             HttpClient: {
@@ -1381,7 +1383,8 @@ describe('restify-client tests', function () {
         Object.keys(_clients).forEach(function (clientName) {
             var _client = _clients[clientName];
 
-            // {Http,Json,String}Client should be able to use .beforeSync and .after
+            // {Http,Json,String}Client should be able to use .beforeSync and
+            // .after
             it('request from ' + clientName, function (done) {
                 var afterCtx = false;
                 var afterRan = false;
@@ -1399,7 +1402,8 @@ describe('restify-client tests', function () {
                         cb();
                     }, before: function (opts, cb) {
                         beforeRan = true;
-                        opts.headers['restify-clients-test-header'] = clientName;
+                        opts.headers['restify-clients-test-header'] =
+                            clientName;
                         cb({hello: 'world'});
                     }, url: serverUrl
                 });
