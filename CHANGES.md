@@ -12,6 +12,9 @@
 ### Fix ###
 * #132: Handle multibyte characters properly in gzipped responses
 
+### New ###
+- #95: Add support for `before` and `after` hooks on client requests.
+
 ## 1.5.2
 
 - Switch back to restify-errors@3 to fix backward incompatiblity in
