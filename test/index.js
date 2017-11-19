@@ -1432,8 +1432,7 @@ describe('restify-client tests', function () {
         });
     });
 
-    // Shows that the .before and .after functions are called for each client
-    // type.
+    // Ensure the .before and .after functions are called for each client.
     describe('before/after hooks', function () {
         var _clients = {
             HttpClient: {
@@ -1444,6 +1443,7 @@ describe('restify-client tests', function () {
                 creator: clients.createStringClient
             }
         };
+        var handles = [];
         var server = restify.createServer({});
         var serverUrl;
 
@@ -1478,11 +1478,10 @@ describe('restify-client tests', function () {
             callback();
         });
 
+        // {Http,Json,String}Client should be able to use .before and .after
         Object.keys(_clients).forEach(function (clientName) {
             var _client = _clients[clientName];
 
-            // {Http,Json,String}Client should be able to use .beforeSync and
-            // .after
             it('request from ' + clientName, function (done) {
                 var afterCtx = false;
                 var afterRan = false;
@@ -1506,25 +1505,86 @@ describe('restify-client tests', function () {
                     }, url: serverUrl
                 });
 
+                handles.push(client);
+
                 client.get('/testheader', function (err, req, res, data) {
                     assert.ifError(err);
                     _getBody(clientName, req, data, function (body) {
                         assert.equal(body, clientName);
                         assert.equal(beforeRan, true);
-                        assert.ok(afterRan, true);
-                        assert.ok(afterCtx, true);
+                        assert.equal(afterRan, true);
+                        assert.equal(afterCtx, true);
 
                         done();
                     });
                 });
+            });
 
-                _clients[clientName].handle = client;
+            it('request (w/o after) from ' + clientName, function (done) {
+                var afterRan = false;
+                var beforeRan = false;
+                var client;
+
+                client = _client.creator({
+                    before: function (opts, cb) {
+                        beforeRan = true;
+                        opts.headers['restify-clients-test-header'] =
+                            clientName;
+                        cb({hello: 'world'});
+                    }, url: serverUrl
+                });
+
+                handles.push(client);
+
+                client.get('/testheader', function (err, req, res, data) {
+                    assert.ifError(err);
+                    _getBody(clientName, req, data, function (body) {
+                        assert.equal(body, clientName);
+                        assert.equal(beforeRan, true);
+                        assert.equal(afterRan, false);
+
+                        done();
+                    });
+                });
+            });
+
+            it('request (w/o before) from ' + clientName, function (done) {
+                var afterCtx = false;
+                var afterRan = false;
+                var beforeRan = false;
+                var client;
+
+                client = _client.creator({
+                    after: function (err, req, res, ctx, cb) {
+                        assert.ifError(err);
+                        afterRan = true;
+                        // got ctx from before() function
+                        if (ctx && ctx.hello === 'world') {
+                            afterCtx = true;
+                        }
+                        cb();
+                    }, url: serverUrl
+                });
+
+                handles.push(client);
+
+                client.get('/testheader', function (err, req, res, data) {
+                    assert.ifError(err);
+                    _getBody(clientName, req, data, function (body) {
+                        assert.equal(body, 'missing');
+                        assert.equal(beforeRan, false);
+                        assert.equal(afterRan, true);
+                        assert.equal(afterCtx, false);
+
+                        done();
+                    });
+                });
             });
         });
 
         after(function (callback) {
-            Object.keys(_clients).forEach(function (clientName) {
-                _clients[clientName].handle.close();
+            handles.forEach(function (clientHandle) {
+                clientHandle.close();
             });
             server.close();
             callback();
