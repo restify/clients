@@ -4,7 +4,7 @@ var assert = require('chai').assert;
 var proxyquire = require('proxyquire');
 var sinon = require('sinon');
 
-describe.only('restify-clients JsonClient tests', function () {
+describe('restify-clients JsonClient tests', function () {
 
     var JsonClient;
     var StringClient;
