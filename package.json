@@ -21,6 +21,7 @@
     "Mihir Rege",
     "Ray Solomon",
     "Trent Mick",
+    "Vinicius Kiatkoski Neves",
     "Vladimir Bulyga",
     "Wagner Francisco Mezaroba"
   ],
@@ -54,7 +55,9 @@
     "mocha": "^3.4.2",
     "nock": "^9.0.13",
     "nsp": "^2.0.1",
-    "restify": "^4.3.0"
+    "proxyquire": "^1.8.0",
+    "restify": "^4.3.0",
+    "sinon": "^4.1.2"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",

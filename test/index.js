@@ -309,7 +309,7 @@ describe('restify-client tests', function () {
             });
         } catch (err) {
             assert.ok(err);
-            assert.equal(err.constructor, TypeError);
+            assert.equal(err instanceof TypeError, true);
             var errMsgRe = /^Request path contains unescaped characters\.?$/;
             assert.ok(errMsgRe.test(err.message),
                 format('error message matches %s: %j', errMsgRe, err.message));
