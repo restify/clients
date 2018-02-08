@@ -74,20 +74,11 @@ function sendSignature(req, res, next) {
     }
 }
 
-
 function sendWhitespace(req, res, next) {
-    var body = ' ';
-
-    if (req.params.flavor === 'spaces') {
-        body = '   ';
-    } else if (req.params.flavor === 'tabs') {
-        body = ' \t\t  ';
-    }
-
     // override contentType as otherwise the string is json-ified to
-    // include quotes. Don't want that for this tesassert.
+    // include quotes. Don't want that for this test.
     res.header('content-type', 'text/plain');
-    res.send(body);
+    res.send(' ');
     next();
 }
 
@@ -177,7 +168,7 @@ describe('restify-client tests', function () {
             SERVER.use(restify.bodyParser());
 
             SERVER.get('/signed', sendSignature);
-            SERVER.get('/whitespace/:flavor', sendWhitespace);
+            SERVER.get('/whitespace', sendWhitespace);
 
             SERVER.get('/json/boom', function (req, res, next) {
                 res.set('content-type', 'text/html');
@@ -813,28 +804,6 @@ describe('restify-client tests', function () {
     });
 
 
-    it('GH-203 GET json, body is whitespace', function (done) {
-        JSON_CLIENT.get('/whitespace/spaces', function (err, req, res, obj) {
-            assert.ifError(err);
-            assert.ok(req);
-            assert.ok(res);
-            assert.strictEqual(obj, '   ');
-            done();
-        });
-    });
-
-
-    it('GH-203 GET json, body is tabs', function (done) {
-        JSON_CLIENT.get('/whitespace/tabs', function (err, req, res, obj) {
-            assert.ifError(err);
-            assert.ok(req);
-            assert.ok(res);
-            assert.strictEqual(obj, ' \t\t  ');
-            done();
-        });
-    });
-
-
     it('don\'t sign a request', function (done) {
         var client = clients.createClient({
             url: 'http://127.0.0.1:' + PORT,
@@ -1200,6 +1169,21 @@ describe('restify-client tests', function () {
             // raw res.body is unparsed JSON
             assert.deepEqual(res.body, '{"hello":"foobar"}');
             assert.deepEqual(data, { hello : 'foobar' });
+            return done();
+        });
+    });
+
+    it('GH-146: empty string should return parse error', function (done) {
+        JSON_CLIENT.get('/whitespace', function (err, req, res, data) {
+            assert.ok(err);
+            assert.deepEqual(err.name, 'RestError');
+            assert.deepEqual(err.message, 'Invalid JSON in response');
+            assert.deepEqual(err.cause().name, 'SyntaxError');
+            assert.include(err.cause().message, 'Unexpected end of');
+            assert.strictEqual(res.statusCode, 200);
+            // raw res.body is unparsed JSON
+            assert.deepEqual(res.body, ' ');
+            assert.deepEqual(data, ' ');
             return done();
         });
     });
