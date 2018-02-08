@@ -77,8 +77,15 @@ function sendSignature(req, res, next) {
 function sendWhitespace(req, res, next) {
     // override contentType as otherwise the string is json-ified to
     // include quotes. Don't want that for this test.
+    var count = parseInt(req.params.count);
+    var whitespaces = '';
+
+    while (count--) {
+        whitespaces += ' ';
+    }
+
     res.header('content-type', 'text/plain');
-    res.send(' ');
+    res.send(whitespaces);
     next();
 }
 
@@ -168,7 +175,7 @@ describe('restify-client tests', function () {
             SERVER.use(restify.bodyParser());
 
             SERVER.get('/signed', sendSignature);
-            SERVER.get('/whitespace', sendWhitespace);
+            SERVER.get('/whitespace/:count', sendWhitespace);
 
             SERVER.get('/json/boom', function (req, res, next) {
                 res.set('content-type', 'text/html');
@@ -1121,7 +1128,7 @@ describe('restify-client tests', function () {
         });
     });
 
-    it('GH-146: JSONClient should errback on receiving invalid JSON',
+    it('GH-147: JSONClient should errback on receiving invalid JSON',
     function (done) {
         JSON_CLIENT.get('/json/invalid', function (err, req, res, data) {
             assert.ok(err);
@@ -1136,7 +1143,7 @@ describe('restify-client tests', function () {
         });
     });
 
-    it('GH-146: JSONClient should prefer http error over parse error',
+    it('GH-147: JSONClient should prefer http error over parse error',
     function (done) {
         JSON_CLIENT.get('/json/invalid500', function (err, req, res, data) {
             assert.ok(err);
@@ -1151,7 +1158,7 @@ describe('restify-client tests', function () {
         });
     });
 
-    it('GH-146: JSONClient should not error on receiving txt/plain',
+    it('GH-147: JSONClient should not error on receiving txt/plain',
     function (done) {
         JSON_CLIENT.get('/str/foobar', function (err, req, res, data) {
             assert.ifError(err);
@@ -1161,7 +1168,7 @@ describe('restify-client tests', function () {
         });
     });
 
-    it('GH-146: JSONClient should accept string input', function (done) {
+    it('GH-147: JSONClient should accept string input', function (done) {
         JSON_CLIENT.post('/json/string', 'foobar',
         function (err, req, res, data) {
             assert.ifError(err);
@@ -1173,8 +1180,8 @@ describe('restify-client tests', function () {
         });
     });
 
-    it('GH-146: empty string should return parse error', function (done) {
-        JSON_CLIENT.get('/whitespace', function (err, req, res, data) {
+    it('GH-147: whitespace should return parse error', function (done) {
+        JSON_CLIENT.get('/whitespace/1', function (err, req, res, data) {
             assert.ok(err);
             assert.deepEqual(err.name, 'RestError');
             assert.deepEqual(err.message, 'Invalid JSON in response');
@@ -1184,6 +1191,15 @@ describe('restify-client tests', function () {
             // raw res.body is unparsed JSON
             assert.deepEqual(res.body, ' ');
             assert.deepEqual(data, ' ');
+            return done();
+        });
+    });
+
+    it('GH-147: empty payload should not return parse error', function (done) {
+        JSON_CLIENT.get('/whitespace/0', function (err, req, res, data) {
+            assert.ifError(err);
+            assert.deepEqual(res.body, '');
+            assert.deepEqual(data, '');
             return done();
         });
     });
