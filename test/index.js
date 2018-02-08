@@ -297,22 +297,6 @@ describe('restify-client tests', function () {
     });
 
 
-    it.skip('GH-778 GET jsonp', function (done) {
-        // Using variables here to keep lines under 80 chars
-        var jsonpUrl = '/json/jsonp?callback=testCallback';
-        var expectedResult = 'typeof testCallback === \'function\' && ' +
-                             'testCallback({"hello":"jsonp"});';
-
-        JSON_CLIENT.get(jsonpUrl, function (err, req, res) {
-            assert.ifError(err);
-            assert.ok(req);
-            assert.ok(res);
-            assert.equal(res.body, expectedResult);
-            done();
-        });
-    });
-
-
     it('GH-115 GET path with spaces', function (done) {
         // As of node v0.11, this throws, since it's never valid HTTP
         try {
@@ -435,8 +419,8 @@ describe('restify-client tests', function () {
             assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
-            assert.deepEqual(obj, {});
             assert.strictEqual(res.body, '0');
+            assert.strictEqual(obj, '0');
             done();
         });
     });
@@ -447,8 +431,8 @@ describe('restify-client tests', function () {
             assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
-            assert.deepEqual(obj, {});
             assert.strictEqual(res.body, 'false');
+            assert.strictEqual(obj, 'false');
             done();
         });
     });
@@ -459,8 +443,8 @@ describe('restify-client tests', function () {
             assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
-            assert.deepEqual(obj, {});
             assert.strictEqual(res.body, 'null');
+            assert.strictEqual(obj, 'null');
             done();
         });
     });
@@ -834,7 +818,7 @@ describe('restify-client tests', function () {
             assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
-            assert.deepEqual(obj, {});
+            assert.strictEqual(obj, '   ');
             done();
         });
     });
@@ -845,7 +829,7 @@ describe('restify-client tests', function () {
             assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
-            assert.deepEqual(obj, {});
+            assert.strictEqual(obj, ' \t\t  ');
             done();
         });
     });
@@ -1177,6 +1161,8 @@ describe('restify-client tests', function () {
             assert.deepEqual(err.cause().name, 'SyntaxError');
             assert.include(err.cause().message, 'Unexpected end of');
             assert.equal(200, res.statusCode);
+            assert.equal(data, '{"foo":"bar}');
+            assert.equal(res.body, '{"foo":"bar}');
             return done();
         });
     });
@@ -1190,6 +1176,8 @@ describe('restify-client tests', function () {
             assert.include(err.message, '{"foo":"bar}');
             assert.isUndefined(err.cause());
             assert.deepEqual(res.statusCode, 500);
+            assert.deepEqual(data, '{"foo":"bar}');
+            assert.deepEqual(res.body, '{"foo":"bar}');
             return done();
         });
     });
@@ -1198,8 +1186,8 @@ describe('restify-client tests', function () {
     function (done) {
         JSON_CLIENT.get('/str/foobar', function (err, req, res, data) {
             assert.ifError(err);
-            assert.deepEqual(data, 'hello foobar');
-            assert.deepEqual(res.statusCode, 200);
+            assert.strictEqual(res.statusCode, 200);
+            assert.strictEqual(data, 'hello foobar');
             return done();
         });
     });
@@ -1208,7 +1196,10 @@ describe('restify-client tests', function () {
         JSON_CLIENT.post('/json/string', 'foobar',
         function (err, req, res, data) {
             assert.ifError(err);
-            assert.deepEqual(data, { hello: 'foobar' });
+            assert.strictEqual(res.statusCode, 200);
+            // raw res.body is unparsed JSON
+            assert.deepEqual(res.body, '{"hello":"foobar"}');
+            assert.deepEqual(data, { hello : 'foobar' });
             return done();
         });
     });
