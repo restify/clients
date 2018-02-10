@@ -3,6 +3,7 @@
 ## not yet released
 
 ### Breaking ###
+* #141: Throw when the `url` option does not have a valid http/https protocol.
 * #148: JSONClient is now strict about valid responses. Non JSON responses
   return parse errors to the caller. HTTP errors supersede parse errors. JSONP
   is also no longer supported. Empty responses return an empty pojo `{}`.
