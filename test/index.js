@@ -1195,11 +1195,11 @@ describe('restify-client tests', function () {
         });
     });
 
-    it('GH-147: empty payload should not return parse error', function (done) {
+    it('GH-147: empty payload should return empty pojo', function (done) {
         JSON_CLIENT.get('/whitespace/0', function (err, req, res, data) {
             assert.ifError(err);
             assert.deepEqual(res.body, '');
-            assert.deepEqual(data, '');
+            assert.deepEqual(data, {});
             return done();
         });
     });
