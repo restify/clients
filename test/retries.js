@@ -77,6 +77,43 @@ describe('backoffs and retries', function () {
         });
     });
 
+    it('should emit `retry` event on exponential retry', function (done) {
+        var retries = 0;
+
+        BAD_CLIENT.on('retry', function () {
+            retries++;
+        });
+
+        BAD_CLIENT.get({
+            path: '/shouldfail',
+            retry: {
+                // set lower minTimeout so test doesn't take so long
+                minTimeout: 100
+            }
+        }, function (err, req, res, data) {
+            assert.ok(err);
+            assert.strictEqual(retries, 4);
+            return done();
+        });
+    });
+
+    it('should emit `retry` event on non-exponential retry', function (done) {
+        var retries = 0;
+
+        BAD_CLIENT.on('retry', function () {
+            retries++;
+        });
+
+        BAD_CLIENT.get({
+            path: '/shouldfail',
+            exponentialBackoff: false
+        }, function (err, req, res, data) {
+            assert.ok(err);
+            assert.strictEqual(retries, 4);
+            return done();
+        });
+    });
+
     it('should not retry on 4xx', function (done) {
         SERVER.get('/4xx', function (req, res, next) {
             res.send(400);
