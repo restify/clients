@@ -74,20 +74,18 @@ function sendSignature(req, res, next) {
     }
 }
 
-
 function sendWhitespace(req, res, next) {
-    var body = ' ';
+    // override contentType as otherwise the string is json-ified to
+    // include quotes. Don't want that for this test.
+    var count = parseInt(req.params.count);
+    var whitespaces = '';
 
-    if (req.params.flavor === 'spaces') {
-        body = '   ';
-    } else if (req.params.flavor === 'tabs') {
-        body = ' \t\t  ';
+    while (count--) {
+        whitespaces += ' ';
     }
 
-    // override contentType as otherwise the string is json-ified to
-    // include quotes. Don't want that for this tesassert.
     res.header('content-type', 'text/plain');
-    res.send(body);
+    res.send(whitespaces);
     next();
 }
 
@@ -110,10 +108,29 @@ function sendJsonFalse(req, res, next) {
     next();
 }
 
+function sendJsonInvalid(req, res, next) {
+    res.header('content-type', 'application/json');
+    res.end('{"foo":"bar}');
+    return next();
+}
+
+function sendJsonInvalid500(req, res, next) {
+    res.header('content-type', 'application/json');
+    res.status(500);
+    res.end('{"foo":"bar}');
+    return next();
+}
+
 function sendJsonNull(req, res, next) {
     res.header('content-type', 'json');
     res.send(200, null);
     next();
+}
+
+function sendJsonString(req, res, next) {
+    res.header('content-type', 'application/json');
+    res.send({ hello: req.params });
+    return next();
 }
 
 function getLog(name, stream, level) {
@@ -146,7 +163,8 @@ describe('restify-client tests', function () {
         try {
             SERVER = restify.createServer({
                 dtrace: dtrace,
-                log: getLog('server')
+                log: getLog('server'),
+                handleUncaughtExceptions: false
             });
 
             SERVER.use(restify.acceptParser(['json', 'text/plain']));
@@ -157,7 +175,7 @@ describe('restify-client tests', function () {
             SERVER.use(restify.bodyParser());
 
             SERVER.get('/signed', sendSignature);
-            SERVER.get('/whitespace/:flavor', sendWhitespace);
+            SERVER.get('/whitespace/:count', sendWhitespace);
 
             SERVER.get('/json/boom', function (req, res, next) {
                 res.set('content-type', 'text/html');
@@ -176,6 +194,9 @@ describe('restify-client tests', function () {
             SERVER.get('/json/zero', sendJsonZero);
             SERVER.get('/json/false', sendJsonFalse);
             SERVER.get('/json/null', sendJsonNull);
+            SERVER.get('/json/invalid', sendJsonInvalid);
+            SERVER.get('/json/invalid500', sendJsonInvalid500);
+            SERVER.post('/json/string', sendJsonString);
 
             SERVER.get('/json/:name', sendJson);
             SERVER.head('/json/:name', sendJson);
@@ -269,31 +290,6 @@ describe('restify-client tests', function () {
             assert.ok(req);
             assert.ok(res);
             assert.deepEqual(obj, {hello: 'mcavage'});
-            done();
-        });
-    });
-
-    it('GH-778 GET jsonp', function (done) {
-        // Using variables here to keep lines under 80 chars
-        var jsonpUrl = '/json/jsonp?callback=testCallback';
-        var expectedResult = 'typeof testCallback === \'function\' && ' +
-                             'testCallback({"hello":"jsonp"});';
-
-        JSON_CLIENT.get(jsonpUrl, function (err, req, res) {
-            assert.ifError(err);
-            assert.ok(req);
-            assert.ok(res);
-            assert.equal(res.body, expectedResult);
-            done();
-        });
-    });
-
-    it('GH-388 GET json, but really HTML', function (done) {
-        JSON_CLIENT.get('/json/boom', function (err, req, res, obj) {
-            assert.ifError(err);
-            assert.ok(req);
-            assert.ok(res);
-            assert.deepEqual(obj, {});
             done();
         });
     });
@@ -421,8 +417,8 @@ describe('restify-client tests', function () {
             assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
-            assert.deepEqual(obj, {});
             assert.strictEqual(res.body, '0');
+            assert.strictEqual(obj, '0');
             done();
         });
     });
@@ -433,8 +429,8 @@ describe('restify-client tests', function () {
             assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
-            assert.deepEqual(obj, {});
             assert.strictEqual(res.body, 'false');
+            assert.strictEqual(obj, 'false');
             done();
         });
     });
@@ -445,8 +441,8 @@ describe('restify-client tests', function () {
             assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
-            assert.deepEqual(obj, {});
             assert.strictEqual(res.body, 'null');
+            assert.strictEqual(obj, 'null');
             done();
         });
     });
@@ -815,28 +811,6 @@ describe('restify-client tests', function () {
     });
 
 
-    it('GH-203 GET json, body is whitespace', function (done) {
-        JSON_CLIENT.get('/whitespace/spaces', function (err, req, res, obj) {
-            assert.ifError(err);
-            assert.ok(req);
-            assert.ok(res);
-            assert.deepEqual(obj, {});
-            done();
-        });
-    });
-
-
-    it('GH-203 GET json, body is tabs', function (done) {
-        JSON_CLIENT.get('/whitespace/tabs', function (err, req, res, obj) {
-            assert.ifError(err);
-            assert.ok(req);
-            assert.ok(res);
-            assert.deepEqual(obj, {});
-            done();
-        });
-    });
-
-
     it('don\'t sign a request', function (done) {
         var client = clients.createClient({
             url: 'http://127.0.0.1:' + PORT,
@@ -1151,6 +1125,82 @@ describe('restify-client tests', function () {
             assert.equal(err.name, 'TooManyRedirectsError');
             client.close();
             done();
+        });
+    });
+
+    it('GH-147: JSONClient should errback on receiving invalid JSON',
+    function (done) {
+        JSON_CLIENT.get('/json/invalid', function (err, req, res, data) {
+            assert.ok(err);
+            assert.deepEqual(err.name, 'RestError');
+            assert.deepEqual(err.message, 'Invalid JSON in response');
+            assert.deepEqual(err.cause().name, 'SyntaxError');
+            assert.include(err.cause().message, 'Unexpected end of');
+            assert.equal(200, res.statusCode);
+            assert.equal(data, '{"foo":"bar}');
+            assert.equal(res.body, '{"foo":"bar}');
+            return done();
+        });
+    });
+
+    it('GH-147: JSONClient should prefer http error over parse error',
+    function (done) {
+        JSON_CLIENT.get('/json/invalid500', function (err, req, res, data) {
+            assert.ok(err);
+            assert.deepEqual(err.name, 'InternalServerError');
+            // should include original unparsed JSON payload
+            assert.include(err.message, '{"foo":"bar}');
+            assert.isUndefined(err.cause());
+            assert.deepEqual(res.statusCode, 500);
+            assert.deepEqual(data, '{"foo":"bar}');
+            assert.deepEqual(res.body, '{"foo":"bar}');
+            return done();
+        });
+    });
+
+    it('GH-147: JSONClient should not error on receiving txt/plain',
+    function (done) {
+        JSON_CLIENT.get('/str/foobar', function (err, req, res, data) {
+            assert.ifError(err);
+            assert.strictEqual(res.statusCode, 200);
+            assert.strictEqual(data, 'hello foobar');
+            return done();
+        });
+    });
+
+    it('GH-147: JSONClient should accept string input', function (done) {
+        JSON_CLIENT.post('/json/string', 'foobar',
+        function (err, req, res, data) {
+            assert.ifError(err);
+            assert.strictEqual(res.statusCode, 200);
+            // raw res.body is unparsed JSON
+            assert.deepEqual(res.body, '{"hello":"foobar"}');
+            assert.deepEqual(data, { hello : 'foobar' });
+            return done();
+        });
+    });
+
+    it('GH-147: whitespace should return parse error', function (done) {
+        JSON_CLIENT.get('/whitespace/1', function (err, req, res, data) {
+            assert.ok(err);
+            assert.deepEqual(err.name, 'RestError');
+            assert.deepEqual(err.message, 'Invalid JSON in response');
+            assert.deepEqual(err.cause().name, 'SyntaxError');
+            assert.include(err.cause().message, 'Unexpected end of');
+            assert.strictEqual(res.statusCode, 200);
+            // raw res.body is unparsed JSON
+            assert.deepEqual(res.body, ' ');
+            assert.deepEqual(data, ' ');
+            return done();
+        });
+    });
+
+    it('GH-147: empty payload should return empty pojo', function (done) {
+        JSON_CLIENT.get('/whitespace/0', function (err, req, res, data) {
+            assert.ifError(err);
+            assert.deepEqual(res.body, '');
+            assert.deepEqual(data, {});
+            return done();
         });
     });
 

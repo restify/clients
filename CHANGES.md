@@ -2,6 +2,11 @@
 
 ## not yet released
 
+### Breaking ###
+* #148: JSONClient is now strict about valid responses. Non JSON responses
+  return parse errors to the caller. HTTP errors supersede parse errors. JSONP
+  is also no longer supported. Empty responses return an empty pojo `{}`.
+
 ## 1.5.2
 
 - Switch back to restify-errors@3 to fix backward incompatiblity in
