@@ -1,5 +1,9 @@
 'use strict';
 
+// core modules
+var fs = require('fs');
+var path = require('path');
+
 // external files
 var assert = require('chai').assert;
 var bunyan = require('bunyan');
@@ -15,7 +19,7 @@ describe('StringClient', function () {
     var LOG = bunyan.createLogger({
         name: 'clientlog'
     });
-    var CLIENT = clients.createJSONClient({
+    var CLIENT = clients.createStringClient({
         url: 'http://localhost:3000',
         log: LOG,
         retry: false,
@@ -39,9 +43,12 @@ describe('StringClient', function () {
 
     it('should support decoding gzipped utf8 multibyte responses',
     function (done) {
+        var payload = fs.readFileSync(path.join(
+            __dirname, './etc/multibyte.txt'
+        )).toString();
+
         SERVER.use(restify.plugins.gzipResponse());
         SERVER.get('/multibyte', function (req, res, next) {
-            var payload = require('./etc/multibyte.json');
             res.send(payload);
             return next();
         });
@@ -53,7 +60,7 @@ describe('StringClient', function () {
             }
         }, function (err, req, res, data) {
             assert.ifError(err);
-            assert.deepEqual(data, require('./etc/multibyte.json'));
+            assert.deepEqual(data, payload);
             return done();
         });
     });
