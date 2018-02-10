@@ -26,12 +26,14 @@ describe('HttpClient', function () {
             CLIENT = clients.createHttpClient({
                 url: 'http://www.restify.com'
             });
-            assert.strictEqual(CLIENT.url.protocol, 'http:');
+        });
+        assert.strictEqual(CLIENT.url.protocol, 'http:');
 
+        assert.doesNotThrow(function () {
             CLIENT = clients.createHttpClient({
                 url: 'https://www.restify.com'
             });
-            assert.strictEqual(CLIENT.url.protocol, 'https:');
         });
+        assert.strictEqual(CLIENT.url.protocol, 'https:');
     });
 });
