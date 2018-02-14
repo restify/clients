@@ -7,6 +7,13 @@
 * #148: JSONClient is now strict about valid responses. Non JSON responses
   return parse errors to the caller. HTTP errors supersede parse errors. JSONP
   is also no longer supported. Empty responses return an empty pojo `{}`.
+* #149: On retries, the `attempt` event was renamed to `retry`.
+
+### New ###
+* #149: Introduced a `req.getAttempts()` API which returns the number of
+  attempts made to establish a connection.
+* #149: Introduced `opts.exponentialBackoff: false` flag to allow retries
+  without exponential backoff.
 
 ### Fix ###
 * #132: Handle multibyte characters properly in gzipped responses
