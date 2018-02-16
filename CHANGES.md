@@ -7,6 +7,7 @@
 * #148: JSONClient is now strict about valid responses. Non JSON responses
   return parse errors to the caller. HTTP errors supersede parse errors. JSONP
   is also no longer supported. Empty responses return an empty pojo `{}`.
+* #152: honor requestTimeout when socket has already been established.
 
 ### Fix ###
 * #132: Handle multibyte characters properly in gzipped responses
