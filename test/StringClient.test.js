@@ -22,13 +22,10 @@ describe('StringClient', function () {
     var CLIENT = clients.createStringClient({
         url: 'http://localhost:3000',
         log: LOG,
-        retry: false,
-        headers: {
-            connection: 'close'
-        }
+        retry: false
     });
 
-    before(function (done) {
+    beforeEach(function (done) {
         SERVER = restify.createServer({
             name: 'unittest',
             log: LOG
@@ -36,8 +33,8 @@ describe('StringClient', function () {
         SERVER.listen(3000, done);
     });
 
-
-    after(function (done) {
+    afterEach(function (done) {
+        CLIENT.close();
         SERVER.close(done);
     });
 
@@ -62,6 +59,37 @@ describe('StringClient', function () {
             assert.ifError(err);
             assert.deepEqual(data, payload);
             return done();
+        });
+    });
+
+
+    it('should honor requestTimeout when socket has already been established',
+    function (done) {
+        SERVER.get('/foo', function (req, res, next) {
+            res.send('foo');
+            return next();
+        });
+
+        SERVER.get('/fooSlow', function (req, res, next) {
+            setTimeout(function () {
+                res.send('foo');
+                return next();
+            }, 200);
+        });
+
+        // first request should establish keep alive
+        CLIENT.get('/foo', function (err, req, res, data) {
+            assert.ifError(err);
+            assert.strictEqual(data, 'foo');
+            // second request should reuse existing socket
+            CLIENT.get({
+                path: '/fooSlow',
+                requestTimeout: 100
+            }, function (err2, req2, res2, data2) {
+                assert.ok(err2);
+                assert.strictEqual(err2.name, 'RequestTimeoutError');
+                return done();
+            });
         });
     });
 });
