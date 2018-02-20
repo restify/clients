@@ -21,7 +21,6 @@ var REST_CODES = [
     { name: 'InvalidVersionError', code: 400 },
     { name: 'MissingParameterError', code: 409 },
     { name: 'NotAuthorizedError', code: 403 },
-    { name: 'PreconditionFailedError', code: 412 },
     { name: 'RequestExpiredError', code: 400 },
     { name: 'RequestThrottledError', code: 429 },
     { name: 'ResourceNotFoundError', code: 404 },
@@ -43,7 +42,7 @@ var HTTP_CODES = [
     { name: 'LengthRequiredError', code: 411 },
     // The PreconditionFailedError exported by restify-errors is
     // actually a RestError, and not an HttpError:
-    // { name: 'PreconditionFailedError', code: 412 },
+    { name: 'PreconditionFailedError', code: 412 },
     { name: 'UnsupportedMediaTypeError', code: 415 },
     { name: 'ExpectationFailedError', code: 417 },
     { name: 'ImATeapotError', code: 418 },
@@ -127,12 +126,13 @@ describe('errors are part of the interface', function () {
 
     it('check that HttpErrors are correct', function (done) {
         HTTP_CODES.forEach(function (info) {
+            var shortName = info.name.replace(/Error$/, '');
             var constructor = errors[info.name];
             assert.isOk(constructor, info.name);
 
             var err = new constructor();
             assert.deepEqual(info.name, err.name);
-            assert.deepEqual(info.name, err.body.code);
+            assert.deepEqual(shortName, err.body.code);
             assert.deepEqual(info.code, err.statusCode);
             assert.isOk(err instanceof errors.HttpError);
         });
