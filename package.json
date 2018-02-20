@@ -72,8 +72,7 @@
     "restify-errors": "git+https://git@github.com/restify/errors#verror-base",
     "semver": "^5.0.1",
     "tunnel-agent": "^0.6.0",
-    "uuid": "^3.0.1",
-    "verror": "^1.9.0"
+    "uuid": "^3.0.1"
   },
   "optionalDependency": {
     "dtrace-provider": "^0.8.3"
