@@ -30,6 +30,7 @@ describe('StringClient', function () {
             name: 'unittest',
             log: LOG
         });
+        SERVER.use(restify.plugins.queryParser());
         SERVER.listen(3000, done);
     });
 
@@ -90,6 +91,28 @@ describe('StringClient', function () {
                 assert.strictEqual(err2.name, 'RequestTimeoutError');
                 return done();
             });
+        });
+    });
+
+
+    it('should support query option for querystring', function (done) {
+        SERVER.get('/foo', function (req, res, next) {
+            assert.deepEqual(req.query, {
+                foo: 'bar'
+            });
+            res.send(200);
+            return next();
+        });
+
+        CLIENT.get({
+            path: '/foo',
+            query: {
+                foo: 'bar'
+            }
+        }, function (err, req, res, data) {
+            assert.ifError(err);
+            assert.strictEqual(req.path, '/foo?foo=bar');
+            return done();
         });
     });
 });

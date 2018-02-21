@@ -131,7 +131,7 @@ var client = restify.createJsonClient({
   url: 'https://api.us-east-1.joyent.com',
   version: '*'
 });
-```    
+```
 
 ### API Options:
 
@@ -147,6 +147,7 @@ var client = restify.createJsonClient({
 |gzip|Object|Will compress data when sent using `content-encoding: gzip`|
 |headers|Object|HTTP headers to set in all requests|
 |log|Object|[bunyan](https://github.com/trentm/node-bunyan) instance|
+|query|Object|querystring object to be serialized via querystring module|
 |retry|Object|options to provide to node-retry;"false" disables retry; defaults to 4 retries|
 |safeStringify|Boolean|Safely serialize JSON objects, i.e. circular dependencies|
 |signRequest|Function|synchronous callback for interposing headers before request is sent|
