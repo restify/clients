@@ -36,4 +36,13 @@ describe('HttpClient', function () {
         });
         assert.strictEqual(CLIENT.url.protocol, 'https:');
     });
+
+
+    it('should trim whitespaces in url', function () {
+        CLIENT = clients.createHttpClient({
+            url: 'https://www.  restify\t.com:3000'
+        });
+        assert.strictEqual(CLIENT.url.hostname, 'www.restify.com');
+        assert.strictEqual(CLIENT.url.port, '3000');
+    });
 });
