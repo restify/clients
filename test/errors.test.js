@@ -5,6 +5,7 @@ var dns = require('dns');
 var assert = require('chai').assert;
 var bunyan = require('bunyan');
 var restify = require('restify');
+var restifyErrs = require('restify-errors');
 
 var clients = require('../lib');
 
@@ -46,7 +47,7 @@ describe('Error factories', function () {
         }, function (err, req) {
             assert.ok(err);
             assert.strictEqual(err.name, 'ConnectTimeoutError');
-            assert.deepEqual(err.info(), {
+            assert.deepEqual(restifyErrs.info(err), {
                 address: '10.255.255.1',
                 connectTimeout: 200,
                 fullUrl: 'http://10.255.255.1:81/foo?a=1',
@@ -78,7 +79,7 @@ describe('Error factories', function () {
         }, function (err, req) {
             assert.ok(err);
             assert.strictEqual(err.name, 'DNSTimeoutError');
-            assert.deepEqual(err.info(), {
+            assert.deepEqual(restifyErrs.info(err), {
                 address: null,
                 connectTimeout: 200,
                 fullUrl: 'http://www.restify.com/foo?a=1',
@@ -117,7 +118,7 @@ describe('Error factories', function () {
                 'http://127.0.0.1:' + PORT + '/timeout ' +
                 'failed to complete within 150ms'
             );
-            assert.deepEqual(err.info(), {
+            assert.deepEqual(restifyErrs.info(err), {
                 address: '127.0.0.1',
                 fullUrl: 'http://127.0.0.1:' + PORT + '/timeout',
                 method: 'GET',
@@ -141,7 +142,7 @@ describe('Error factories', function () {
         CLIENT.get('/500', function (err, req, res, obj) {
             assert.isTrue(err instanceof Error);
             assert.strictEqual(err.name, 'InternalServerError');
-            assert.deepEqual(err.info(), {
+            assert.deepEqual(restifyErrs.info(err), {
                 address: '127.0.0.1',
                 fullUrl: 'http://127.0.0.1:' + PORT + '/500',
                 method: 'GET',
