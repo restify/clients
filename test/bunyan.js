@@ -38,7 +38,7 @@ function getLog(name, stream, level) {
 function BunyanRecordCapturer() {
     this.records = [];
 }
-BunyanRecordCapturer.prototype.write = function (record) {
+BunyanRecordCapturer.prototype.write = function(record) {
     this.records.push(record);
 };
 
@@ -49,15 +49,15 @@ function assertCreateClientAndValidLog(log, capture, done) {
         retry: false,
         log: log
     });
-    client.get('/json/ping', function (err, req, res, obj) {
+    client.get('/json/ping', function(err, req, res, obj) {
         assert.ifError(err);
         assert.isAtLeast(capture.records.length, 3);
         assert.ok(capture.records[0].client_req);
         assert.deepEqual(Object.keys(capture.records[0].client_req).sort(),
-            ['method', 'url', 'address', 'port', 'headers'].sort());
+            [ 'method', 'url', 'address', 'port', 'headers' ].sort());
         assert.ok(capture.records[1].client_res);
         assert.deepEqual(Object.keys(capture.records[1].client_res).sort(),
-            ['statusCode', 'headers'].sort());
+            [ 'statusCode', 'headers' ].sort());
         client.close();
         done();
     });
@@ -66,47 +66,33 @@ function assertCreateClientAndValidLog(log, capture, done) {
 
 // --- Tests
 
-describe('restify-client bunyan usage tests', function () {
+describe('restify-client bunyan usage tests', function() {
 
-    before(function (callback) {
-        try {
-            SERVER = restify.createServer({
-                log: getLog('server')
-            });
+    before(function(callback) {
+        SERVER = restify.createServer({
+            log: getLog('server')
+        });
 
-            SERVER.get('/json/ping', sendJsonPong);
+        SERVER.get('/json/ping', sendJsonPong);
 
-            SERVER.listen(PORT, '127.0.0.1', function () {
-                PORT = SERVER.address().port;
-                setImmediate(callback);
-            });
-        } catch (e) {
-            /* eslint-disable no-console*/
-            console.error(e.stack);
-            /* eslint-enable no-console*/
-            process.exit(1);
-        }
+        SERVER.listen(PORT, '127.0.0.1', function() {
+            PORT = SERVER.address().port;
+            setImmediate(callback);
+        });
     });
 
 
-    after(function (callback) {
-        try {
-            SERVER.close(callback);
-        } catch (e) {
-            /* eslint-disable no-console*/
-            console.error(e.stack);
-            /* eslint-enable no-console*/
-            process.exit(1);
-        }
+    after(function(callback) {
+        SERVER.close(callback);
     });
 
 
-    it('no logger', function (done) {
+    it('no logger', function(done) {
         var client = clients.createJsonClient({
             url: 'http://127.0.0.1:' + PORT,
             retry: false
         });
-        client.get('/json/ping', function (err, req, res, obj) {
+        client.get('/json/ping', function(err, req, res, obj) {
             assert.ifError(err);
             assert.ok(req);
             assert.ok(res);
@@ -116,30 +102,30 @@ describe('restify-client bunyan usage tests', function () {
         });
     });
 
-    it('no serializers', function (done) {
+    it('no serializers', function(done) {
         var capture = new BunyanRecordCapturer();
         var log = bunyan.createLogger({
             name: 'client',
-            streams: [{type: 'raw', stream: capture, level: 'trace'}]
+            streams: [{ type: 'raw', stream: capture, level: 'trace' }]
         });
         assertCreateClientAndValidLog(log, capture, done);
     });
 
-    it('bunyan stdSerializers', function (done) {
+    it('bunyan stdSerializers', function(done) {
         var capture = new BunyanRecordCapturer();
         var log = bunyan.createLogger({
             name: 'client',
-            streams: [{type: 'raw', stream: capture, level: 'trace'}],
+            streams: [{ type: 'raw', stream: capture, level: 'trace' }],
             serializers: bunyan.stdSerializers
         });
         assertCreateClientAndValidLog(log, capture, done);
     });
 
-    it('some unrelated bunyan serializer "foo"', function (done) {
+    it('some unrelated bunyan serializer "foo"', function(done) {
         var capture = new BunyanRecordCapturer();
         var log = bunyan.createLogger({
             name: 'client',
-            streams: [{type: 'raw', stream: capture, level: 'trace'}],
+            streams: [{ type: 'raw', stream: capture, level: 'trace' }],
             serializers: {
                 foo: function serializeFoo(foo) {
                     return foo;
@@ -149,7 +135,7 @@ describe('restify-client bunyan usage tests', function () {
         assertCreateClientAndValidLog(log, capture, done);
     });
 
-    it('using restify-clients exported "bunyan.serializers"', function (done) {
+    it('using restify-clients exported "bunyan.serializers"', function(done) {
         assert.ok(clients.bunyan.serializers);
         assert.ok(clients.bunyan.serializers.err);
         assert.ok(clients.bunyan.serializers.req);
@@ -160,7 +146,7 @@ describe('restify-client bunyan usage tests', function () {
         var capture = new BunyanRecordCapturer();
         var log = bunyan.createLogger({
             name: 'client',
-            streams: [{type: 'raw', stream: capture, level: 'trace'}],
+            streams: [{ type: 'raw', stream: capture, level: 'trace' }],
             serializers: clients.bunyan.serializers
         });
         assertCreateClientAndValidLog(log, capture, done);

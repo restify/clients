@@ -94,11 +94,11 @@ if (process.version.slice(0, 2) === 'v0') {
  * response they received from the server. These tests make sure that they
  * don't accidentally change.
  */
-describe('errors are part of the interface', function () {
-    it('check that codeToHttpError is present', function (done) {
+describe('errors are part of the interface', function() {
+    it('check that codeToHttpError is present', function(done) {
         assert.equal('function', typeof (errors.codeToHttpError));
 
-        HTTP_CODES.forEach(function (info) {
+        HTTP_CODES.forEach(function(info) {
             var err = errors.codeToHttpError(info.code);
             assert.equal(info.name, err.name);
             assert.equal(info.code, err.statusCode);
@@ -107,8 +107,8 @@ describe('errors are part of the interface', function () {
         done();
     });
 
-    it('check that RestErrors are correct', function (done) {
-        REST_CODES.forEach(function (info) {
+    it('check that RestErrors are correct', function(done) {
+        REST_CODES.forEach(function(info) {
             var shortName = info.name.replace(/Error$/, '');
             var constructor = errors[info.name];
             assert.isOk(constructor, info.name);
@@ -124,8 +124,8 @@ describe('errors are part of the interface', function () {
         done();
     });
 
-    it('check that HttpErrors are correct', function (done) {
-        HTTP_CODES.forEach(function (info) {
+    it('check that HttpErrors are correct', function(done) {
+        HTTP_CODES.forEach(function(info) {
             var shortName = info.name.replace(/Error$/, '');
             var constructor = errors[info.name];
             assert.isOk(constructor, info.name);
