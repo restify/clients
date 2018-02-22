@@ -470,6 +470,23 @@ client.get(options, function(err, res, socket, head) {
 });
 ```
 
+#### Timings
+
+Request timings are available under the `req.getTimings()` in milliseconds:
+
+```javascript
+{
+  dnsLookup: 34,
+  tcpConnection: 52,
+  tlsHandshake: 112,
+  firstByte: 66,
+  contentTransfer: 2,
+  total: 266
+}
+```
+
+All timings except `total` can be `null` under various circumstances like
+keep-alive connection, missing https etc.
 
 ## Contributing
 
