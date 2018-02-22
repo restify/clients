@@ -6,11 +6,9 @@ var fs = require('fs');
 var path = require('path');
 
 var README_PATH = path.join(__dirname, '../README.md');
-/* jscs:disable maximumLineLength */
 var FAIL_BADGE = 'vulnerabilities%20found-red';
 var SUCCESS_BADGE = 'no%20vulnerabilities-green';
 var NSP_LINE_ID = '[NSP Status]';
-/* jscs:enable maximumLineLength */
 
 process.stdin.on('data', function(exitCodeBuf) {
 

@@ -9,9 +9,9 @@ var assert = require('chai').assert;
 var bunyan = require('bunyan');
 var crypto = require('crypto');
 var format = require('util').format;
+var restify = require('restify');
 var uuid   = require('uuid');
 
-var restify = require('restify');
 var clients = require('../lib');
 var auditor = require('../lib/helpers/auditor');
 var pkgJson = require('../package');
@@ -22,7 +22,6 @@ var PORT = process.env.UNIT_TEST_PORT || 0;
 var JSON_CLIENT;
 var STR_CLIENT;
 var RAW_CLIENT;
-var TIMEOUT_CLIENT;
 var SAFE_STRINGIFY_CLIENT;
 var SERVER;
 
@@ -87,13 +86,6 @@ function sendWhitespace(req, res, next) {
     res.header('content-type', 'text/plain');
     res.send(whitespaces);
     next();
-}
-
-function requestThatTimesOut(req, res, next) {
-    setTimeout(function () {
-        res.send('OK');
-        next();
-    }, 170);
 }
 
 function sendJsonZero(req, res, next) {
@@ -206,8 +198,6 @@ describe('restify-client tests', function () {
             SERVER.del('/json/:name', sendJson);
             SERVER.opts('/json/:name', sendJson);
 
-            SERVER.get('/str/request_timeout', requestThatTimesOut);
-
             SERVER.del('/str/:name', sendText);
             SERVER.get('/str/:name', sendText);
             SERVER.head('/str/:name', sendText);
@@ -247,11 +237,6 @@ describe('restify-client tests', function () {
                         accept: 'text/plain'
                     }
                 });
-                TIMEOUT_CLIENT = clients.createStringClient({
-                    url: 'http://127.0.0.1:' + PORT,
-                    requestTimeout: 150,
-                    retry: false
-                });
                 SAFE_STRINGIFY_CLIENT = clients.createJsonClient({
                     url: 'http://127.0.0.1:' + PORT,
                     dtrace: dtrace,
@@ -274,7 +259,6 @@ describe('restify-client tests', function () {
             JSON_CLIENT.close();
             STR_CLIENT.close();
             RAW_CLIENT.close();
-            TIMEOUT_CLIENT.close();
             SAFE_STRINGIFY_CLIENT.close();
             SERVER.close(callback);
         } catch (e) {
@@ -738,32 +722,6 @@ describe('restify-client tests', function () {
             assert.ifError(err);
             assert.notStrictEqual(req.agent, RAW_CLIENT.agent,
                 'request should not use client agent');
-            done();
-        });
-    });
-
-    it('GH-20 connectTimeout', function (done) {
-        var client = clients.createClient({
-            url: 'http://169.254.1.10',
-            type: 'http',
-            accept: 'text/plain',
-            connectTimeout: 100,
-            retry: false,
-            agent: false
-        });
-
-        client.get('/foo', function (err, req) {
-            assert.ok(err);
-            assert.equal(err.name, 'ConnectTimeoutError');
-            done();
-        });
-    });
-
-    it('requestTimeout', function (done) {
-        TIMEOUT_CLIENT.get('/str/request_timeout',
-            function (err, req, res, obj) {
-            assert.ok(err);
-            assert.equal(err.name, 'RequestTimeoutError');
             done();
         });
     });
