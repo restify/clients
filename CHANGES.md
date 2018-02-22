@@ -2,6 +2,26 @@
 
 ## not yet released
 
+### Breaking ###
+* #141: Throw when the `url` option does not have a valid http/https protocol.
+* #148: JSONClient is now strict about valid responses. Non JSON responses
+  return parse errors to the caller. HTTP errors supersede parse errors. JSONP
+  is also no longer supported. Empty responses return an empty pojo `{}`.
+* #152: honor requestTimeout when socket has already been established.
+
+### Fix ###
+* #132: Handle multibyte characters properly in gzipped responses
+
+## 1.5.2
+
+- Switch back to restify-errors@3 to fix backward incompatiblity in
+  `<err>.code` for some error classes.
+
+## 1.5.1
+
+Note: *Bad Release*. `restify-errors` was erroneously updated, breaking
+the API.
+
 ## 1.5.0
 
 Add a `safeStringify` option to the JSON client to safely stringify request

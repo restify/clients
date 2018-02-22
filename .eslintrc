@@ -61,7 +61,7 @@
         "no-loop-func": [ 2 ],
         "no-multi-spaces": [ 0 ],
         "no-native-reassign": [ 2 ],
-        "no-new": [ 2 ],
+        "no-new": [ 0 ],
         "no-new-func": [ 2 ],
         "no-new-wrappers": [ 2 ],
         "no-octal": [ 2 ],

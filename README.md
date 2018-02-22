@@ -52,10 +52,10 @@ Here's an example of hitting the
 [Joyent CloudAPI](https://api.us-east-1.joyent.com):
 
 ```javascript
-var restify = require('restify');
+var clients = require('restify-clients');
 
 // Creates a JSON client
-var client = restify.createJsonClient({
+var client = clients.createJsonClient({
   url: 'https://us-east-1.api.joyent.com'
 });
 
@@ -72,9 +72,9 @@ As a short-hand, a client can be initialized with a string-URL rather than
 an options object:
 
 ```javascript
-var restify = require('restify');
+var clients = require('restify-clients');
 
-var client = restify.createJsonClient('https://us-east-1.api.joyent.com');
+var client = clients.createJsonClient('https://us-east-1.api.joyent.com');
 ```
 
 Note that all further documentation refers to the "short-hand" form of
@@ -131,7 +131,7 @@ var client = restify.createJsonClient({
   url: 'https://api.us-east-1.joyent.com',
   version: '*'
 });
-```    
+```
 
 ### API Options:
 
@@ -141,11 +141,13 @@ var client = restify.createJsonClient({
 |audit|Boolean|Enable Audit logging|
 |auditor|Function|Function for Audit logging|
 |connectTimeout|Number|Amount of time to wait for a socket|
+|contentType|String|Content-Type header to send|
 |requestTimeout|Number|Amount of time to wait for the request to finish|
 |dtrace|Object|node-dtrace-provider handle|
 |gzip|Object|Will compress data when sent using `content-encoding: gzip`|
 |headers|Object|HTTP headers to set in all requests|
 |log|Object|[bunyan](https://github.com/trentm/node-bunyan) instance|
+|query|Object|querystring object to be serialized via querystring module|
 |retry|Object|options to provide to node-retry;"false" disables retry; defaults to 4 retries|
 |safeStringify|Boolean|Safely serialize JSON objects, i.e. circular dependencies|
 |signRequest|Function|synchronous callback for interposing headers before request is sent|
@@ -468,6 +470,23 @@ client.get(options, function(err, res, socket, head) {
 });
 ```
 
+#### Timings
+
+Request timings are available under the `req.getTimings()` in milliseconds:
+
+```javascript
+{
+  dnsLookup: 34,
+  tcpConnection: 52,
+  tlsHandshake: 112,
+  firstByte: 66,
+  contentTransfer: 2,
+  total: 266
+}
+```
+
+All timings except `total` can be `null` under various circumstances like
+keep-alive connection, missing https etc.
 
 ## Contributing
 

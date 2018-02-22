@@ -1,36 +1,37 @@
 #
 # Directories
 #
-ROOT           := $(shell pwd)
-NODE_MODULES   := $(ROOT)/node_modules
-NODE_BIN       := $(NODE_MODULES)/.bin
-TOOLS          := $(ROOT)/tools
+ROOT		:= $(shell pwd)
+NODE_MODULES	:= $(ROOT)/node_modules
+NODE_BIN	:= $(NODE_MODULES)/.bin
+TOOLS		:= $(ROOT)/tools
 
 
 #
 # Tools and binaries
 #
-ESLINT      := $(NODE_BIN)/eslint
-JSCS        := $(NODE_BIN)/jscs
-MOCHA       := $(NODE_BIN)/mocha
-_MOCHA      := $(NODE_BIN)/_mocha
-ISTANBUL    := $(NODE_BIN)/istanbul
-COVERALLS   := $(NODE_BIN)/coveralls
-NSP         := $(NODE_BIN)/nsp
-NPM         := npm
-NSP_BADGE   := $(TOOLS)/nspBadge.js
-JSON        := $(NODE_BIN)/json
+ESLINT		:= $(NODE_BIN)/eslint
+JSCS		:= $(NODE_BIN)/jscs
+MOCHA		:= $(NODE_BIN)/mocha
+_MOCHA		:= $(NODE_BIN)/_mocha
+ISTANBUL	:= $(NODE_BIN)/istanbul
+COVERALLS	:= $(NODE_BIN)/coveralls
+NSP		:= $(NODE_BIN)/nsp
+NPM		:= npm
+NSP_BADGE	:= $(TOOLS)/nspBadge.js
+JSON		:= $(NODE_BIN)/json
+GITHOOKS_SRC	:= $(TOOLS)/githooks
+GITHOOKS_DEST	:= $(ROOT)/.git/hooks
 
 #
 # Files
 #
-GIT_HOOK_SRC   = '../../tools/githooks/pre-push'
-GIT_HOOK_DEST  = '.git/hooks/pre-push'
-LIB_FILES  	   = $(ROOT)/lib
-TEST_FILES     = $(ROOT)/test
-COVERAGE_FILES = $(ROOT)/coverage
-LCOV           = $(ROOT)/coverage/lcov.info
-SHRINKWRAP     = $(ROOT)/npm-shrinkwrap.json
+GITHOOKS	:= $(wildcard $(GITHOOKS_SRC)/*)
+LIB_FILES	= $(ROOT)/lib
+TEST_FILES	= $(ROOT)/test
+COVERAGE_FILES	= $(ROOT)/coverage
+LCOV		= $(ROOT)/coverage/lcov.info
+SHRINKWRAP	= $(ROOT)/npm-shrinkwrap.json
 
 
 #
@@ -47,8 +48,11 @@ node_modules: package.json
 
 
 .PHONY: githooks
-githooks:
-	@ln -s $(GIT_HOOK_SRC) $(GIT_HOOK_DEST)
+githooks: $(GITHOOKS)
+	@$(foreach hook,\
+		$(GITHOOKS),\
+			ln -sf $(hook) $(GITHOOKS_DEST)/$(hook##*/);\
+	)
 
 
 .PHONY: lint
