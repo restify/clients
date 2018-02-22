@@ -163,7 +163,8 @@ function sendJsonString(req, res, next) {
     return next();
 }
 
-// sends back a body with the contents of the restify-clients-test-header received
+// sends back a body with the contents of the restify-clients-test-header
+// received
 function sendTestHeader(req, res, next) {
     res.header('content-type', 'json');
     res.send(200, req.header('restify-clients-test-header', 'missing'));
