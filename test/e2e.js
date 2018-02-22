@@ -8,8 +8,8 @@ var clients = require('../lib');
 
 describe('restify-client tests against real web server', function () {
     it('have timings', function (done) {
-        var client = clients.createJsonClient({
-            url: 'https://netflix.com'
+        var client = clients.createStringClient({
+            url: 'https://www.netflix.com'
         });
 
         client.get('/', function (err, req, res) {
@@ -24,6 +24,7 @@ describe('restify-client tests against real web server', function () {
             assert.isNumber(timings.firstByte);
             assert.isNumber(timings.contentTransfer);
             assert.isNumber(timings.total);
+            client.close();
             done();
         });
     });
