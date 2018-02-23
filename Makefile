@@ -1,15 +1,26 @@
 #
 # Directories
 #
-ROOT		:= $(shell pwd)
+ROOT_SLASH	:= $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+ROOT		:= $(patsubst %/,%,$(ROOT_SLASH))
+TEST		:= $(ROOT)/test
+TOOLS		:= $(ROOT)/tools
+GITHOOKS_SRC	:= $(TOOLS)/githooks
+GITHOOKS_DEST	:= $(ROOT)/.git/hooks
+
+
+#
+# Generated Directories
+#
 NODE_MODULES	:= $(ROOT)/node_modules
 NODE_BIN	:= $(NODE_MODULES)/.bin
-TOOLS		:= $(ROOT)/tools
+COVERAGE	:= $(ROOT)/coverage
 
 
 #
 # Tools and binaries
 #
+YARN		:= yarn
 ESLINT		:= $(NODE_BIN)/eslint
 JSCS		:= $(NODE_BIN)/jscs
 MOCHA		:= $(NODE_BIN)/mocha
@@ -17,38 +28,50 @@ _MOCHA		:= $(NODE_BIN)/_mocha
 ISTANBUL	:= $(NODE_BIN)/istanbul
 COVERALLS	:= $(NODE_BIN)/coveralls
 NSP		:= $(NODE_BIN)/nsp
-NPM		:= npm
-NSP_BADGE	:= $(TOOLS)/nspBadge.js
 JSON		:= $(NODE_BIN)/json
-GITHOOKS_SRC	:= $(TOOLS)/githooks
-GITHOOKS_DEST	:= $(ROOT)/.git/hooks
+
 
 #
 # Files
 #
+LCOV		:= $(ROOT)/coverage/lcov.info
+PACKAGE_JSON	:= $(ROOT)/package.json
+YARN_LOCK       := $(ROOT)/yarn.lock
 GITHOOKS	:= $(wildcard $(GITHOOKS_SRC)/*)
-LIB_FILES	= $(ROOT)/lib
-TEST_FILES	= $(ROOT)/test
-COVERAGE_FILES	= $(ROOT)/coverage
-LCOV		= $(ROOT)/coverage/lcov.info
 SHRINKWRAP	= $(ROOT)/npm-shrinkwrap.json
+ALL_FILES	:= $(shell find $(ROOT) \
+			-not \( -path $(NODE_MODULES) -prune \) \
+			-not \( -path $(COVERAGE) -prune \) \
+			-name '*.js' -type f)
 
 
 #
 # Targets
 #
 
+
+.PHONY: help
+help:
+	@perl -nle'print $& if m{^[a-zA-Z_-]+:.*?## .*$$}' $(MAKEFILE_LIST) \
+		| sort | awk 'BEGIN {FS = ":.*?## "}; \
+		{printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+
 .PHONY: all
-all: node_modules lint codestyle test clean-coverage
+all: $(NODE_MODULES) lint codestyle test clean-coverage
 
 
-node_modules: package.json
-	$(NPM) install
+$(YARN_LOCK): $(PACKAGE_JSON)
+	@$(YARN)
+
+
+$(NODE_MODULES): $(PACKAGE_JSON)
+	@$(YARN)
 	@touch $(NODE_MODULES)
 
 
 .PHONY: githooks
-githooks: $(GITHOOKS)
+githooks: $(GITHOOKS) ## Install githooks
 	@$(foreach hook,\
 		$(GITHOOKS),\
 			ln -sf $(hook) $(GITHOOKS_DEST)/$(hook##*/);\
@@ -56,43 +79,41 @@ githooks: $(GITHOOKS)
 
 
 .PHONY: lint
-lint: node_modules $(LIB_FILES) $(TEST_FILES)
-	@$(ESLINT) $(LIB_FILES) $(TEST_FILES)
+lint: $(NODE_MODULES) ## Run lint checks
+	@$(ESLINT) $(ALL_FILES)
 
 
 .PHONY: codestyle
-codestyle: node_modules $(LIB_FILES) $(TEST_FILES)
-	@$(JSCS) $(LIB_FILES) $(TEST_FILES)
+codestyle: $(NODE_MODULES) ## Run style checks
+	@$(JSCS) $(ALL_FILES)
 
 
 .PHONY: codestyle-fix
-codestyle-fix: node_modules $(LIB_FILES) $(TEST_FILES)
-	@$(JSCS) $(LIB_FILES) $(TEST_FILES) --fix
+codestyle-fix: $(NODE_MODULES) ## Run and fix style check errors
+	@$(JSCS) $(ALL_FILES) --fix
 
 
 .PHONY: nsp
-nsp: node_modules $(NSP)
-	$(NPM) shrinkwrap --dev
-	@($(NSP) check || echo 1) | $(NSP_BADGE)
-	@rm $(SHRINKWRAP)
+nsp: $(NODE_MODULES) $(YARN_LOCK) ## Check for dependency vulnerabilities
+	@$(NSP) check --preprocessor yarn
 
 
 .PHONY: prepush
-prepush: node_modules lint codestyle test versioncheck
+prepush: $(NODE_MODULES) lint codestyle test versioncheck ## Run all required tasks for a git push
 
 
 .PHONY: test
-test: node_modules
+test: $(NODE_MODULES) ## Run unit tests
 	@$(MOCHA) -R spec --full-trace
 
 
 .PHONY: coverage
-coverage: node_modules clean-coverage $(LIB_FILES) $(TEST_FILES)
+coverage: $(NODE_MODULES) clean-coverage ## Generate test coverage
 	@$(ISTANBUL) cover $(_MOCHA) --report lcovonly -- -R spec
 
 
 .PHONY: report-coverage
-report-coverage: coverage
+report-coverage: coverage ## Report test coverage to Coveralls
 	@cat $(LCOV) | $(COVERALLS)
 
 
@@ -102,7 +123,7 @@ clean-coverage:
 
 
 .PHONY: clean
-clean: clean-coverage
+clean: clean-coverage ## Clean all generated directories
 	@rm -rf $(NODE_MODULES)
 
 

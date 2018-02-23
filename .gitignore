@@ -10,7 +10,7 @@ Thumbs.db
 
 /node_modules/
 npm-debug.log
-/yarn.lock
+yarn.lock
 package-lock.json
 
 # build task results for ci
