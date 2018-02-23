@@ -1,16 +1,31 @@
 # restify-clients Changelog
 
-## not yet released
+## Not Yet Released
+
+## 2.0.0
 
 ### Breaking ###
+* #109: Migrate to restify-errors@6.0.0. This migrates all errors to using
+  VError under the hood.
 * #141: Throw when the `url` option does not have a valid http/https protocol.
 * #148: JSONClient is now strict about valid responses. Non JSON responses
   return parse errors to the caller. HTTP errors supersede parse errors. JSONP
   is also no longer supported. Empty responses return an empty pojo `{}`.
-* #152: honor requestTimeout when socket has already been established.
 
 ### Fix ###
 * #132: Handle multibyte characters properly in gzipped responses
+* #152: Honor `requestTimeout` when re-using existing socket/connection
+* #154: Trim extraneous whitespace characters in `url` option
+
+### New ###
+* #109: Add DNSTimeoutError.
+* #105: Support for checkServerIdentity https option (#155)
+* #139: Record request lifecyclet timings. Retrievable via `req.getTimings()`
+* #153: Support `query` option at both constructor and request time
+
+### Chore ###
+* Makefile now uses Yarn under the hood.
+* #158: Upgrade to new major versions, mime@2.x and fast-safe-stringify@2.x
 
 ## 1.5.2
 
