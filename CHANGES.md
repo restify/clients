@@ -1,6 +1,11 @@
 # restify-clients Changelog
 
-## Not Yet Released
+## not yet released
+
+## 2.0.1
+
+### Fix ###
+* #160: handle request timeouts when a response object has not yet been created
 
 ## 2.0.0
 
