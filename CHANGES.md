@@ -2,6 +2,13 @@
 
 ## not yet released
 
+(nothing yet)
+
+## 2.0.2
+
+* #169: Restore 'dtrace-provided' optional dependency (accidentally removed
+  in v1.5.1)
+
 ## 2.0.1
 
 ### Fix ###
