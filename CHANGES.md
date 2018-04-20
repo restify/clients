@@ -2,6 +2,13 @@
 
 ## not yet released
 
+(nothing yet)
+
+## 1.5.3
+
+- #169: Restore 'dtrace-provided' optional dependency (accidentally removed
+  in v1.5.1).
+
 ## 1.5.2
 
 - Switch back to restify-errors@3 to fix backward incompatiblity in
