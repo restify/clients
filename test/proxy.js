@@ -31,7 +31,7 @@ function stripProcessEnv() {
         'https_proxy',
         'NO_PROXY',
         'no_proxy'
-    ].forEach(function (n) {
+    ].forEach(function(n) {
         delete process.env[n];
     });
 }
@@ -39,63 +39,49 @@ function stripProcessEnv() {
 
 // --- Tests
 
-describe('restify-client proxy tests', function () {
+describe('restify-client proxy tests', function() {
 
-    before(function (callback) {
-        try {
-            // A forward-proxy adapted from
-            // jscs:disable maximumLineLength
-            // <https://github.com/nodejitsu/node-http-proxy/blob/master/examples/http/reverse-proxy.js>
-            // (where it is incorrectly named a "reverse" proxy).
-            // jscs:enable maximumLineLength
-            PROXYSERVER = http.createServer();
+    before(function(callback) {
+        /* eslint-disable max-len */
+        // A forward-proxy adapted from
+        // <https://github.com/nodejitsu/node-http-proxy/blob/master/examples/http/reverse-proxy.js>
+        // (where it is incorrectly named a "reverse" proxy).
+        /* eslint-enable max-len */
+        PROXYSERVER = http.createServer();
 
-            PROXYSERVER.on('connect', function (req, socket) {
-                PROXIED.push({url: req.url, headers: req.headers});
-                var serverUrl = url.parse('https://' + req.url);
+        PROXYSERVER.on('connect', function(req, socket) {
+            PROXIED.push({ url: req.url, headers: req.headers });
+            var serverUrl = url.parse('https://' + req.url);
 
-                var srvSocket = net.connect(serverUrl.port, serverUrl.hostname,
-                function () {
-                    socket.write('HTTP/1.1 200 Connection Established\r\n' +
-                        'Proxy-agent: Node-Proxy\r\n' +
-                        '\r\n');
-                    srvSocket.pipe(socket);
-                    socket.pipe(srvSocket);
-                });
+            var srvSocket = net.connect(serverUrl.port, serverUrl.hostname,
+            function() {
+                socket.write('HTTP/1.1 200 Connection Established\r\n' +
+                    'Proxy-agent: Node-Proxy\r\n' +
+                    '\r\n');
+                srvSocket.pipe(socket);
+                socket.pipe(srvSocket);
             });
+        });
 
-            PROXYSERVER.listen(PORT, '127.0.0.1', function () {
-                PORT = PROXYSERVER.address().port;
-                PROXYURL = 'http://127.0.0.1:' + PORT;
-                setImmediate(callback);
-            });
-        } catch (e) {
-            /* eslint-disable no-console */
-            console.error(e.stack);
-            /* eslint-enable no-console */
-            process.exit(1);
-        }
+        PROXYSERVER.listen(PORT, '127.0.0.1', function() {
+            PORT = PROXYSERVER.address().port;
+            PROXYURL = 'http://127.0.0.1:' + PORT;
+            setImmediate(callback);
+        });
     });
 
-    after(function (callback) {
-        try {
-            PROXYSERVER.close(callback);
-        } catch (e) {
-            /* eslint-disable no-console */
-            console.error(e.stack);
-            /* eslint-enable no-console */
-            process.exit(1);
-        }
+    after(function(callback) {
+        PROXYSERVER.close(callback);
     });
 
-    it('GET https (without a proxy)', function (done) {
+    it('GET https (without a proxy)', function(done) {
         stripProcessEnv();
         PROXIED = [];
         var client = clients.createStringClient({
             url: 'https://www.google.com',
             retry: false
         });
-        client.get('/', function (err, req, res, body) {
+        client.get('/', function(err, req, res, body) {
             assert.ifError(err);
             assert.equal(PROXIED.length, 0);
             assert.ok(res.statusCode < 400);
@@ -104,14 +90,14 @@ describe('restify-client proxy tests', function () {
         });
     });
 
-    it('GET http (without a proxy)', function (done) {
+    it('GET http (without a proxy)', function(done) {
         stripProcessEnv();
         PROXIED = [];
         var client = clients.createStringClient({
             url: 'http://www.google.com',
             retry: false
         });
-        client.get('/', function (err, req, res, body) {
+        client.get('/', function(err, req, res, body) {
             assert.ifError(err);
             assert.equal(PROXIED.length, 0);
             assert.ok(res.statusCode < 400);
@@ -120,7 +106,7 @@ describe('restify-client proxy tests', function () {
         });
     });
 
-    it('GET https with options.proxy', function (done) {
+    it('GET https with options.proxy', function(done) {
         stripProcessEnv();
         PROXIED = [];
         var client = clients.createStringClient({
@@ -128,7 +114,7 @@ describe('restify-client proxy tests', function () {
             proxy: PROXYURL,
             retry: false
         });
-        client.get('/', function (err, req, res, body) {
+        client.get('/', function(err, req, res, body) {
             assert.ifError(err);
             assert.equal(PROXIED.length, 1);
             assert.ok(res.statusCode < 400);
@@ -137,7 +123,7 @@ describe('restify-client proxy tests', function () {
         });
     });
 
-    it('GET http with options.proxy', function (done) {
+    it('GET http with options.proxy', function(done) {
         stripProcessEnv();
         PROXIED = [];
         var client = clients.createStringClient({
@@ -145,7 +131,7 @@ describe('restify-client proxy tests', function () {
             proxy: PROXYURL,
             retry: false
         });
-        client.get('/', function (err, req, res, body) {
+        client.get('/', function(err, req, res, body) {
             assert.ifError(err);
             assert.equal(PROXIED.length, 1);
             assert.ok(res.statusCode < 400);
@@ -159,8 +145,8 @@ describe('restify-client proxy tests', function () {
         'http_proxy',
         'HTTPS_PROXY',
         'https_proxy'
-    ].forEach(function (n) {
-        it('GET https with ' + n + ' envvar', function (done) {
+    ].forEach(function(n) {
+        it('GET https with ' + n + ' envvar', function(done) {
             stripProcessEnv();
             process.env[n] = PROXYURL;
             PROXIED = [];
@@ -168,7 +154,7 @@ describe('restify-client proxy tests', function () {
                 url: 'https://www.google.com',
                 retry: false
             });
-            client.get('/', function (err, req, res, body) {
+            client.get('/', function(err, req, res, body) {
                 assert.ifError(err);
                 assert.equal(PROXIED.length, 1);
                 assert.ok(res.statusCode < 400);
@@ -177,7 +163,7 @@ describe('restify-client proxy tests', function () {
             });
         });
 
-        it('GET http with ' + n + ' envvar', function (done) {
+        it('GET http with ' + n + ' envvar', function(done) {
             stripProcessEnv();
             process.env[n] = PROXYURL;
             PROXIED = [];
@@ -185,7 +171,7 @@ describe('restify-client proxy tests', function () {
                 url: 'http://www.google.com',
                 retry: false
             });
-            client.get('/', function (err, req, res, body) {
+            client.get('/', function(err, req, res, body) {
                 assert.ifError(err);
                 assert.equal(PROXIED.length, 1);
                 assert.ok(res.statusCode < 400);
@@ -195,7 +181,7 @@ describe('restify-client proxy tests', function () {
         });
     });
 
-    it('options.proxy=PROXYURL wins over envvar', function (done) {
+    it('options.proxy=PROXYURL wins over envvar', function(done) {
         stripProcessEnv();
         process.env.https_proxy = 'https://example.com:1234';
         PROXIED = [];
@@ -204,7 +190,7 @@ describe('restify-client proxy tests', function () {
             proxy: PROXYURL,
             retry: false
         });
-        client.get('/', function (err, req, res, body) {
+        client.get('/', function(err, req, res, body) {
             assert.ifError(err);
             assert.equal(PROXIED.length, 1);
             assert.ok(res.statusCode < 400);
@@ -213,7 +199,7 @@ describe('restify-client proxy tests', function () {
         });
     });
 
-    it('options.proxy=false wins over envvar', function (done) {
+    it('options.proxy=false wins over envvar', function(done) {
         stripProcessEnv();
         process.env.https_proxy = PROXYURL;
         PROXIED = [];
@@ -222,7 +208,7 @@ describe('restify-client proxy tests', function () {
             proxy: false,
             retry: false
         });
-        client.get('/', function (err, req, res, body) {
+        client.get('/', function(err, req, res, body) {
             assert.ifError(err);
             assert.equal(PROXIED.length, 0);
             assert.ok(res.statusCode < 400);
@@ -231,7 +217,7 @@ describe('restify-client proxy tests', function () {
         });
     });
 
-    it('no_proxy=*', function (done) {
+    it('no_proxy=*', function(done) {
         stripProcessEnv();
         process.env.no_proxy = '*';
         PROXIED = [];
@@ -240,7 +226,7 @@ describe('restify-client proxy tests', function () {
             proxy: PROXYURL,
             retry: false
         });
-        client.get('/', function (err, req, res, body) {
+        client.get('/', function(err, req, res, body) {
             assert.ifError(err);
             assert.equal(PROXIED.length, 0);
             assert.ok(res.statusCode < 400);
@@ -249,7 +235,7 @@ describe('restify-client proxy tests', function () {
         });
     });
 
-    it('NO_PROXY=*', function (done) {
+    it('NO_PROXY=*', function(done) {
         stripProcessEnv();
         process.env.NO_PROXY = '*';
         PROXIED = [];
@@ -258,7 +244,7 @@ describe('restify-client proxy tests', function () {
             proxy: PROXYURL,
             retry: false
         });
-        client.get('/', function (err, req, res, body) {
+        client.get('/', function(err, req, res, body) {
             assert.ifError(err);
             assert.equal(PROXIED.length, 0);
             assert.ok(res.statusCode < 400);
@@ -267,7 +253,7 @@ describe('restify-client proxy tests', function () {
         });
     });
 
-    it('options.noProxy wins over NO_PROXY envvar', function (done) {
+    it('options.noProxy wins over NO_PROXY envvar', function(done) {
         stripProcessEnv();
         process.env.NO_PROXY = '*';
         PROXIED = [];
@@ -277,7 +263,7 @@ describe('restify-client proxy tests', function () {
             noProxy: '',
             retry: false
         });
-        client.get('/', function (err, req, res, body) {
+        client.get('/', function(err, req, res, body) {
             assert.ifError(err);
             assert.equal(PROXIED.length, 1);
             assert.ok(res.statusCode < 400);
@@ -293,8 +279,8 @@ describe('restify-client proxy tests', function () {
         'www.google.com',
         'example.com,www.google.com',
         'example.com, www.google.com'
-    ].forEach(function (noProxy) {
-        it('options.noProxy="' + noProxy + '" (match)', function (done) {
+    ].forEach(function(noProxy) {
+        it('options.noProxy="' + noProxy + '" (match)', function(done) {
             stripProcessEnv();
             PROXIED = [];
             var client = clients.createStringClient({
@@ -303,7 +289,7 @@ describe('restify-client proxy tests', function () {
                 noProxy: noProxy,
                 retry: false
             });
-            client.get('/', function (err, req, res, body) {
+            client.get('/', function(err, req, res, body) {
                 assert.ifError(err);
                 assert.equal(PROXIED.length, 0);
                 assert.ok(res.statusCode < 400);
@@ -319,8 +305,8 @@ describe('restify-client proxy tests', function () {
         'oogle.com',
         'ww.google.com',
         'foo.google.com'
-    ].forEach(function (noProxy) {
-        it('options.noProxy="' + noProxy + '" (no match)', function (done) {
+    ].forEach(function(noProxy) {
+        it('options.noProxy="' + noProxy + '" (no match)', function(done) {
             stripProcessEnv();
             PROXIED = [];
             var client = clients.createStringClient({
@@ -329,7 +315,7 @@ describe('restify-client proxy tests', function () {
                 noProxy: noProxy,
                 retry: false
             });
-            client.get('/', function (err, req, res, body) {
+            client.get('/', function(err, req, res, body) {
                 assert.ifError(err);
                 assert.equal(PROXIED.length, 1);
                 assert.ok(res.statusCode < 400);

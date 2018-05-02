@@ -22,7 +22,6 @@ COVERAGE	:= $(ROOT)/coverage
 #
 YARN		:= yarn
 ESLINT		:= $(NODE_BIN)/eslint
-JSCS		:= $(NODE_BIN)/jscs
 MOCHA		:= $(NODE_BIN)/mocha
 _MOCHA		:= $(NODE_BIN)/_mocha
 ISTANBUL	:= $(NODE_BIN)/istanbul
@@ -83,14 +82,9 @@ lint: $(NODE_MODULES) ## Run lint checks
 	@$(ESLINT) $(ALL_FILES)
 
 
-.PHONY: codestyle
-codestyle: $(NODE_MODULES) ## Run style checks
-	@$(JSCS) $(ALL_FILES)
-
-
-.PHONY: codestyle-fix
-codestyle-fix: $(NODE_MODULES) ## Run and fix style check errors
-	@$(JSCS) $(ALL_FILES) --fix
+.PHONY: lint-fix
+lint-fix: node_modules $(LIB_FILES) $(TEST_FILES)
+	@$(ESLINT) $(LIB_FILES) $(TEST_FILES) --fix
 
 
 .PHONY: nsp
@@ -99,7 +93,7 @@ nsp: $(NODE_MODULES) $(YARN_LOCK) ## Check for dependency vulnerabilities
 
 
 .PHONY: prepush
-prepush: $(NODE_MODULES) lint codestyle test versioncheck ## Run all required tasks for a git push
+prepush: $(NODE_MODULES) lint test versioncheck ## Run all required tasks for a git push
 
 
 .PHONY: test

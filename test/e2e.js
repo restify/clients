@@ -6,13 +6,16 @@ var clients = require('../lib');
 
 // --- Tests
 
-describe('restify-client tests against real web server', function () {
-    it('have timings', function (done) {
+describe('restify-client tests against real web server', function() {
+    it('have timings', function(done) {
+
+        this.timeout(10000);
+
         var client = clients.createJsonClient({
             url: 'https://netflix.com'
         });
 
-        client.get('/', function (err, req, res) {
+        client.get('/', function(err, req, res) {
             assert.ifError(err);
 
             var timings = req.getTimings();

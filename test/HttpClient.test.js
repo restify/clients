@@ -7,13 +7,13 @@ var assert = require('chai').assert;
 var clients = require('../lib');
 
 
-describe('HttpClient', function () {
+describe('HttpClient', function() {
 
     var CLIENT;
 
 
-    it('should throw on url without protocol', function () {
-        assert.throws(function () {
+    it('should throw on url without protocol', function() {
+        assert.throws(function() {
             clients.createHttpClient({
                 url: 'localhost:3000'
             });
@@ -21,15 +21,15 @@ describe('HttpClient', function () {
     });
 
 
-    it('should not throw on url with protocol', function () {
-        assert.doesNotThrow(function () {
+    it('should not throw on url with protocol', function() {
+        assert.doesNotThrow(function() {
             CLIENT = clients.createHttpClient({
                 url: 'http://www.restify.com'
             });
         });
         assert.strictEqual(CLIENT.url.protocol, 'http:');
 
-        assert.doesNotThrow(function () {
+        assert.doesNotThrow(function() {
             CLIENT = clients.createHttpClient({
                 url: 'https://www.restify.com'
             });
@@ -38,7 +38,7 @@ describe('HttpClient', function () {
     });
 
 
-    it('should trim whitespaces in url', function () {
+    it('should trim whitespaces in url', function() {
         CLIENT = clients.createHttpClient({
             url: 'https://www.  restify\t.com:3000'
         });

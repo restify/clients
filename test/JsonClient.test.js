@@ -9,7 +9,7 @@ var restify = require('restify');
 var clients = require('../lib');
 
 
-describe('JsonClient', function () {
+describe('JsonClient', function() {
 
     var SERVER;
     var LOG = bunyan.createLogger({
@@ -21,7 +21,7 @@ describe('JsonClient', function () {
         retry: false
     });
 
-    beforeEach(function (done) {
+    beforeEach(function(done) {
         SERVER = restify.createServer({
             name: 'unittest',
             log: LOG
@@ -30,14 +30,14 @@ describe('JsonClient', function () {
         SERVER.listen(3000, done);
     });
 
-    afterEach(function (done) {
+    afterEach(function(done) {
         CLIENT.close();
         SERVER.close(done);
     });
 
 
-    it('should support default query option in constructor', function (done) {
-        SERVER.get('/foo', function (req, res, next) {
+    it('should support default query option in constructor', function(done) {
+        SERVER.get('/foo', function(req, res, next) {
             assert.deepEqual(req.query, {
                 foo: 'i am default'
             });
@@ -53,7 +53,7 @@ describe('JsonClient', function () {
             retry: false
         });
 
-        CLIENT.get('/foo', function (err, req, res, data) {
+        CLIENT.get('/foo', function(err, req, res, data) {
             assert.ifError(err);
             assert.strictEqual(req.path, '/foo?foo=i%20am%20default');
             return done();
@@ -61,8 +61,8 @@ describe('JsonClient', function () {
     });
 
 
-    it('should support query option per request', function (done) {
-        SERVER.get('/foo', function (req, res, next) {
+    it('should support query option per request', function(done) {
+        SERVER.get('/foo', function(req, res, next) {
             assert.deepEqual(req.query, {
                 foo: 'bar'
             });
@@ -75,7 +75,7 @@ describe('JsonClient', function () {
             query: {
                 foo: 'bar'
             }
-        }, function (err, req, res, data) {
+        }, function(err, req, res, data) {
             assert.ifError(err);
             assert.strictEqual(req.path, '/foo?foo=bar');
             return done();
@@ -83,8 +83,8 @@ describe('JsonClient', function () {
     });
 
 
-    it('should override default query option per request', function (done) {
-        SERVER.get('/foo', function (req, res, next) {
+    it('should override default query option per request', function(done) {
+        SERVER.get('/foo', function(req, res, next) {
             assert.deepEqual(req.query, {
                 baz: 'qux'
             });
@@ -105,7 +105,7 @@ describe('JsonClient', function () {
             query: {
                 baz: 'qux'
             }
-        }, function (err, req, res, data) {
+        }, function(err, req, res, data) {
             assert.ifError(err);
             assert.strictEqual(req.path, '/foo?baz=qux');
             return done();
@@ -114,8 +114,8 @@ describe('JsonClient', function () {
 
 
     it('should ignore query option if querystring exists in url',
-    function (done) {
-        SERVER.get('/foo', function (req, res, next) {
+    function(done) {
+        SERVER.get('/foo', function(req, res, next) {
             assert.deepEqual(req.query, {
                 a: '1'
             });
@@ -128,7 +128,7 @@ describe('JsonClient', function () {
             query: {
                 b: 2
             }
-        }, function (err, req, res, data) {
+        }, function(err, req, res, data) {
             assert.ifError(err);
             assert.strictEqual(req.path, '/foo?a=1');
             return done();
