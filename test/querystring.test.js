@@ -9,7 +9,7 @@ var restify = require('restify');
 var clients = require('../lib');
 
 
-describe('JsonClient', function () {
+describe('query string parameters', function () {
 
     var SERVER;
     var LOG = bunyan.createLogger({
@@ -133,5 +133,43 @@ describe('JsonClient', function () {
             assert.strictEqual(req.path, '/foo?a=1');
             return done();
         });
+    });
+
+
+    it('should prefer default query string in url over query options',
+    function (done) {
+        SERVER.get('/foo', function (req, res, next) {
+            assert.deepEqual(req.query, {
+                foo: 'baz'
+            });
+            res.send(200);
+            return next();
+        });
+
+        CLIENT = clients.createJsonClient({
+            url: 'http://localhost:3000/foo?foo=bar',
+            query: {
+                foo: 'baz'
+            }
+        });
+
+        CLIENT.get('/foo', done);
+    });
+
+
+    it('should throw away default query string in url', function (done) {
+        SERVER.get('/foo', function (req, res, next) {
+            assert.deepEqual(req.query, {});
+            res.send(200);
+            return next();
+        });
+
+        CLIENT = clients.createJsonClient({
+            url: 'http://localhost:3000/foo?foo=bar'
+        });
+
+        CLIENT.get({
+            path: '/foo'
+        }, done);
     });
 });
