@@ -12,13 +12,9 @@ var clients = require('../lib');
 describe('query string parameters', function () {
 
     var SERVER;
+    var CLIENT;
     var LOG = bunyan.createLogger({
         name: 'clientlog'
-    });
-    var CLIENT = clients.createJsonClient({
-        url: 'http://localhost:3000',
-        log: LOG,
-        retry: false
     });
 
     beforeEach(function (done) {
@@ -36,140 +32,164 @@ describe('query string parameters', function () {
     });
 
 
-    it('should support default query option in constructor', function (done) {
-        SERVER.get('/foo', function (req, res, next) {
-            assert.deepEqual(req.query, {
-                foo: 'i am default'
+    describe('constructor time qs', function () {
+
+        it('should support query option', function (done) {
+            SERVER.get('/foo', function (req, res, next) {
+                assert.deepEqual(req.query, {
+                    foo: 'bar'
+                });
+                res.send(200);
+                return next();
             });
-            res.send(200);
-            return next();
+
+            CLIENT = clients.createJsonClient({
+                url: 'http://localhost:3000',
+                query: {
+                    foo: 'bar'
+                }
+            });
+            CLIENT.get('/foo', done);
         });
 
-        CLIENT = clients.createJsonClient({
-            url: 'http://localhost:3000',
-            query: {
-                foo: 'i am default'
-            },
-            retry: false
+        it('should not support existing query in url', function (done) {
+            SERVER.get('/foo', function (req, res, next) {
+                assert.deepEqual(req.query, {});
+                res.send(200);
+                return next();
+            });
+
+            CLIENT = clients.createJsonClient({
+                url: 'http://localhost:3000/foo?foo=bar'
+            });
+            CLIENT.get('/foo', done);
         });
 
-        CLIENT.get('/foo', function (err, req, res, data) {
-            assert.ifError(err);
-            assert.strictEqual(req.path, '/foo?foo=i%20am%20default');
-            return done();
+        it('should prefer query option over query in url', function (done) {
+            SERVER.get('/foo', function (req, res, next) {
+                assert.deepEqual(req.query, {
+                    foo: 'baz'
+                });
+                res.send(200);
+                return next();
+            });
+
+            CLIENT = clients.createJsonClient({
+                url: 'http://localhost:3000/foo?foo=bar',
+                query: {
+                    foo: 'baz'
+                }
+            });
+            CLIENT.get('/foo', done);
         });
     });
 
 
-    it('should support query option per request', function (done) {
-        SERVER.get('/foo', function (req, res, next) {
-            assert.deepEqual(req.query, {
-                foo: 'bar'
+    describe('verb time qs', function () {
+
+        it('should support query option', function (done) {
+            SERVER.get('/foo', function (req, res, next) {
+                assert.deepEqual(req.query, {
+                    foo: 'bar'
+                });
+                res.send(200);
+                return next();
             });
-            res.send(200);
-            return next();
+
+            CLIENT = clients.createJsonClient({
+                url: 'http://localhost:3000'
+            });
+            CLIENT.get({
+                path: '/foo',
+                query: {
+                    foo: 'bar'
+                }
+            }, done);
         });
 
-        CLIENT.get({
-            path: '/foo',
-            query: {
-                foo: 'bar'
-            }
-        }, function (err, req, res, data) {
-            assert.ifError(err);
-            assert.strictEqual(req.path, '/foo?foo=bar');
-            return done();
+        it('should support query string in path', function (done) {
+            SERVER.get('/foo', function (req, res, next) {
+                assert.deepEqual(req.query, {
+                    foo: 'bar'
+                });
+                res.send(200);
+                return next();
+            });
+
+            CLIENT = clients.createJsonClient({
+                url: 'http://localhost:3000'
+            });
+            CLIENT.get({
+                path: '/foo?foo=bar'
+            }, done);
+        });
+
+        it('should prefer query string in path over query option',
+        function (done) {
+            SERVER.get('/foo', function (req, res, next) {
+                assert.deepEqual(req.query, {
+                    foo: 'bar'
+                });
+                res.send(200);
+                return next();
+            });
+
+            CLIENT = clients.createJsonClient({
+                url: 'http://localhost:3000'
+            });
+            CLIENT.get({
+                path: '/foo?foo=bar',
+                query: {
+                    foo: 'baz'
+                }
+            }, done);
         });
     });
 
 
-    it('should override default query option per request', function (done) {
-        SERVER.get('/foo', function (req, res, next) {
-            assert.deepEqual(req.query, {
-                baz: 'qux'
+    describe('constructor + verb time overrides', function () {
+
+        it('should prefer verb time query string in path over constructor ' +
+        'query', function (done) {
+            SERVER.get('/foo', function (req, res, next) {
+                assert.deepEqual(req.query, {
+                    foo: 'qux'
+                });
+                res.send(200);
+                return next();
             });
-            res.send(200);
-            return next();
-        });
 
-        CLIENT = clients.createJsonClient({
-            url: 'http://localhost:3000',
-            query: {
-                foo: 'bar'
-            },
-            retry: false
-        });
-
-        CLIENT.get({
-            path: '/foo',
-            query: {
-                baz: 'qux'
-            }
-        }, function (err, req, res, data) {
-            assert.ifError(err);
-            assert.strictEqual(req.path, '/foo?baz=qux');
-            return done();
-        });
-    });
-
-
-    it('should ignore query option if querystring exists in url',
-    function (done) {
-        SERVER.get('/foo', function (req, res, next) {
-            assert.deepEqual(req.query, {
-                a: '1'
+            CLIENT = clients.createJsonClient({
+                url: 'http://localhost:3000/foo?foo=bar',
+                query: {
+                    foo: 'baz'
+                }
             });
-            res.send(200);
-            return next();
+            CLIENT.get('/foo?foo=qux', done);
         });
 
-        CLIENT.get({
-            path: '/foo?a=1',
-            query: {
-                b: 2
-            }
-        }, function (err, req, res, data) {
-            assert.ifError(err);
-            assert.strictEqual(req.path, '/foo?a=1');
-            return done();
-        });
-    });
-
-
-    it('should prefer default query string in url over query options',
-    function (done) {
-        SERVER.get('/foo', function (req, res, next) {
-            assert.deepEqual(req.query, {
-                foo: 'baz'
+        it('should prefer verb time query option over constructor query',
+        function (done) {
+            SERVER.get('/foo', function (req, res, next) {
+                assert.deepEqual(req.query, {
+                    foo: 'boop'
+                });
+                res.send(200);
+                return next();
             });
-            res.send(200);
-            return next();
+
+            CLIENT = clients.createJsonClient({
+                url: 'http://localhost:3000/foo?foo=bar',
+                query: {
+                    foo: 'baz'
+                }
+            });
+            CLIENT.get({
+                path: '/foo',
+                query: {
+                    foo: 'boop'
+                }
+            }, done);
         });
-
-        CLIENT = clients.createJsonClient({
-            url: 'http://localhost:3000/foo?foo=bar',
-            query: {
-                foo: 'baz'
-            }
-        });
-
-        CLIENT.get('/foo', done);
-    });
-
-
-    it('should throw away default query string in url', function (done) {
-        SERVER.get('/foo', function (req, res, next) {
-            assert.deepEqual(req.query, {});
-            res.send(200);
-            return next();
-        });
-
-        CLIENT = clients.createJsonClient({
-            url: 'http://localhost:3000/foo?foo=bar'
-        });
-
-        CLIENT.get({
-            path: '/foo'
-        }, done);
     });
 });
