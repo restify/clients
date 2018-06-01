@@ -1,6 +1,7 @@
 'use strict';
 
 // core modules
+var crypto = require('crypto');
 var fs = require('fs');
 var path = require('path');
 
@@ -128,6 +129,90 @@ describe('StringClient', function () {
         }, function (err, req, res, data) {
             assert.ifError(err);
             assert.strictEqual(req.path, '/foo?foo=bar');
+            return done();
+        });
+    });
+
+
+    it('should allow content-md5 with default encoding', function (done) {
+        var result = '¥';
+
+        SERVER.get('/foo', function (req, res, next) {
+            var hash = crypto.createHash('md5').update(result);
+            res.header('content-md5', hash.digest('base64'));
+            res.send(result);
+            return next();
+        });
+
+        CLIENT.get({
+            path: '/foo'
+        }, function (err, req, res, data) {
+            assert.ifError(err);
+            assert.strictEqual(res.body, result);
+            assert.isOk(res.headers['content-md5'], 'Has content-md5 header');
+            return done();
+        });
+    });
+
+    it('should allow content-md5 with binary encoding', function (done) {
+        var result = '¥';
+
+        SERVER.get('/foo', function (req, res, next) {
+            var hash = crypto.createHash('md5').update(result, 'binary');
+            res.header('content-md5', hash.digest('base64'));
+            res.send(result);
+            return next();
+        });
+
+        CLIENT.get({
+            path: '/foo'
+        }, function (err, req, res, data) {
+            assert.ifError(err);
+            assert.strictEqual(res.body, result);
+            assert.isOk(res.headers['content-md5'], 'Has content-md5 header');
+            return done();
+        });
+
+    });
+
+    it('should allow content-md5 with utf8 encoding', function (done) {
+        var result = '¥';
+
+        // Test with 'utf8' encoding.
+        SERVER.get('/foo', function (req, res, next) {
+            var hash = crypto.createHash('md5').update(result, 'utf8');
+            res.header('content-md5', hash.digest('base64'));
+            res.send(result);
+            return next();
+        });
+
+        CLIENT.get({
+            path: '/foo'
+        }, function (err, req, res, data) {
+            assert.ifError(err);
+            assert.strictEqual(res.body, result);
+            assert.isOk(res.headers['content-md5'], 'Has content-md5 header');
+            return done();
+        });
+    });
+
+    it('should disallow bogus content-md5', function (done) {
+        var result = '¥';
+
+        // Test with bad content-md5 header.
+        SERVER.get('/foo', function (req, res, next) {
+            var hash = crypto.createHash('md5').update(result);
+            res.header('content-md5', hash.digest('base64'));
+            res.send('bogus data');
+            return next();
+        });
+
+        CLIENT.get({
+            path: '/foo'
+        }, function (err, req, res, data) {
+            assert.isOk(err, 'expect an error');
+            assert.strictEqual(err.message, 'BadDigest');
+            assert.isOk(res.headers['content-md5'], 'Has content-md5 header');
             return done();
         });
     });

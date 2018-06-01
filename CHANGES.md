@@ -4,6 +4,10 @@
 
 (nothing yet)
 
+## 2.4.1
+
+* #173: support content-md5 header generated from different node versions
+
 ## 2.4.0
 
 * #81: add `inflightRequests()` API
