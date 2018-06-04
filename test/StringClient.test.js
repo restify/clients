@@ -154,7 +154,7 @@ describe('StringClient', function () {
         });
     });
 
-    it('should allow content-md5 with binary encoding', function (done) {
+    it('GH-173 should allow content-md5 with binary encoding', function (done) {
         var result = '¥';
 
         SERVER.get('/foo', function (req, res, next) {
@@ -175,7 +175,7 @@ describe('StringClient', function () {
 
     });
 
-    it('should allow content-md5 with utf8 encoding', function (done) {
+    it('GH-173 should allow content-md5 with utf8 encoding', function (done) {
         var result = '¥';
 
         // Test with 'utf8' encoding.
