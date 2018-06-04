@@ -39,6 +39,9 @@
 * Makefile now uses Yarn under the hood.
 * #158: Upgrade to new major versions, mime@2.x and fast-safe-stringify@2.x
 
+### New ###
+- #95: Add support for `before` and `after` hooks on client requests.
+
 ## 1.5.2
 
 - Switch back to restify-errors@3 to fix backward incompatiblity in

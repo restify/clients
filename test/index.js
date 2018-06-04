@@ -163,6 +163,14 @@ function sendJsonString(req, res, next) {
     return next();
 }
 
+// sends back a body with the contents of the restify-clients-test-header
+// received
+function sendTestHeader(req, res, next) {
+    res.header('content-type', 'json');
+    res.send(200, req.header('restify-clients-test-header', 'missing'));
+    next();
+}
+
 function getLog(name, stream, level) {
     return (bunyan.createLogger({
         level: (process.env.LOG_LEVEL || level || 'fatal'),
@@ -1422,6 +1430,165 @@ describe('restify-client tests', function () {
                 assert.equal(200, res.statusCode);
                 done();
             });
+        });
+    });
+
+    // Ensure the .before and .after functions are called for each client.
+    describe('before/after hooks', function () {
+        var _clients = {
+            HttpClient: {
+                creator: clients.createHttpClient
+            }, JsonClient: {
+                creator: clients.createJsonClient
+            }, StringClient: {
+                creator: clients.createStringClient
+            }
+        };
+        var handles = [];
+        var server = restify.createServer({});
+        var serverUrl;
+
+        function _getBody(clientType, req, data, cb) {
+            if (clientType === 'HttpClient') {
+                req.on('result', function (err, res) {
+                    var body = '';
+
+                    assert.ifError(err);
+
+                    res.setEncoding('utf8');
+                    res.on('data', function (chunk) {
+                        body += chunk;
+                    });
+
+                    res.on('end', function () {
+                        cb(body.replace(/"/g, ''));
+                    });
+                });
+            } else {
+                cb(data.replace(/"/g, ''));
+            }
+        }
+
+        before(function (callback) {
+            var url = 'http://127.0.0.1';
+
+            server.get('/testheader', sendTestHeader);
+            server.listen();
+            serverUrl = url + ':' + server.address().port;
+
+            callback();
+        });
+
+        // {Http,Json,String}Client should be able to use .before and .after
+        Object.keys(_clients).forEach(function (clientName) {
+            var _client = _clients[clientName];
+
+            it('request from ' + clientName, function (done) {
+                var afterCtx = false;
+                var afterRan = false;
+                var beforeRan = false;
+                var client;
+
+                client = _client.creator({
+                    after: function (err, req, res, ctx, cb) {
+                        assert.ifError(err);
+                        afterRan = true;
+                        // got ctx from before() function
+                        if (ctx && ctx.hello === 'world') {
+                            afterCtx = true;
+                        }
+                        cb();
+                    }, before: function (opts, cb) {
+                        beforeRan = true;
+                        opts.headers['restify-clients-test-header'] =
+                            clientName;
+                        cb({hello: 'world'});
+                    }, url: serverUrl
+                });
+
+                handles.push(client);
+
+                client.get('/testheader', function (err, req, res, data) {
+                    assert.ifError(err);
+                    _getBody(clientName, req, data, function (body) {
+                        assert.equal(body, clientName);
+                        assert.equal(beforeRan, true);
+                        assert.equal(afterRan, true);
+                        assert.equal(afterCtx, true);
+
+                        done();
+                    });
+                });
+            });
+
+            it('request (w/o after) from ' + clientName, function (done) {
+                var afterRan = false;
+                var beforeRan = false;
+                var client;
+
+                client = _client.creator({
+                    before: function (opts, cb) {
+                        beforeRan = true;
+                        opts.headers['restify-clients-test-header'] =
+                            clientName;
+                        cb({hello: 'world'});
+                    }, url: serverUrl
+                });
+
+                handles.push(client);
+
+                client.get('/testheader', function (err, req, res, data) {
+                    assert.ifError(err);
+                    _getBody(clientName, req, data, function (body) {
+                        assert.equal(body, clientName);
+                        assert.equal(beforeRan, true);
+                        assert.equal(afterRan, false);
+
+                        done();
+                    });
+                });
+            });
+
+            it('request (w/o before) from ' + clientName, function (done) {
+                var afterCtx = false;
+                var afterRan = false;
+                var beforeRan = false;
+                var client;
+
+                client = _client.creator({
+                    after: function (err, req, res, ctx, cb) {
+                        assert.ifError(err);
+                        afterRan = true;
+                        // got ctx from before() function
+                        if (ctx && ctx.hello === 'world') {
+                            afterCtx = true;
+                        }
+                        cb();
+                    }, url: serverUrl
+                });
+
+                handles.push(client);
+
+                client.get('/testheader', function (err, req, res, data) {
+                    assert.ifError(err);
+                    _getBody(clientName, req, data, function (body) {
+                        assert.equal(body, 'missing');
+                        assert.equal(beforeRan, false);
+                        assert.equal(afterRan, true);
+                        assert.equal(afterCtx, false);
+
+                        done();
+                    });
+                });
+            });
+        });
+
+        after(function (callback) {
+            handles.forEach(function (clientHandle) {
+                clientHandle.close();
+            });
+            server.close();
+            callback();
         });
     });
 });

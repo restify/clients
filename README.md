@@ -137,8 +137,10 @@ var client = restify.createJsonClient({
 |Name  | Type   | Description |
 | :--- | :----: | :---- |
 |accept|String|Accept header to send|
+|after|Function|Function for tracing. Run after every request, after the client has received the response.|
 |audit|Boolean|Enable Audit logging|
 |auditor|Function|Function for Audit logging|
+|before|Function|Function for tracing. Run before every request.|
 |connectTimeout|Number|Amount of time to wait for a socket|
 |contentType|String|Content-Type header to send|
 |requestTimeout|Number|Amount of time to wait for the request to finish|
@@ -486,6 +488,118 @@ Request timings are available under the `req.getTimings()` in milliseconds:
 
 All timings except `total` can be `null` under various circumstances like
 keep-alive connection, missing https etc.
+
+## Tracing
+
+This module allows the caller to add hook functions which will be called before
+and/or after each request from a JsonClient, StringClient or HttpClient. To
+utilize these hooks, you can pass the before and/or after options when creating
+the client. Any requests made by this client will then cause these functions to
+be called.
+
+These hooks are useful for integrating with a tracing framework such as
+[OpenTracing](http://opentracing.io/), as they allow passing in functions that
+add tracing for all outgoing requests made by your application.
+
+If passed, the value of the `before` parameter should be a function with the
+following prototype:
+
+```
+function before(opts, next) {
+```
+
+where `opts` is an object containing the options for the request, and `next`
+is a callback to call when processing is complete. Some things you might want to
+do in this before function include:
+
+ * writing a trace log message indicating that you're making a request
+ * modifying opts.headers to include additional headers in the outbound request
+
+Once processing is complete, the `before` function *must* call the `next`
+callback. If an object is passed as a parameter to `next` as in:
+
+```
+function before(opts, next) {
+    next({hello: 'world'});
+}
+```
+
+the object argument to next will be passed as an argument to the `after`
+function.
+
+If passed, the value of the `after` parameter should be a function with the
+following prototype:
+
+```
+function after(err, req, res, ctx, next) {
+```
+
+Where the parameters are:
+
+|Name  | Type   | Description |
+| :--- | :----: | :---- |
+|err|Error Object|The err object as returned by req.once('result', function (err, ...)|
+|req|Request Object|The [req](http://restify.com/#request-api) object for this request|
+|res|Response Object|The [res](http://restify.com/#response-api) object as returned by req.once('result', function (err, res)|
+|ctx|Object|The object passed by the `before` hook to its callback|
+|next|Function|The callback your handler must call when processing is complete|
+
+All of these parameters can also be `undefined` in cases where the value does
+not make sense. For example the `ctx` parameter will be `undefined` if `before`
+was not called or did not pass an object to its callback, and `req` and `res`
+will be undefined in error cases where a request failed early on.
+
+The `after` caller is most useful for logging the fact that a request completed
+and indicating errors or response details to a tracing system.
+
+A simple example of this tracing (missing any error checking) in action would be:
+
+```
+var restifyClients = require('restify-clients');
+
+var client = restifyClients.createJsonClient({
+    after: function _afterCb(err, req, res, ctx, next) {
+        console.error('AFTER: ' + JSON.stringify({
+            ctx: ctx,
+            statusCode: res.statusCode
+        }, null, 2));
+        next();
+    }, before: function _beforeCb(opts, next) {
+        console.error('BEFORE: ' + JSON.stringify({
+            headers: opts.headers
+        }, null, 2));
+        // set an additional header before the request is made
+        opts.headers['x-example-header'] = 'exemplary';
+        next({hello: 'from _beforeCb'});
+    }, url: 'http://127.0.0.1:8080'
+});
+
+// make a GET request to /hello
+client.get('/hello', function _getCb(err, req, res, obj) {
+    console.error('REQUEST COMPLETE');
+});
+```
+
+which, if run, should output something like:
+
+```
+BEFORE: {
+  "headers": {
+    "accept": "application/json",
+    "user-agent": "restify/1.4.1 (x64-darwin; v8/4.5.103.37; OpenSSL/1.0.2j) node/4.6.0",
+    "date": "Fri, 04 Nov 2016 06:06:42 GMT"
+  }
+}
+AFTER: {
+  "ctx": {
+    "hello": "from _beforeCb"
+  },
+  "statusCode": 200
+}
+REQUEST COMPLETE
+```
+
+assuming you have a server listening on 127.0.0.1:8080 responding to `GET /hello`.
 
 ## Contributing
 
