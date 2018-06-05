@@ -137,6 +137,7 @@ var client = restify.createJsonClient({
 |Name  | Type   | Description |
 | :--- | :----: | :---- |
 |accept|String|Accept header to send|
+|appendPath|Boolean|Append paths provided at verb time to existing client path|
 |audit|Boolean|Enable Audit logging|
 |auditor|Function|Function for Audit logging|
 |connectTimeout|Number|Amount of time to wait for a socket|

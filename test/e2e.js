@@ -8,8 +8,9 @@ var clients = require('../lib');
 
 describe('restify-client tests against real web server', function () {
     it('have timings', function (done) {
-        var client = clients.createJsonClient({
-            url: 'https://netflix.com'
+        this.timeout(10000);
+        var client = clients.createStringClient({
+            url: 'https://www.netflix.com'
         });
 
         client.get('/', function (err, req, res) {
