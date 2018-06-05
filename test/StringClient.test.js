@@ -134,7 +134,7 @@ describe('StringClient', function () {
     });
 
 
-    it('should allow content-md5 with default encoding', function (done) {
+    it('allow content-md5 with default encoding', function (done) {
         var result = '¥';
 
         SERVER.get('/foo', function (req, res, next) {
@@ -154,7 +154,7 @@ describe('StringClient', function () {
         });
     });
 
-    it('GH-173 should allow content-md5 with binary encoding', function (done) {
+    it('GH-173 allow content-md5 with binary encoding', function (done) {
         var result = '¥';
 
         SERVER.get('/foo', function (req, res, next) {
@@ -175,7 +175,7 @@ describe('StringClient', function () {
 
     });
 
-    it('GH-173 should allow content-md5 with utf8 encoding', function (done) {
+    it('GH-173 allow content-md5 with utf8 encoding', function (done) {
         var result = '¥';
 
         // Test with 'utf8' encoding.
@@ -196,7 +196,37 @@ describe('StringClient', function () {
         });
     });
 
-    it('should disallow bogus content-md5', function (done) {
+    it('GH-173 disallow content-md5 with binary encoding when option is off',
+            function (done) {
+        var result = '¥';
+
+        SERVER.get('/foo', function (req, res, next) {
+            var hash = crypto.createHash('md5').update(result, 'binary');
+            res.header('content-md5', hash.digest('base64'));
+            res.send(result);
+            return next();
+        });
+
+        var localClient = clients.createStringClient({
+            url: 'http://localhost:3000',
+            log: LOG,
+            retry: false,
+            supportLatin1ContentMd5: false
+        });
+
+        localClient.get({
+            path: '/foo'
+        }, function (err, req, res, data) {
+            localClient.close();
+            assert.isOk(err, 'expect an error');
+            assert.strictEqual(err.message, 'BadDigest');
+            assert.isOk(res.headers['content-md5'], 'Has content-md5 header');
+            return done();
+        });
+
+    });
+
+    it('disallow bogus content-md5', function (done) {
         var result = '¥';
 
         // Test with bad content-md5 header.

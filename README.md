@@ -231,6 +231,15 @@ the source for `JsonClient`. Effectively, you extend it, and set the
 appropriate options in the constructor and implement a `write` (for
 put/post) and `parse` method (for all HTTP bodies), and that's it.
 
+If the server responds with a `content-md5` header, `StringClient` will
+automatically verify the response body md5 hash, and return a BadDigest
+error when it does not match. By default, the `StringClient` content-md5 hash
+calculation will support both "utf8" (for node.js v6 and higher versions) as
+well as "binary" (a latin1 encoding used in node.js v4 and older versions).
+You can set the `supportLatin1ContentMd5` StringClient option to false to
+disable the 'binary' hash calculation and just allow the 'utf8' hash
+calculation.
+
 #### createStringClient(options)
 
 ```javascript
