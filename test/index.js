@@ -305,7 +305,7 @@ describe('restify-client tests', function () {
         }
     });
 
-    describe('req.getTimings()', function () {
+    describe('Request timing', function () {
         var TIMINGS_CLIENT_IP;
         var TIMINGS_CLIENT_HOST;
 
@@ -354,6 +354,23 @@ describe('restify-client tests', function () {
                 done();
             });
         });
+
+        it('emits timings from client', function (done) {
+            TIMINGS_CLIENT_HOST.once('timings', function (timings) {
+                assert.isObject(timings);
+                assert.isNumber(timings.dnsLookup);
+                assert.isNull(timings.tlsHandshake);
+                assert.isNumber(timings.tcpConnection);
+                assert.isNumber(timings.firstByte);
+                assert.isNumber(timings.contentTransfer);
+                assert.isNumber(timings.total);
+                done();
+            });
+            TIMINGS_CLIENT_HOST.get('/json/mcavage', function (err, req, res) {
+                assert.ifError(err);
+            });
+        });
+
     });
 
     it('GET json', function (done) {
