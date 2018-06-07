@@ -39,6 +39,22 @@ describe('StringClient', function () {
         SERVER.close(done);
     });
 
+    it('should make a request',
+    function (done) {
+        SERVER.get('/ping', function (req, res, next) {
+            res.send('pong');
+            return next();
+        });
+
+        CLIENT.get({
+            path: '/ping'
+        }, function (err, req, res, data) {
+            assert.ifError(err);
+            assert.equal(data, 'pong');
+            return done();
+        });
+    });
+
     it('should support decoding gzipped utf8 multibyte responses',
     function (done) {
         var payload = fs.readFileSync(path.join(
