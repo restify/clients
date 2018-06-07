@@ -472,7 +472,8 @@ client.get(options, function(err, res, socket, head) {
 
 #### Timings
 
-Request timings are available under the `req.getTimings()` in milliseconds:
+Request timings are available under the `req.getTimings()` or emitted from the
+client via a `timings` event in milliseconds:
 
 ```javascript
 {
