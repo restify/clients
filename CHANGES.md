@@ -4,6 +4,11 @@
 
 (nothing yet)
 
+## 2.0.3
+
+* #175: fix(HttpClient): attach readable event after data to keep response
+  stream flow
+
 ## 2.0.2
 
 * #169: Restore 'dtrace-provided' optional dependency (accidentally removed
