@@ -13,6 +13,9 @@ var restify = require('restify');
 // local files
 var clients = require('../lib');
 
+// globals
+var nodeMajorVer = parseInt(process.versions.node.split('.'), 10);
+
 
 describe('StringClient', function () {
 
@@ -154,77 +157,216 @@ describe('StringClient', function () {
         });
     });
 
-    it('GH-173 allow content-md5 with binary encoding', function (done) {
-        var result = '¥';
+    if (nodeMajorVer >= 6) {
+        it('GH-173 allow content-md5 with utf8 encoding', function (done) {
+            var result = '¥';
 
-        SERVER.get('/foo', function (req, res, next) {
-            var hash = crypto.createHash('md5').update(result, 'binary');
-            res.header('content-md5', hash.digest('base64'));
-            res.send(result);
-            return next();
+            // Test with 'utf8' encoding.
+            SERVER.get('/foo', function (req, res, next) {
+                var hash = crypto.createHash('md5').update(result, 'utf8');
+                res.header('content-md5', hash.digest('base64'));
+                res.send(result);
+                return next();
+            });
+
+            CLIENT.get({
+                path: '/foo'
+            }, function (err, req, res, data) {
+                assert.ifError(err);
+                assert.strictEqual(res.body, result);
+                assert.isOk(res.headers['content-md5'],
+                    'Has content-md5 header');
+                return done();
+            });
         });
 
-        CLIENT.get({
-            path: '/foo'
-        }, function (err, req, res, data) {
-            assert.ifError(err);
-            assert.strictEqual(res.body, result);
-            assert.isOk(res.headers['content-md5'], 'Has content-md5 header');
-            return done();
+        it('GH-173 disallow content-md5 with binary encoding',
+                function (done) {
+            var result = '¥';
+
+            SERVER.get('/foo', function (req, res, next) {
+                var hash = crypto.createHash('md5').update(result, 'binary');
+                res.header('content-md5', hash.digest('base64'));
+                res.send(result);
+                return next();
+            });
+
+            CLIENT.get({
+                path: '/foo'
+            }, function (err, req, res, data) {
+                assert.isOk(err, 'expect an error');
+                assert.strictEqual(err.message, 'BadDigest');
+                assert.isOk(res.headers['content-md5'],
+                    'Has content-md5 header');
+                return done();
+            });
         });
 
-    });
+        it('GH-173 allow content-md5 with binary encoding when option is set',
+                function (done) {
+            var result = '¥';
 
-    it('GH-173 allow content-md5 with utf8 encoding', function (done) {
-        var result = '¥';
+            SERVER.get('/foo', function (req, res, next) {
+                var hash = crypto.createHash('md5').update(result, 'binary');
+                res.header('content-md5', hash.digest('base64'));
+                res.send(result);
+                return next();
+            });
 
-        // Test with 'utf8' encoding.
-        SERVER.get('/foo', function (req, res, next) {
-            var hash = crypto.createHash('md5').update(result, 'utf8');
-            res.header('content-md5', hash.digest('base64'));
-            res.send(result);
-            return next();
+            var localClient = clients.createStringClient({
+                url: 'http://localhost:3000',
+                log: LOG,
+                retry: false,
+                allowAlternativeContentMd5: true
+            });
+
+            localClient.get({
+                path: '/foo'
+            }, function (err, req, res, data) {
+                localClient.close();
+                assert.ifError(err);
+                assert.strictEqual(res.body, result);
+                assert.isOk(res.headers['content-md5'],
+                    'Has content-md5 header');
+                return done();
+            });
         });
 
-        CLIENT.get({
-            path: '/foo'
-        }, function (err, req, res, data) {
-            assert.ifError(err);
-            assert.strictEqual(res.body, result);
-            assert.isOk(res.headers['content-md5'], 'Has content-md5 header');
-            return done();
-        });
-    });
+        it('GH-173 disallow content-md5 with binary encoding when opt is off',
+                function (done) {
+            var result = '¥';
 
-    it('GH-173 disallow content-md5 with binary encoding when option is off',
-            function (done) {
-        var result = '¥';
+            SERVER.get('/foo', function (req, res, next) {
+                var hash = crypto.createHash('md5').update(result, 'binary');
+                res.header('content-md5', hash.digest('base64'));
+                res.send(result);
+                return next();
+            });
 
-        SERVER.get('/foo', function (req, res, next) {
-            var hash = crypto.createHash('md5').update(result, 'binary');
-            res.header('content-md5', hash.digest('base64'));
-            res.send(result);
-            return next();
-        });
+            var localClient = clients.createStringClient({
+                url: 'http://localhost:3000',
+                log: LOG,
+                retry: false,
+                allowAlternativeContentMd5: false
+            });
 
-        var localClient = clients.createStringClient({
-            url: 'http://localhost:3000',
-            log: LOG,
-            retry: false,
-            supportLatin1ContentMd5: false
-        });
-
-        localClient.get({
-            path: '/foo'
-        }, function (err, req, res, data) {
-            localClient.close();
-            assert.isOk(err, 'expect an error');
-            assert.strictEqual(err.message, 'BadDigest');
-            assert.isOk(res.headers['content-md5'], 'Has content-md5 header');
-            return done();
+            localClient.get({
+                path: '/foo'
+            }, function (err, req, res, data) {
+                localClient.close();
+                assert.isOk(err, 'expect an error');
+                assert.strictEqual(err.message, 'BadDigest');
+                assert.isOk(res.headers['content-md5'],
+                    'Has content-md5 header');
+                return done();
+            });
         });
 
-    });
+    } else {
+        it('GH-173 allow content-md5 with binary encoding', function (done) {
+            var result = '¥';
+
+            // Test with 'utf8' encoding.
+            SERVER.get('/foo', function (req, res, next) {
+                var hash = crypto.createHash('md5').update(result, 'binary');
+                res.header('content-md5', hash.digest('base64'));
+                res.send(result);
+                return next();
+            });
+
+            CLIENT.get({
+                path: '/foo'
+            }, function (err, req, res, data) {
+                assert.ifError(err);
+                assert.strictEqual(res.body, result);
+                assert.isOk(res.headers['content-md5'],
+                    'Has content-md5 header');
+                return done();
+            });
+        });
+
+        it('GH-173 disallow content-md5 with utf8 encoding',
+                function (done) {
+            var result = '¥';
+
+            SERVER.get('/foo', function (req, res, next) {
+                var hash = crypto.createHash('md5').update(result, 'utf8');
+                res.header('content-md5', hash.digest('base64'));
+                res.send(result);
+                return next();
+            });
+
+            CLIENT.get({
+                path: '/foo'
+            }, function (err, req, res, data) {
+                assert.isOk(err, 'expect an error');
+                assert.strictEqual(err.message, 'BadDigest');
+                assert.isOk(res.headers['content-md5'],
+                    'Has content-md5 header');
+                return done();
+            });
+        });
+
+        it('GH-173 allow content-md5 with utf8 encoding when option is set',
+                function (done) {
+            var result = '¥';
+
+            SERVER.get('/foo', function (req, res, next) {
+                var hash = crypto.createHash('md5').update(result, 'utf8');
+                res.header('content-md5', hash.digest('base64'));
+                res.send(result);
+                return next();
+            });
+
+            var localClient = clients.createStringClient({
+                url: 'http://localhost:3000',
+                log: LOG,
+                retry: false,
+                allowAlternativeContentMd5: true
+            });
+
+            localClient.get({
+                path: '/foo'
+            }, function (err, req, res, data) {
+                localClient.close();
+                assert.ifError(err);
+                assert.strictEqual(res.body, result);
+                assert.isOk(res.headers['content-md5'],
+                    'Has content-md5 header');
+                return done();
+            });
+        });
+
+        it('GH-173 disallow content-md5 with utf8 encoding when option is off',
+                function (done) {
+            var result = '¥';
+
+            SERVER.get('/foo', function (req, res, next) {
+                var hash = crypto.createHash('md5').update(result, 'utf8');
+                res.header('content-md5', hash.digest('base64'));
+                res.send(result);
+                return next();
+            });
+
+            var localClient = clients.createStringClient({
+                url: 'http://localhost:3000',
+                log: LOG,
+                retry: false,
+                allowAlternativeContentMd5: false
+            });
+
+            localClient.get({
+                path: '/foo'
+            }, function (err, req, res, data) {
+                localClient.close();
+                assert.isOk(err, 'expect an error');
+                assert.strictEqual(err.message, 'BadDigest');
+                assert.isOk(res.headers['content-md5'],
+                    'Has content-md5 header');
+                return done();
+            });
+        });
+    }
 
     it('disallow bogus content-md5', function (done) {
         var result = '¥';
