@@ -496,7 +496,7 @@ Per request metrics are available via a `metrics` event.
 {
   statusCode: 200,
   method: 'POST',
-  success: true,,
+  success: true,
   path: '/foo/bar',
   url: 'http://netflix.com',
   timings: {
