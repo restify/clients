@@ -252,6 +252,15 @@ describe('restify-client tests', function () {
             SERVER.del('/redirect/:status_code/:path', sendRedirect);
             SERVER.opts('/redirect/:status_code/:path', sendRedirect);
 
+            SERVER.del('/delete404', function (req, res, next) {
+                res.send(404);
+                return next();
+            });
+            SERVER.get('/get500', function (req, res, next) {
+                res.send(500);
+                return next();
+            });
+
             SERVER.listen(PORT, '127.0.0.1', function () {
                 PORT = SERVER.address().port;
 
@@ -372,6 +381,181 @@ describe('restify-client tests', function () {
         });
 
     });
+
+    describe('request metrics', function () {
+        var METRICS_CLIENT_HOST;
+        var METRICS_CLIENT_URL;
+
+        beforeEach(function () {
+            METRICS_CLIENT_URL = 'http://localhost:' + PORT + '/';
+            METRICS_CLIENT_HOST = clients.createJsonClient({
+                url: METRICS_CLIENT_URL,
+                retry: false
+            });
+        });
+
+        afterEach(function () {
+            METRICS_CLIENT_HOST.close();
+        });
+
+        it('emits metrics for 200 get', function (done) {
+            METRICS_CLIENT_HOST.get('/json/mcavage', function (err, req, res) {
+                assert.ifError(err);
+            });
+
+            METRICS_CLIENT_HOST.once('metrics', function (metrics) {
+                assert.isObject(metrics);
+                assert.equal(200, metrics.statusCode);
+                assert.equal('GET', metrics.method);
+                assert.equal(METRICS_CLIENT_URL, metrics.url);
+                assert.isTrue(metrics.success);
+                assert.isObject(metrics.timings);
+                assert.isNumber(metrics.timings.dnsLookup);
+                assert.isNull(metrics.timings.tlsHandshake);
+                assert.isNumber(metrics.timings.tcpConnection);
+                assert.isNumber(metrics.timings.firstByte);
+                assert.isNumber(metrics.timings.contentTransfer);
+                assert.isNumber(metrics.timings.total);
+                done();
+            });
+        });
+
+        it('emits metrics for 200 put', function (done) {
+            METRICS_CLIENT_HOST.put(
+                '/json/mcavage',
+                '',
+                function (err, req, res) {
+                    assert.ifError(err);
+                });
+
+            METRICS_CLIENT_HOST.once('metrics', function (metrics) {
+                assert.isObject(metrics);
+                assert.equal(200, metrics.statusCode);
+                assert.equal('PUT', metrics.method);
+                assert.equal(METRICS_CLIENT_URL, metrics.url);
+                assert.isTrue(metrics.success);
+                assert.isObject(metrics.timings);
+                assert.isNumber(metrics.timings.dnsLookup);
+                assert.isNull(metrics.timings.tlsHandshake);
+                assert.isNumber(metrics.timings.tcpConnection);
+                assert.isNumber(metrics.timings.firstByte);
+                assert.isNumber(metrics.timings.contentTransfer);
+                assert.isNumber(metrics.timings.total);
+                done();
+            });
+        });
+
+        it('emits metrics for 200 head', function (done) {
+            METRICS_CLIENT_HOST.head('/json/mcavage', function (err, req, res) {
+                assert.ifError(err);
+            });
+
+            METRICS_CLIENT_HOST.once('metrics', function (metrics) {
+                assert.isObject(metrics);
+                assert.equal(200, metrics.statusCode);
+                assert.equal('HEAD', metrics.method);
+                assert.equal(METRICS_CLIENT_URL, metrics.url);
+                assert.isTrue(metrics.success);
+                assert.isObject(metrics.timings);
+                assert.isNumber(metrics.timings.dnsLookup);
+                assert.isNull(metrics.timings.tlsHandshake);
+                assert.isNumber(metrics.timings.tcpConnection);
+                assert.isNumber(metrics.timings.firstByte);
+                assert.isNumber(metrics.timings.contentTransfer);
+                assert.isNumber(metrics.timings.total);
+                done();
+            });
+        });
+
+        it('emits metrics for 200 post', function (done) {
+            METRICS_CLIENT_HOST.post('/json/mcavage', function (err, req, res) {
+                assert.ifError(err);
+            });
+
+            METRICS_CLIENT_HOST.once('metrics', function (metrics) {
+                assert.isObject(metrics);
+                assert.equal(200, metrics.statusCode);
+                assert.equal('POST', metrics.method);
+                assert.equal(METRICS_CLIENT_URL, metrics.url);
+                assert.isTrue(metrics.success);
+                assert.isObject(metrics.timings);
+                assert.isNumber(metrics.timings.dnsLookup);
+                assert.isNull(metrics.timings.tlsHandshake);
+                assert.isNumber(metrics.timings.tcpConnection);
+                assert.isNumber(metrics.timings.firstByte);
+                assert.isNumber(metrics.timings.contentTransfer);
+                assert.isNumber(metrics.timings.total);
+                done();
+            });
+        });
+
+        it('emits metrics for 200 delete', function (done) {
+            METRICS_CLIENT_HOST.del('/json/mcavage', function (err, req, res) {
+                assert.ifError(err);
+            });
+
+            METRICS_CLIENT_HOST.once('metrics', function (metrics) {
+                assert.isObject(metrics);
+                assert.equal(200, metrics.statusCode);
+                assert.equal('DELETE', metrics.method);
+                assert.equal(METRICS_CLIENT_URL, metrics.url);
+                assert.isTrue(metrics.success);
+                assert.isObject(metrics.timings);
+                assert.isNumber(metrics.timings.dnsLookup);
+                assert.isNull(metrics.timings.tlsHandshake);
+                assert.isNumber(metrics.timings.tcpConnection);
+                assert.isNumber(metrics.timings.firstByte);
+                assert.isNumber(metrics.timings.contentTransfer);
+                assert.isNumber(metrics.timings.total);
+                done();
+            });
+        });
+
+        it('emits metrics for 404 delete', function (done) {
+            METRICS_CLIENT_HOST.del('/delete404', function (err, req, res) {
+                assert.isObject(err);
+            });
+
+            METRICS_CLIENT_HOST.once('metrics', function (metrics) {
+                assert.isObject(metrics);
+                assert.equal(404, metrics.statusCode);
+                assert.equal('DELETE', metrics.method);
+                assert.equal(METRICS_CLIENT_URL, metrics.url);
+                assert.isFalse(metrics.success);
+                assert.isObject(metrics.timings);
+                assert.isNumber(metrics.timings.dnsLookup);
+                assert.isNull(metrics.timings.tlsHandshake);
+                assert.isNumber(metrics.timings.tcpConnection);
+                assert.isNumber(metrics.timings.firstByte);
+                assert.isNumber(metrics.timings.contentTransfer);
+                assert.isNumber(metrics.timings.total);
+                done();
+            });
+        });
+
+        it('emits metrics for 500 get', function (done) {
+            METRICS_CLIENT_HOST.get('/get500', function (err, req, res) {
+                assert.isObject(err);
+            });
+
+            METRICS_CLIENT_HOST.once('metrics', function (metrics) {
+                assert.isObject(metrics);
+                assert.equal(500, metrics.statusCode);
+                assert.equal('GET', metrics.method);
+                assert.equal(METRICS_CLIENT_URL, metrics.url);
+                assert.isFalse(metrics.success);
+                assert.isObject(metrics.timings);
+                assert.isNumber(metrics.timings.dnsLookup);
+                assert.isNull(metrics.timings.tlsHandshake);
+                assert.isNumber(metrics.timings.tcpConnection);
+                assert.isNumber(metrics.timings.firstByte);
+                assert.isNumber(metrics.timings.contentTransfer);
+                assert.isNumber(metrics.timings.total);
+                done();
+            });
+        });
+    });
+
 
     it('GET json', function (done) {
         JSON_CLIENT.get('/json/mcavage', function (err, req, res, obj) {

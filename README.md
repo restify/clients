@@ -489,6 +489,27 @@ client via a `timings` event in milliseconds:
 All timings except `total` can be `null` under various circumstances like
 keep-alive connection, missing https etc.
 
+#### Metrics
+Per request metrics are available via a `metrics` event.
+
+```javascript
+{
+  statusCode: 200,
+  method: 'POST',
+  success: true,,
+  path: '/foo/bar',
+  url: 'http://netflix.com',
+  timings: {
+    dnsLookup: 34,
+    tcpConnection: 52,
+    tlsHandshake: 112,
+    firstByte: 66,
+    contentTransfer: 2,
+    total: 266
+  }
+}
+```
+
 ## Contributing
 
 Add unit tests for any new or changed functionality. Ensure that lint and style
