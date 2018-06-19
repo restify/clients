@@ -6,7 +6,9 @@
 
 ## 2.4.1
 
-* #173: support content-md5 header generated from different node versions
+* #173: support content-md5 header generated from different node versions. This
+  adds a new [contentMd5](README.md#contentMd5) StringClient option that can be
+  used to control content-md5 response header validation.
 
 ## 2.4.0
 
