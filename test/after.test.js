@@ -14,10 +14,12 @@ describe('`after` event', function () {
 
     var SERVER;
     var STRINGCLIENT = clients.createStringClient({
-        url: 'http://localhost:3000/'
+        url: 'http://localhost:3000/',
+        requestTimeout: 100
     });
     var JSONCLIENT = clients.createJsonClient({
-        url: 'http://localhost:3000/'
+        url: 'http://localhost:3000/',
+        requestTimeout: 100
     });
     var LOG = bunyan.createLogger({
         name: 'clientlog'
@@ -36,6 +38,11 @@ describe('`after` event', function () {
             res.send(500, { empty: 'world' });
             return next();
         });
+        SERVER.get('/timeout', function (req, res, next) {
+            setTimeout(function () {
+                return next();
+            }, 1000);
+        });
         SERVER.use(restify.plugins.queryParser());
         SERVER.listen(3000, done);
     });
@@ -45,7 +52,6 @@ describe('`after` event', function () {
         JSONCLIENT.close();
         SERVER.close(done);
     });
-
 
     it('StringClient should emit after event on 200', function (done) {
         STRINGCLIENT.get('/200', _.noop);
@@ -73,15 +79,92 @@ describe('`after` event', function () {
         });
     });
 
-    it('StringClient should emit after event on 500', function (done) {
-        STRINGCLIENT.get('/500', _.noop);
+    it('StringClient should emit after event on connect timeout',
+    function (done) {
+        // setup client to point to unresolvable IP
+        var client = clients.createStringClient({
+            url: 'http://10.255.255.1/',
+            connectTimeout: 100,
+            retry: false
+        });
+        client.get('/timeout', _.noop);
+        client.once('after', function (req, res, err) {
+            assert.ok(req);
+            assert.ok(req.socket);
+            assert.isNull(res);
+            assert.ok(err);
+            assert.equal(err.name, 'ConnectTimeoutError');
+            return done();
+        });
+    });
+
+    it('StringClient should emit after event on request timeout',
+    function (done) {
+        STRINGCLIENT.get('/timeout', _.noop);
         STRINGCLIENT.once('after', function (req, res, err) {
+            assert.ok(req);
+            assert.ok(req.socket);
+            assert.isNull(res);
+            assert.ok(err);
+            assert.equal(err.name, 'RequestTimeoutError');
+            return done();
+        });
+    });
+
+    it('JSONClient should emit after event on 200', function (done) {
+        JSONCLIENT.get('/200', _.noop);
+        JSONCLIENT.once('after', function (req, res, err, data) {
+            assert.ok(req);
+            assert.ok(req.socket);
+            assert.ok(res);
+            assert.ok(res.socket);
+            assert.equal(res.statusCode, 200);
+            assert.ifError(err);
+            return done();
+        });
+    });
+
+    it('JSONClient should emit after event on 500', function (done) {
+        JSONCLIENT.get('/500', _.noop);
+        JSONCLIENT.once('after', function (req, res, err, data) {
             assert.ok(req);
             assert.ok(req.socket);
             assert.ok(res);
             assert.ok(res.socket);
             assert.equal(res.statusCode, 500);
             assert.ok(err);
+            return done();
+        });
+    });
+
+    it('JSONClient should emit after event on connect timeout',
+    function (done) {
+        // setup client to point to unresolvable IP
+        var client = clients.createJsonClient({
+            url: 'http://10.255.255.1/',
+            connectTimeout: 100,
+            retry: false
+        });
+        client.get('/timeout', _.noop);
+        client.once('after', function (req, res, err) {
+            assert.ok(req);
+            assert.ok(req.socket);
+            assert.isNull(res);
+            assert.ok(err);
+            assert.equal(err.name, 'ConnectTimeoutError');
+            return done();
+        });
+    });
+
+    it('JSONClient should emit after event on request timeout',
+    function (done) {
+        JSONCLIENT.get('/timeout', _.noop);
+        JSONCLIENT.once('after', function (req, res, err) {
+            assert.ok(req);
+            assert.ok(req.socket);
+            assert.isNull(res);
+            assert.ok(err);
+            assert.equal(err.name, 'RequestTimeoutError');
             return done();
         });
     });
