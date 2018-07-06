@@ -470,10 +470,13 @@ client.get(options, function(err, res, socket, head) {
 });
 ```
 
-#### Timings
+### Events
 
-Request timings are available under the `req.getTimings()` or emitted from the
-client via a `timings` event in milliseconds:
+The client emits the following events:
+
+#### client.on('timings', function(timings) {... });
+Per request timings are available under the `req.getTimings()` or emitted from
+the client via a `timings` event in milliseconds:
 
 ```javascript
 {
@@ -489,8 +492,9 @@ client via a `timings` event in milliseconds:
 All timings except `total` can be `null` under various circumstances like
 keep-alive connection, missing https etc.
 
-#### Metrics
-Per request metrics are available via a `metrics` event.
+#### client.on('metrics', function(metrics) {... });
+Per request metrics are available under the `req.getMetrics()` method, and are
+also emitted from the client via a `metrics` event:
 
 ```javascript
 {
@@ -509,6 +513,17 @@ Per request metrics are available via a `metrics` event.
   }
 }
 ```
+
+#### client.on('after', function(req, res, err) {... });
+StringClient and JsonClient emit an `after` event after each completed request
+(successful or not). This can be useful for attaching after handlers to report
+metrics or other useful information about the client. When using this event,
+the timings and metrics information is available via the request getters,
+`req.getTimings()` and `req.getMetrics()`. Note that the low level HttpClient
+does not support this method, as that client is a thin wrapper over the http
+streams. As such, the user is in full control of the request lifecycle, and
+`after` would not have a clear meaning.
+
 
 ## Contributing
 

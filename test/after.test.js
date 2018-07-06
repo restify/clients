@@ -168,5 +168,31 @@ describe('`after` event', function () {
             return done();
         });
     });
+
+    it('StringClient should emit after event after userland callback',
+    function (done) {
+        var afterFired = false;
+
+        STRINGCLIENT.get('/200', function () {
+            assert.isFalse(afterFired);
+        });
+        STRINGCLIENT.once('after', function (req, res, err) {
+            afterFired = true;
+            return done();
+        });
+    });
+
+    it('JSONClient should emit after event after userland callback',
+    function (done) {
+        var afterFired = false;
+
+        JSONCLIENT.get('/200', function () {
+            assert.isFalse(afterFired);
+        });
+        JSONCLIENT.once('after', function (req, res, err) {
+            afterFired = true;
+            return done();
+        });
+    });
 });
 
