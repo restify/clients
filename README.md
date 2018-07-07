@@ -515,14 +515,64 @@ also emitted from the client via a `metrics` event:
 ```
 
 #### client.on('after', function(req, res, err) {... });
-StringClient and JsonClient emit an `after` event after each completed request
+The client will emit an `after` event after each completed request
 (successful or not). This can be useful for attaching after handlers to report
 metrics or other useful information about the client. When using this event,
 the timings and metrics information is available via the request getters,
-`req.getTimings()` and `req.getMetrics()`. Note that the low level HttpClient
-does not support this method, as that client is a thin wrapper over the http
-streams. As such, the user is in full control of the request lifecycle, and
-`after` would not have a clear meaning.
+`req.getTimings()` and `req.getMetrics()`.
+
+As the low level HttpClient's callback interface exposes the streams
+directly to the consumer, there are a few caveats around using `after` with the
+HttpClient. Consumers must consume the response stream (by consuming the `data`
+event on the response) in order for the `after` event to be fired. For example,
+imagine an HttpClient request returning a 500:
+
+```javascript
+httpClient.get('/200', function (err, req) {
+  req.on('result', function (err, res) {
+    // must consume the stream first
+      res.on('data', function (chunk) {
+        res.body += chunk;
+      });
+  });
+});
+
+httpClient.once('after', function (req, res, err) {
+  // this is fired after response's `end` event.
+});
+```
+
+Another effect due to the low level nature of HttpClient means that any errors
+created in the consuming callback will not be available automatically in
+the `after` event. For example, if you get a 500, but then determine that your
+payload has some bad or malformed data, or your encounter an error while
+consuming your stream, it's your responsibility to propagate that back to
+`after` if you want to consume it later:
+
+```javascript
+httpClient.get('/500', function (err, req) {
+  req.on('result', function (err, res) {
+    // err is an InternalServerError here. but a 500 could still return
+    // some data.
+    res.on('data', function (chunk) {
+      // parse the chunks here...  // oh no, bad data! but how do I get
+      // this error to the after event?
+      var invalidDataError = new Error('invalid data format!');
+      // attach it to the req or res object
+      req.httpClientError = invalidDataError;
+    });
+  });
+});
+
+httpClient.once('after', function (req, res, err) {
+  // err will be an InternalServerError, and req.httpClientError will be your
+  // custom error.
+});
+```
+
+In timeout scenarios (connection timeout or request timeout), there is no
+response to consume, in which case the client's `after` event is fired at the
+same time as the req's `result` event.
 
 
 ## Contributing
