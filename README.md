@@ -521,19 +521,27 @@ metrics or other useful information about the client. When using this event,
 the timings and metrics information is available via the request getters,
 `req.getTimings()` and `req.getMetrics()`.
 
-As the low level HttpClient's callback interface exposes the streams
-directly to the consumer, there are a few caveats around using `after` with the
-HttpClient. Consumers must consume the response stream (by consuming the `data`
-event on the response) in order for the `after` event to be fired. For example,
-imagine an HttpClient request returning a 500:
+For the StringClient and JSONClient, the `after` event is fired after the
+response has been received and parsed. For the HttpClient, usage is a bit more
+nuanced, which will be covered below.
+
+##### Using the `after` event with the HttpClient
+
+As the low level HttpClient's callback interface exposes the associated request
+and response streams directly to the consumer, there are a few caveats around
+using `after` with the HttpClient. Consumers must consume the response stream
+(by consuming the `data` event on the response) in order for the `after` event
+to be fired. For example, here's how an HttpClient instance consumes the
+response's data to trigger the `after` event:
 
 ```javascript
 httpClient.get('/200', function (err, req) {
   req.on('result', function (err, res) {
+    let body = '';
     // must consume the stream first
-      res.on('data', function (chunk) {
-        res.body += chunk;
-      });
+    res.on('data', function (chunk) {
+      body += chunk;
+    });
   });
 });
 
@@ -545,7 +553,7 @@ httpClient.once('after', function (req, res, err) {
 Another effect due to the low level nature of HttpClient means that any errors
 created in the consuming callback will not be available automatically in
 the `after` event. For example, if you get a 500, but then determine that your
-payload has some bad or malformed data, or your encounter an error while
+payload has some bad or malformed data, or you encounter an error while
 consuming your stream, it's your responsibility to propagate that back to
 `after` if you want to consume it later:
 
@@ -553,10 +561,10 @@ consuming your stream, it's your responsibility to propagate that back to
 httpClient.get('/500', function (err, req) {
   req.on('result', function (err, res) {
     // err is an InternalServerError here. but a 500 could still return
-    // some data.
+    // some data like an error message, so let's parse the response now.
     res.on('data', function (chunk) {
-      // parse the chunks here...  // oh no, bad data! but how do I get
-      // this error to the after event?
+      // parse the chunks here...
+      // oh no, bad data! but how do I get this error to the after event?
       var invalidDataError = new Error('invalid data format!');
       // attach it to the req or res object
       req.httpClientError = invalidDataError;
