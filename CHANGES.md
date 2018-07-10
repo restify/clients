@@ -4,6 +4,10 @@
 
 (nothing yet)
 
+## 2.2.0
+
+* #178: add metrics event
+
 ## 2.0.3
 
 * #175: fix(HttpClient): attach readable event after data to keep response
