@@ -4,6 +4,10 @@
 
 (nothing yet)
 
+## 2.3.0
+
+* #179: add `after` event
+
 ## 2.2.0
 
 * #178: add metrics event
