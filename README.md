@@ -218,6 +218,7 @@ client.del('/foo/bar', function(err, req, res) {
 });
 ```
 
+
 ### StringClient
 
 `StringClient` is what `JsonClient` is built on, and provides a base
@@ -469,6 +470,25 @@ client.get(options, function(err, res, socket, head) {
   });
 });
 ```
+
+### More APIs
+
+The following methods are shared by all versions of the client:
+
+#### inflightRequests()
+
+Returns the number of inflight requests the client is currently handling. An
+inflight request is a request that is in any of the following states:
+
+* connection establishment (dns resolution, socket connection, etc.)
+* request serialization (uploading of req bodies)
+* waiting for server response
+* response marshalling/consumption
+
+The request count is incremented when a verb method is called, and is
+decremented when the response's `end` event is emitted, or when the request's
+`error` event is emitted.
+
 
 ### Events
 
