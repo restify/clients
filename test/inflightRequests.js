@@ -83,7 +83,7 @@ describe('inflightRequests', function () {
                 minTimeout: 100,
                 maxTimeout: 500,
                 // ensure even with retries we do correct counting
-                retries: 1
+                retries: 3
             }
         });
         client.get('/foo', function (err, req, res, data) {
