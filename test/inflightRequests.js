@@ -17,7 +17,7 @@ describe('inflightRequests', function () {
         url: 'http://localhost:3000/',
         requestTimeout: 100
     });
-    var JSONCLIENT = clients.createStringClient({
+    var JSONCLIENT = clients.createJsonClient({
         url: 'http://localhost:3000/',
         requestTimeout: 100
     });
