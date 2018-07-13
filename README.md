@@ -482,10 +482,9 @@ request count is incremented as soon as a verb method is called, which means
 that an inflight request is defined as a request that is in any of the
 following states:
 
-* after the verb function is called but before any I/O (dns resolution, socket
-  connection, etc.) is performed
+* after the verb function is called but before any I/O
 * waiting on I/O (dns resolution, socket connection, server response, etc.)
-* request serialization (uploading of req bodies)
+* request serialization (uploading of req bodies, etc.)
 * response marshalling/consumption
 
 The counter is decremented when the response's `end` event is emitted, or when
