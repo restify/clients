@@ -17,6 +17,10 @@ describe('inflightRequests', function () {
         url: 'http://localhost:3000/',
         requestTimeout: 100
     });
+    var JSONCLIENT = clients.createStringClient({
+        url: 'http://localhost:3000/',
+        requestTimeout: 100
+    });
     var STRINGCLIENT = clients.createStringClient({
         url: 'http://localhost:3000/',
         requestTimeout: 100
@@ -28,6 +32,7 @@ describe('inflightRequests', function () {
     beforeEach(function (done) {
         assert.strictEqual(HTTPCLIENT.inflightRequests(), 0);
         assert.strictEqual(STRINGCLIENT.inflightRequests(), 0);
+        assert.strictEqual(JSONCLIENT.inflightRequests(), 0);
 
         SERVER = restify.createServer({
             name: 'unittest',
@@ -53,10 +58,83 @@ describe('inflightRequests', function () {
     afterEach(function (done) {
         assert.strictEqual(HTTPCLIENT.inflightRequests(), 0);
         assert.strictEqual(STRINGCLIENT.inflightRequests(), 0);
+        assert.strictEqual(JSONCLIENT.inflightRequests(), 0);
 
         HTTPCLIENT.close();
         STRINGCLIENT.close();
+        JSONCLIENT.close();
         SERVER.close(done);
+    });
+
+    it('JsonClient should increment and decrement inflight requests',
+    function (done) {
+        // request count decremented right before callback is fired.
+        JSONCLIENT.get('/200', function (err, req, res, data) {
+            assert.ifError(err);
+            assert.strictEqual(JSONCLIENT.inflightRequests(), 0);
+            return done();
+        });
+
+        // after firing one request
+        assert.strictEqual(JSONCLIENT.inflightRequests(), 1);
+    });
+
+    it('JsonClient should increment and decrement inflight on connection ' +
+    'timeout',
+    function (done) {
+        // setup client to point to unresolvable IP
+        var client = clients.createJsonClient({
+            url: 'http://10.255.255.1/',
+            connectTimeout: 100,
+            retry: {
+                minTimeout: 100,
+                maxTimeout: 500,
+                // ensure even with retries we do correct counting
+                retries: 3
+            }
+        });
+        client.get('/foo', function (err, req, res, data) {
+            assert.strictEqual(err.name, 'ConnectTimeoutError');
+            assert.strictEqual(client.inflightRequests(), 0);
+            return done();
+        });
+        assert.strictEqual(client.inflightRequests(), 1);
+    });
+
+    it('JsonClient should increment and decrement inflight on request ' +
+    'timeout', function (done) {
+        // setup client to point to unresolvable IP
+        JSONCLIENT.get('/timeout', function (err, req, res, data) {
+            assert.strictEqual(err.name, 'RequestTimeoutError');
+            assert.strictEqual(JSONCLIENT.inflightRequests(), 0);
+            return done();
+        });
+        assert.strictEqual(JSONCLIENT.inflightRequests(), 1);
+    });
+
+    it('JsonClient should count multiple inflight requests', function (done) {
+        var count = 4;
+
+        function decrement() {
+            count--;
+
+            if (count === 0) {
+                assert.strictEqual(JSONCLIENT.inflightRequests(), 0);
+                done();
+            }
+        }
+
+        JSONCLIENT.get('/200', decrement);
+        assert.strictEqual(JSONCLIENT.inflightRequests(), 1);
+
+        JSONCLIENT.get('/200', decrement);
+        assert.strictEqual(JSONCLIENT.inflightRequests(), 2);
+
+        JSONCLIENT.get('/200', decrement);
+        assert.strictEqual(JSONCLIENT.inflightRequests(), 3);
+
+        JSONCLIENT.get('/200', decrement);
+        assert.strictEqual(JSONCLIENT.inflightRequests(), 4);
     });
 
     it('StringClient should increment and decrement inflight requests',
@@ -88,7 +166,7 @@ describe('inflightRequests', function () {
         });
         client.get('/foo', function (err, req, res, data) {
             assert.strictEqual(err.name, 'ConnectTimeoutError');
-            assert.strictEqual(STRINGCLIENT.inflightRequests(), 0);
+            assert.strictEqual(client.inflightRequests(), 0);
             return done();
         });
         assert.strictEqual(client.inflightRequests(), 1);
@@ -103,6 +181,32 @@ describe('inflightRequests', function () {
             return done();
         });
         assert.strictEqual(STRINGCLIENT.inflightRequests(), 1);
+    });
+
+    it('StringClient should count multiple inflight requests', function (done) {
+
+        var count = 4;
+
+        function decrement() {
+            count--;
+
+            if (count === 0) {
+                assert.strictEqual(STRINGCLIENT.inflightRequests(), 0);
+                done();
+            }
+        }
+
+        STRINGCLIENT.get('/200', decrement);
+        assert.strictEqual(STRINGCLIENT.inflightRequests(), 1);
+
+        STRINGCLIENT.get('/200', decrement);
+        assert.strictEqual(STRINGCLIENT.inflightRequests(), 2);
+
+        STRINGCLIENT.get('/200', decrement);
+        assert.strictEqual(STRINGCLIENT.inflightRequests(), 3);
+
+        STRINGCLIENT.get('/200', decrement);
+        assert.strictEqual(STRINGCLIENT.inflightRequests(), 4);
     });
 
     it('HttpClient should increment and decrement inflight requests',
@@ -182,24 +286,37 @@ describe('inflightRequests', function () {
         });
     });
 
-    it('should count multiple inflight requests', function (done) {
+    it('HttpClient should count multiple inflight requests', function (done) {
 
-        STRINGCLIENT.get('/200', _.noop);
-        assert.strictEqual(STRINGCLIENT.inflightRequests(), 1);
+        var count = 4;
 
-        STRINGCLIENT.get('/200', _.noop);
-        assert.strictEqual(STRINGCLIENT.inflightRequests(), 2);
+        function decrement(err, req) {
+            assert.ifError(err);
 
-        STRINGCLIENT.get('/200', _.noop);
-        assert.strictEqual(STRINGCLIENT.inflightRequests(), 3);
+            req.on('result', function (err2, res) {
+                assert.ifError(err2);
+                res.on('data', _.noop);
+                res.on('end', function () {
+                    count--;
 
-        STRINGCLIENT.get('/200', _.noop);
-        assert.strictEqual(STRINGCLIENT.inflightRequests(), 4);
+                    if (count === 0) {
+                        assert.strictEqual(HTTPCLIENT.inflightRequests(), 0);
+                        done();
+                    }
+                });
+            });
+        }
 
-        setTimeout(function () {
-            // wait for all requests to complete
-            assert.strictEqual(STRINGCLIENT.inflightRequests(), 0);
-            return done();
-        }, 500);
+        HTTPCLIENT.get('/200', decrement);
+        assert.strictEqual(HTTPCLIENT.inflightRequests(), 1);
+
+        HTTPCLIENT.get('/200', decrement);
+        assert.strictEqual(HTTPCLIENT.inflightRequests(), 2);
+
+        HTTPCLIENT.get('/200', decrement);
+        assert.strictEqual(HTTPCLIENT.inflightRequests(), 3);
+
+        HTTPCLIENT.get('/200', decrement);
+        assert.strictEqual(HTTPCLIENT.inflightRequests(), 4);
     });
 });
