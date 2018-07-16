@@ -4,6 +4,10 @@
 
 (nothing yet)
 
+## 2.4.0
+
+* #81: add `inflightRequests()` API
+
 ## 2.3.0
 
 * #179: add `after` event
