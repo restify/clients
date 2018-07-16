@@ -27,7 +27,6 @@ MOCHA		:= $(NODE_BIN)/mocha
 _MOCHA		:= $(NODE_BIN)/_mocha
 ISTANBUL	:= $(NODE_BIN)/istanbul
 COVERALLS	:= $(NODE_BIN)/coveralls
-NSP		:= $(NODE_BIN)/nsp
 JSON		:= $(NODE_BIN)/json
 
 
@@ -91,11 +90,6 @@ codestyle: $(NODE_MODULES) ## Run style checks
 .PHONY: codestyle-fix
 codestyle-fix: $(NODE_MODULES) ## Run and fix style check errors
 	@$(JSCS) $(ALL_FILES) --fix
-
-
-.PHONY: nsp
-nsp: $(NODE_MODULES) $(YARN_LOCK) ## Check for dependency vulnerabilities
-	@$(NSP) check --preprocessor yarn
 
 
 .PHONY: prepush

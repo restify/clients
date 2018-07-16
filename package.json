@@ -46,18 +46,17 @@
   },
   "devDependencies": {
     "chai": "^4.0.2",
-    "coveralls": "^2.11.4",
-    "eslint": "^4.1.1",
+    "coveralls": "^3.0.2",
+    "eslint": "^4.19.1",
     "istanbul": "^0.4.0",
-    "jscs": "^2.11.0",
+    "jscs": "^3.0.7",
     "json": "^9.0.4",
     "mkdirp": "^0.5.1",
-    "mocha": "^3.4.2",
+    "mocha": "^5.2.0",
     "nock": "^9.0.13",
-    "nsp": "^2.0.1",
-    "proxyquire": "^1.8.0",
+    "proxyquire": "^2.0.1",
     "restify": "^4.3.0",
-    "sinon": "^4.1.2"
+    "sinon": "^6.1.3"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
@@ -65,7 +64,7 @@
     "bunyan": "^1.8.3",
     "fast-safe-stringify": "^2.0.3",
     "keep-alive-agent": "0.0.1",
-    "lodash": "^4.7.0",
+    "lodash": "^4.17.10",
     "lru-cache": "^4.0.1",
     "mime": "^2.2.0",
     "once": "^1.3.2",
