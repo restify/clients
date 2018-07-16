@@ -127,14 +127,16 @@ function sendWhitespace(req, res, next) {
 }
 
 function sendJsonZero(req, res, next) {
-    res.header('content-type', 'json');
-    res.send(200, 0);
+    res.header('content-type', 'application/json');
+    // to avoid any issues or bugs with restify formatters, call send raw
+    res.sendRaw('0');
     next();
 }
 
 function sendJsonFalse(req, res, next) {
-    res.header('content-type', 'json');
-    res.send(200, false);
+    res.header('content-type', 'application/json');
+    // to avoid any issues or bugs with restify formatters, call send raw
+    res.sendRaw('false');
     next();
 }
 
@@ -152,8 +154,9 @@ function sendJsonInvalid500(req, res, next) {
 }
 
 function sendJsonNull(req, res, next) {
-    res.header('content-type', 'json');
-    res.send(200, null);
+    res.header('content-type', 'application/json');
+    // to avoid any issues or bugs with restify formatters, call send raw
+    res.sendRaw('null');
     next();
 }
 
@@ -173,18 +176,6 @@ function getLog(name, stream, level) {
     }));
 }
 
-function dtrace() {
-    var dtp;
-
-    try {
-        var d = require('dtrace-provider');
-        dtp = d.createDTraceProvider('restifyUnitTest');
-    } catch (e) {
-        dtp = null;
-    }
-    return (dtp);
-}
-
 // --- Tests
 
 describe('restify-client tests', function () {
@@ -192,17 +183,18 @@ describe('restify-client tests', function () {
     before(function (callback) {
         try {
             SERVER = restify.createServer({
-                dtrace: dtrace,
+                // restify 7.x router has max param url char length of 100
+                maxParamLength: 200,
                 log: getLog('server'),
                 handleUncaughtExceptions: false
             });
 
-            SERVER.use(restify.acceptParser(['json', 'text/plain']));
-            SERVER.use(restify.jsonp()); // Added for GH-778
-            SERVER.use(restify.dateParser());
-            SERVER.use(restify.authorizationParser());
-            SERVER.use(restify.queryParser());
-            SERVER.use(restify.bodyParser());
+            SERVER.use(restify.plugins.acceptParser(['json', 'text/plain']));
+            SERVER.use(restify.plugins.jsonp()); // Added for GH-778
+            SERVER.use(restify.plugins.dateParser());
+            SERVER.use(restify.plugins.authorizationParser());
+            SERVER.use(restify.plugins.queryParser({ mapParams: true }));
+            SERVER.use(restify.plugins.bodyParser({ mapParams: true }));
 
             SERVER.get('/signed', sendSignature);
             SERVER.get('/whitespace/:count', sendWhitespace);
@@ -236,6 +228,11 @@ describe('restify-client tests', function () {
             SERVER.del('/json/:name', sendJson);
             SERVER.opts('/json/:name', sendJson);
 
+            // we can reuse the sendJson* handlers when the string client makes
+            // a request against this endpoint - it will default to plain text.
+            SERVER.get('/str/zero', sendJsonZero);
+            SERVER.get('/str/false', sendJsonFalse);
+            SERVER.get('/str/null', sendJsonNull);
             SERVER.del('/str/:name', sendText);
             SERVER.get('/str/:name', sendText);
             SERVER.head('/str/:name', sendText);
@@ -266,19 +263,16 @@ describe('restify-client tests', function () {
 
                 JSON_CLIENT = clients.createJsonClient({
                     url: 'http://127.0.0.1:' + PORT,
-                    dtrace: dtrace,
                     retry: false,
                     followRedirects: true
                 });
                 STR_CLIENT = clients.createStringClient({
                     url: 'http://127.0.0.1:' + PORT,
-                    dtrace: dtrace,
                     retry: false,
                     followRedirects: true
                 });
                 RAW_CLIENT = clients.createClient({
                     url: 'http://127.0.0.1:' + PORT,
-                    dtrace: dtrace,
                     retry: false,
                     headers: {
                         accept: 'text/plain'
@@ -286,7 +280,6 @@ describe('restify-client tests', function () {
                 });
                 SAFE_STRINGIFY_CLIENT = clients.createJsonClient({
                     url: 'http://127.0.0.1:' + PORT,
-                    dtrace: dtrace,
                     retry: false,
                     followRedirects: true,
                     safeStringify: true
@@ -691,7 +684,7 @@ describe('restify-client tests', function () {
             assert.ok(req);
             assert.ok(res);
             assert.strictEqual(res.body, '0');
-            assert.strictEqual(obj, '0');
+            assert.strictEqual(obj, 0);
             done();
         });
     });
@@ -703,7 +696,7 @@ describe('restify-client tests', function () {
             assert.ok(req);
             assert.ok(res);
             assert.strictEqual(res.body, 'false');
-            assert.strictEqual(obj, 'false');
+            assert.strictEqual(obj, false);
             done();
         });
     });
@@ -715,7 +708,43 @@ describe('restify-client tests', function () {
             assert.ok(req);
             assert.ok(res);
             assert.strictEqual(res.body, 'null');
-            assert.strictEqual(obj, 'null');
+            assert.strictEqual(obj, null);
+            done();
+        });
+    });
+
+
+    it('GET string 0', function (done) {
+        STR_CLIENT.get('/str/zero', function (err, req, res, data) {
+            assert.ifError(err);
+            assert.ok(req);
+            assert.ok(res);
+            assert.strictEqual(res.body, '0');
+            assert.strictEqual(data, '0');
+            done();
+        });
+    });
+
+
+    it('GET string false', function (done) {
+        STR_CLIENT.get('/str/false', function (err, req, res, data) {
+            assert.ifError(err);
+            assert.ok(req);
+            assert.ok(res);
+            assert.strictEqual(res.body, 'false');
+            assert.strictEqual(data, 'false');
+            done();
+        });
+    });
+
+
+    it('GET string null', function (done) {
+        STR_CLIENT.get('/str/null', function (err, req, res, data) {
+            assert.ifError(err);
+            assert.ok(req);
+            assert.ok(res);
+            assert.strictEqual(res.body, 'null');
+            assert.strictEqual(data, 'null');
             done();
         });
     });
@@ -1364,7 +1393,6 @@ describe('restify-client tests', function () {
     it('should respect custom maxRedirects', function (done) {
         var client = clients.createStringClient({
             url: 'http://127.0.0.1:' + PORT,
-            dtrace: dtrace,
             retry: false,
             followRedirects: true,
             maxRedirects: 2
