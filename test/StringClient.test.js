@@ -496,4 +496,25 @@ describe('StringClient', function () {
             return done();
         });
     });
+
+    it('exception thrown when using an invalid content-md5 encoding',
+            function (done) {
+        try {
+            clients.createStringClient({
+                url: 'http://localhost:3000',
+                log: LOG,
+                contentMd5: {
+                    encodings: ['bogus']
+                }
+            });
+            assert.fail('StringClient should throw a bad encoding assertion');
+        } catch (ex) {
+            assert.equal(ex.name, 'AssertionError',
+                'StringClient should throw an AssertionError');
+            assert.ok(ex.message &&
+                ex.message.indexOf('invalid encoding') >= 0,
+                'StringClient error message contains "invalid encoding"');
+        }
+        return done();
+    });
 });
