@@ -67,7 +67,7 @@
     "lodash": "^4.17.10",
     "lru-cache": "^4.0.1",
     "mime": "^2.2.0",
-    "once": "^1.3.2",
+    "once": "^1.4.0",
     "restify-errors": "^6.0.0",
     "semver": "^5.0.1",
     "tunnel-agent": "^0.6.0",
