@@ -4,6 +4,10 @@
 
 (nothing yet)
 
+## 2.5.1
+
+* #184: fix: bump once dependency to version 1.4.0 to get missing once.strict API
+
 ## 2.5.0
 
 * #173: support content-md5 header generated from different node versions. This
