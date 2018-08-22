@@ -652,6 +652,24 @@ If you have style errors, you can auto fix whitespace issues by running:
 make codestyle-fix
 ```
 
+### Cutting a release
+
+In order to release a new version of the restify-clients module, maintainers go
+through the following steps:
+
+1. Bump the version number in the `package.json` file according to the changes
+made since the latest release.
+2. Add a section in the [changelog](CHANGES.md) for the version being released,
+and make sure that a separate item is present for each change.
+3. Send a pull request with those changes against the master branch.
+4. If the PR is approved by at least one other maintainer, merge the changes
+using the new version number as the complete commit message. For instance, if
+you're releasing version 2.5.1, the commit message should only be "2.5.1",
+without the quotes.
+5. Once that pull request is merged, pull those changes in the master branch of
+your local clone of the Git repoository, run `make cutarelease` and follow the
+instructions.
+
 ## License
 
 Copyright (c) 2015 Alex Liu
