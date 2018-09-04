@@ -6,7 +6,7 @@
 
 ## 2.5.2
 
-* #187: fix callback getting invokved more than once causing throw
+* #187: fix callback getting invoked more than once causing throw
 
 ## 2.5.1
 
