@@ -4,6 +4,10 @@
 
 (nothing yet)
 
+## 2.5.2
+
+* #187: fix callback getting invoked more than once causing throw
+
 ## 2.5.1
 
 * #184: fix: bump once dependency to version 1.4.0 to get missing once.strict API
