@@ -65,6 +65,31 @@ describe('query string parameters', function () {
             CLIENT.get('/foo', done);
         });
 
+        it('should support serializing objects into associative array',
+        function (done) {
+            SERVER.get('/foo', function (req, res, next) {
+                assert.deepEqual(req.query, {
+                    foo: {
+                        a: 'coffee',
+                        b: 'beans'
+                    }
+                });
+                res.send(200);
+                return next();
+            });
+
+            CLIENT = clients.createJsonClient({
+                url: 'http://localhost:3000/foo',
+                query: {
+                    foo: {
+                        a: 'coffee',
+                        b: 'beans'
+                    }
+                }
+            });
+            CLIENT.get('/foo', done);
+        });
+
         it('should prefer query option over query in url', function (done) {
             SERVER.get('/foo', function (req, res, next) {
                 assert.deepEqual(req.query, {
@@ -121,6 +146,33 @@ describe('query string parameters', function () {
             });
             CLIENT.get({
                 path: '/foo?foo=bar'
+            }, done);
+        });
+
+        it('should support serializing objects into associative array',
+        function (done) {
+            SERVER.get('/foo', function (req, res, next) {
+                assert.deepEqual(req.query, {
+                    foo: {
+                        a: 'coffee',
+                        b: 'beans'
+                    }
+                });
+                res.send(200);
+                return next();
+            });
+
+            CLIENT = clients.createJsonClient({
+                url: 'http://localhost:3000/foo'
+            });
+            CLIENT.get({
+                path: '/foo',
+                query: {
+                    foo: {
+                        a: 'coffee',
+                        b: 'beans'
+                    }
+                }
             }, done);
         });
 

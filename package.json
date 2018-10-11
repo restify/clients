@@ -68,6 +68,7 @@
     "lru-cache": "^4.0.1",
     "mime": "^2.2.0",
     "once": "^1.4.0",
+    "qs": "^6.5.2",
     "restify-errors": "^6.0.0",
     "semver": "^5.0.1",
     "tunnel-agent": "^0.6.0",
