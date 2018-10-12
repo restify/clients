@@ -4,6 +4,10 @@
 
 (nothing yet)
 
+## 2.6.2
+
+* #189: swap querystring for qs to support object serialization in query params
+
 ## 2.5.2
 
 * #187: fix callback getting invoked more than once causing throw
