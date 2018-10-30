@@ -568,7 +568,7 @@ describe('restify-client tests', function () {
 
             METRICS_CLIENT_HOST.once('metrics', function (metrics) {
                 assert.isObject(metrics);
-                assert.strictEqual(metrics.statusCode.toString(), 'NaN');
+                assert.strictEqual(metrics.statusCode, null);
                 assert.strictEqual(metrics.method, 'GET');
                 assert.strictEqual(metrics.path, '/econnreset');
                 assert.include(metrics.url, 'http://localhost');
