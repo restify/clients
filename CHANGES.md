@@ -4,6 +4,11 @@
 
 (nothing yet)
 
+## 2.6.3
+
+* #192: ensure `req.getMetrics()` and `req.getTimings()` methods are always
+  available.
+
 ## 2.6.2
 
 * #189: swap querystring for qs to support object serialization in query params
