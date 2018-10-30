@@ -563,6 +563,8 @@ describe('restify-client tests', function () {
         function (done) {
             METRICS_CLIENT_HOST.get('/econnreset', function (err, req, res) {
                 assert.ok(err);
+                assert.isObject(req.getTimings());
+                assert.isObject(req.getMetrics());
                 assert.strictEqual(err.code, 'ECONNRESET');
             });
 
