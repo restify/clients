@@ -260,6 +260,10 @@ describe('restify-client tests', function () {
                 res.send(500);
                 return next();
             });
+            SERVER.get('/econnreset', function (req, res, next) {
+                req.socket.destroy();
+                return next();
+            });
 
             SERVER.listen(PORT, '127.0.0.1', function () {
                 PORT = SERVER.address().port;
@@ -552,6 +556,31 @@ describe('restify-client tests', function () {
                 assert.isNumber(metrics.timings.contentTransfer);
                 assert.isNumber(metrics.timings.total);
                 done();
+            });
+        });
+
+        it('should return best effort metrics and timings in error scenarios',
+        function (done) {
+            METRICS_CLIENT_HOST.get('/econnreset', function (err, req, res) {
+                assert.ok(err);
+                assert.strictEqual(err.code, 'ECONNRESET');
+            });
+
+            METRICS_CLIENT_HOST.once('metrics', function (metrics) {
+                assert.isObject(metrics);
+                assert.strictEqual(metrics.statusCode, null);
+                assert.strictEqual(metrics.method, 'GET');
+                assert.strictEqual(metrics.path, '/econnreset');
+                assert.include(metrics.url, 'http://localhost');
+                assert.strictEqual(metrics.success, false);
+                assert.isObject(metrics.timings);
+                assert.isNumber(metrics.timings.dnsLookup);
+                assert.isNull(metrics.timings.tlsHandshake);
+                assert.isNumber(metrics.timings.tcpConnection);
+                assert.isNull(metrics.timings.firstByte);
+                assert.isNull(metrics.timings.contentTransfer);
+                assert.isNumber(metrics.timings.total);
+                return done();
             });
         });
     });
