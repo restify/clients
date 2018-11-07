@@ -7,18 +7,6 @@
 [![devDependency Status](https://david-dm.org/restify/clients/dev-status.svg)](https://david-dm.org/restify/clients#info=devDependencies)
 [![bitHound Score](https://www.bithound.io/github/restify/clients/badges/score.svg)](https://www.bithound.io/github/restify/clients/master)
 
-> HttpClient, StringClient, and JsonClient extracted from restify
-
-This module contains HTTP clients extracted from restify.
-
-* JsonClient - sends and expects application/json
-* StringClient - sends url-encoded request and expects text/plain
-* HttpClient - thin wrapper over node's http/https libraries
-
-The idea being that if you want to support "typical" control-plane REST APIs, you probably want the JsonClient, or if you're using some other serialization (like XML) you'd write your own client that extends the StringClient. If you need streaming support, you'll need to do some work on top of the HttpClient, as StringClient and friends buffer requests/responses.
-
-All clients support retry with exponential backoff for getting a TCP connection; they do not perform retries on 5xx error codes like previous versions of the restify client. You can set retry to false to disable this logic altogether. Also, all clients support a connectTimeout field, which is use on each retry. The default is not to set a connectTimeout, so you end up with the node.js socket defaults.
-
 ## Getting Started
 
 Install the module with: `npm install restify-clients`
@@ -27,7 +15,7 @@ Install the module with: `npm install restify-clients`
 
 ### Client API
 
-There are actually three separate clients shipped in restify:
+There are three separate clients:
 
 * **JsonClient:** sends and expects application/json
 * **StringClient:** sends url-encoded request and expects text/plain
