@@ -7,8 +7,6 @@
 [![devDependency Status](https://david-dm.org/restify/clients/dev-status.svg)](https://david-dm.org/restify/clients#info=devDependencies)
 [![bitHound Score](https://www.bithound.io/github/restify/clients/badges/score.svg)](https://www.bithound.io/github/restify/clients/master)
 
-The **restify-clients** [Node](https://nodejs.org/) package provides HTTP clients from [restify](https://github.com/restify/node-restify).
-
 ## Getting Started
 
 Install the module with: `npm install restify-clients`
