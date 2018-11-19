@@ -4,6 +4,12 @@
 
 (nothing yet)
 
+## 2.6.4
+
+* #195: fix: read from response stream using non-flowing mode
+* #197: docs: remove duplicated and confusing content
+* #200: fix: double inflight request decrement
+
 ## 2.6.3
 
 * #192: ensure `req.getMetrics()` and `req.getTimings()` methods are always
