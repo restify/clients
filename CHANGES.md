@@ -4,6 +4,10 @@
 
 (nothing yet)
 
+## 2.6.5
+
+* #159: fix: CRL support for HttpClient
+
 ## 2.6.4
 
 * #195: fix: read from response stream using non-flowing mode
