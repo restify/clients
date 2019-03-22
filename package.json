@@ -45,7 +45,7 @@
     "test": "make test"
   },
   "devDependencies": {
-    "chai": "^4.0.2",
+    "chai": "^4.2.2",
     "coveralls": "^3.0.2",
     "eslint": "^4.19.1",
     "istanbul": "^0.4.0",
@@ -60,21 +60,21 @@
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
-    "backoff": "^2.4.1",
-    "bunyan": "^1.8.3",
-    "fast-safe-stringify": "^2.0.3",
+    "backoff": "^2.5.0",
+    "bunyan": "^1.8.12",
+    "fast-safe-stringify": "^2.0.6",
     "keep-alive-agent": "0.0.1",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.11",
     "lru-cache": "^4.0.1",
-    "mime": "^2.2.0",
+    "mime": "^2.4.0",
     "once": "^1.4.0",
-    "qs": "^6.5.2",
-    "restify-errors": "^6.0.0",
-    "semver": "^5.0.1",
+    "qs": "^6.6.0",
+    "restify-errors": "^7.0.0",
+    "semver": "^5.6.0",
     "tunnel-agent": "^0.6.0",
-    "uuid": "^3.0.1"
+    "uuid": "^3.3.2"
   },
   "optionalDependencies": {
-    "dtrace-provider": "^0.8.3"
+    "dtrace-provider": "^0.8.7"
   }
 }
