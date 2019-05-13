@@ -1,11 +1,8 @@
 language: node_js
-script:
-    make prepush
 node_js:
-    - "6"                    # Maintenance LTS release
-    - "8"                    # Maintenance LTS release
-    - "10"                   # Active LTS release
-    - "node"                 # Latest stable release
+   - '8'
+   - '10'
+   - "lts/*"                # Active LTS release
+   - "node"                 # Latest stable release
 after_success:
     - make report-coverage
-    - make nsp
