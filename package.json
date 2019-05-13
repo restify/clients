@@ -69,7 +69,7 @@
     "mime": "^2.4.0",
     "once": "^1.4.0",
     "qs": "^6.6.0",
-    "restify-errors": "^7.0.0",
+    "restify-errors": "^8.0.0",
     "semver": "^5.6.0",
     "tunnel-agent": "^0.6.0",
     "uuid": "^3.3.2"
