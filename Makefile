@@ -93,7 +93,7 @@ codestyle-fix: $(NODE_MODULES) ## Run and fix style check errors
 
 
 .PHONY: prepush
-prepush: $(NODE_MODULES) lint codestyle test versioncheck ## Run all required tasks for a git push
+prepush: $(NODE_MODULES) lint codestyle test ## Run all required tasks for a git push
 
 
 .PHONY: test
