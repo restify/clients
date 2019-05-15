@@ -1,6 +1,6 @@
 {
   "name": "restify-clients",
-  "version": "2.6.5",
+  "version": "2.6.6",
   "main": "lib/index.js",
   "description": "HttpClient, StringClient, and JsonClient extracted from restify",
   "homepage": "http://www.restify.com",
