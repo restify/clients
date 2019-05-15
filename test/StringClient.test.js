@@ -6,6 +6,7 @@ var fs = require('fs');
 var path = require('path');
 
 // external files
+var _ = require('lodash');
 var assert = require('chai').assert;
 var bunyan = require('bunyan');
 var restify = require('restify');
@@ -23,10 +24,21 @@ describe('StringClient', function () {
     var LOG = bunyan.createLogger({
         name: 'clientlog'
     });
+    var headers = {
+        string: 'dark roast is awful',
+        number: 0,
+        negative_integer: -1,
+        undefined: undefined,
+        object: {},
+        true: true,
+        false: false,
+        null: null
+    };
     var CLIENT = clients.createStringClient({
         url: 'http://localhost:3000',
         log: LOG,
-        retry: false
+        retry: false,
+        headers: Object.assign({}, headers)
     });
 
     beforeEach(function (done) {
@@ -57,6 +69,39 @@ describe('StringClient', function () {
             assert.equal(data, 'pong');
             return done();
         });
+    });
+
+    it('should filter out undefined headers', function (done) {
+        SERVER.get('/ping', function (req, res, next) {
+            res.json({
+                reqHeaders: req.headers
+            });
+            return next();
+        });
+
+        CLIENT.get({
+            path: '/ping',
+            headers: Object.assign({}, headers)
+        }, function(err, req, res, text) {
+            assert.ifError(err);
+            assert.deepStrictEqual(
+                _.pick(req._headers, Object.keys(headers)),
+                _.omit(headers, 'undefined')
+            );
+            assert.deepStrictEqual(
+                _.pick(JSON.parse(text).reqHeaders, Object.keys(headers)),
+                {
+                    false: 'false',
+                    negative_integer: '-1',
+                    null: 'null',
+                    number: '0',
+                    object: '[object Object]',
+                    string: 'dark roast is awful',
+                    true: 'true'
+                }
+            )
+            return done();
+        })
     });
 
     it('should support decoding gzipped utf8 multibyte responses',
