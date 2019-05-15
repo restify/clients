@@ -82,7 +82,7 @@ describe('StringClient', function () {
         CLIENT.get({
             path: '/ping',
             headers: Object.assign({}, headers)
-        }, function(err, req, res, text) {
+        }, function (err, req, res, text) {
             assert.ifError(err);
             assert.deepStrictEqual(
                 _.pick(req._headers, Object.keys(headers)),
@@ -101,7 +101,7 @@ describe('StringClient', function () {
                 }
             )
             return done();
-        })
+        });
     });
 
     it('should support decoding gzipped utf8 multibyte responses',
