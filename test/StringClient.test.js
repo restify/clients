@@ -99,7 +99,7 @@ describe('StringClient', function () {
                     string: 'dark roast is awful',
                     true: 'true'
                 }
-            )
+            );
             return done();
         });
     });
