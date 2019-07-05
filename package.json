@@ -42,7 +42,9 @@
     "superagent"
   ],
   "scripts": {
-    "test": "make test"
+    "test": "make test",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "devDependencies": {
     "chai": "^4.2.0",
@@ -72,9 +74,11 @@
     "restify-errors": "^8.0.0",
     "semver": "^5.6.0",
     "tunnel-agent": "^0.6.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "snyk": "^1.192.0"
   },
   "optionalDependencies": {
     "dtrace-provider": "^0.8.7"
-  }
+  },
+  "snyk": true
 }
