@@ -64,7 +64,7 @@
     "bunyan": "^1.8.12",
     "fast-safe-stringify": "^2.0.6",
     "keep-alive-agent": "0.0.1",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.15",
     "lru-cache": "^5.1.1",
     "mime": "^2.4.0",
     "once": "^1.4.0",
