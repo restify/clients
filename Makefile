@@ -14,7 +14,8 @@ GITHOOKS_DEST	:= $(ROOT)/.git/hooks
 #
 NODE_MODULES	:= $(ROOT)/node_modules
 NODE_BIN	:= $(NODE_MODULES)/.bin
-COVERAGE	:= $(ROOT)/coverage
+COVERAGE	:= $(ROOT)/.nyc_output
+COVERAGE_RES	:= $(ROOT)/coverage
 
 
 #
@@ -24,8 +25,7 @@ YARN		:= yarn
 ESLINT		:= $(NODE_BIN)/eslint
 JSCS		:= $(NODE_BIN)/jscs
 MOCHA		:= $(NODE_BIN)/mocha
-_MOCHA		:= $(NODE_BIN)/_mocha
-ISTANBUL	:= $(NODE_BIN)/istanbul
+NYC		:= $(NODE_BIN)/nyc
 COVERALLS	:= $(NODE_BIN)/coveralls
 UNLEASH		:= $(NODE_BIN)/unleash
 CONVENTIONAL_RECOMMENDED_BUMP := $(NODE_BIN)/conventional-recommended-bump
@@ -42,6 +42,7 @@ SHRINKWRAP	= $(ROOT)/npm-shrinkwrap.json
 ALL_FILES	:= $(shell find $(ROOT) \
 			-not \( -path $(NODE_MODULES) -prune \) \
 			-not \( -path $(COVERAGE) -prune \) \
+			-not \( -path $(COVERAGE_RES) -prune \) \
 			-name '*.js' -type f)
 
 
@@ -58,7 +59,7 @@ help:
 
 
 .PHONY: all
-all: $(NODE_MODULES) lint codestyle test clean-coverage
+all: $(NODE_MODULES) lint codestyle coverage
 
 
 $(YARN_LOCK): $(PACKAGE_JSON)
@@ -98,28 +99,23 @@ prepush: $(NODE_MODULES) lint codestyle test ## Run all required tasks for a git
 
 
 .PHONY: test
-test: $(NODE_MODULES) ## Run unit tests
+test: $(NODE_MODULES) $(NYC) ## Run unit tests
 	@$(MOCHA) -R spec --full-trace
 
 
 .PHONY: coverage
-coverage: $(NODE_MODULES) clean-coverage ## Generate test coverage
-	@$(ISTANBUL) cover $(_MOCHA) --report lcovonly -- -R spec
+coverage: $(NODE_MODULES) $(NYC) ## Run unit tests with coverage reporting. Generates reports into /coverage.
+	@$(NYC) --reporter=html --reporter=text --reporter=lcov make test
 
 
 .PHONY: report-coverage
-report-coverage: coverage ## Report test coverage to Coveralls
-	@cat $(LCOV) | $(COVERALLS)
-
-
-.PHONY: clean-coverage
-clean-coverage:
-	@rm -rf $(COVERAGE_FILES)
+report-coverage: $(NODE_MODULES) $(NYC) ## Run unit tests with coverage reporting. Generates reports into /coverage.
+	@$(NYC) report --reporter=text-lcov | $(COVERALLS)
 
 
 .PHONY: clean
-clean: clean-coverage ## Clean all generated directories
-	@rm -rf $(NODE_MODULES)
+clean: ## Cleans unit test coverage files and node_modules.
+	@rm -rf $(NODE_MODULES) $(COVERAGE) $(COVERAGE_RES) $(YARN_LOCK) $(PACKAGE_LOCK)
 
 
 .PHONY: release-dry
@@ -131,7 +127,6 @@ release-dry: $(NODE_MODULES) $(UNLEASH) ## Dry run of `release` target
 release: $(NODE_MODULES) $(UNLEASH) ## Versions, tags, and updates changelog based on commit messages
 	$(UNLEASH) --type=$(shell $(CONVENTIONAL_RECOMMENDED_BUMP) -p angular) --no-publish
 	$(NPM) publish
-
 
 #
 ## Debug -- print out a a variable via `make print-FOO`
