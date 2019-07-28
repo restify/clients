@@ -46,17 +46,19 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "conventional-changelog-angular": "^5.0.0",
+    "conventional-recommended-bump": "^4.0.0",
     "coveralls": "^3.0.2",
     "eslint": "^4.19.1",
     "istanbul": "^0.4.0",
     "jscs": "^3.0.7",
-    "json": "^9.0.4",
     "mkdirp": "^0.5.1",
     "mocha": "^5.2.0",
     "nock": "^9.0.13",
     "proxyquire": "^2.0.1",
     "restify": "^4.3.0",
-    "sinon": "^6.1.3"
+    "sinon": "^6.1.3",
+    "unleash": "^2.0.1"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
