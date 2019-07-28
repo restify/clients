@@ -120,13 +120,27 @@ clean: ## Cleans unit test coverage files and node_modules.
 
 .PHONY: release-dry
 release-dry: $(NODE_MODULES) $(UNLEASH) ## Dry run of `release` target
-	$(UNLEASH) -d --type=$(shell $(CONVENTIONAL_RECOMMENDED_BUMP) -p angular)
+	@$(UNLEASH) -d --type=$(shell $(CONVENTIONAL_RECOMMENDED_BUMP) -p angular)
 
 
 .PHONY: release
-release: $(NODE_MODULES) $(UNLEASH) ## Versions, tags, and updates changelog based on commit messages
-	$(UNLEASH) --type=$(shell $(CONVENTIONAL_RECOMMENDED_BUMP) -p angular) --no-publish
-	$(NPM) publish
+release: $(NODE_MODULES) $(UNLEASH) security ## Versions, tags, and updates changelog based on commit messages
+	@$(UNLEASH) --type=$(shell $(CONVENTIONAL_RECOMMENDED_BUMP) -p angular) --no-publish
+	@$(NPM) publish
+
+
+.PHONY: security
+security: $(NODE_MODULES) ## Check for dependency vulnerabilities.
+	@# remove lockfile, reinstall to get latest deps and regen lockfile
+	@rm $(YARN_LOCK) || true
+	@$(YARN)
+	@$(YARN) audit || EXIT_CODE=$$?; \
+	if [ $$EXIT_CODE -gt 15 ] ; then \
+		echo "'yarn audit' exited with error code $$EXIT_CODE, critical vulnerabilities found!"; \
+		exit 1; \
+	else \
+		echo "'yarn audit' exited with error code $$EXIT_CODE, no critical vulnerabilities found."; \
+	fi
 
 #
 ## Debug -- print out a a variable via `make print-FOO`
