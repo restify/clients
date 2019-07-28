@@ -1,11 +1,13 @@
 language: node_js
-script:
-    make prepush
 node_js:
     - "6"                    # Maintenance LTS release
     - "8"                    # Maintenance LTS release
     - "10"                   # Active LTS release
     - "node"                 # Latest stable release
+cache:
+   npm: false
+script:
+    make prepush
 after_success:
     - make report-coverage
     - make nsp
