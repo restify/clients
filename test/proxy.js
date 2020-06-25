@@ -18,6 +18,7 @@ var PORT = process.env.UNIT_TEST_PORT || 0;
 var PROXYSERVER;
 var PROXYURL;
 var PROXIED = [];
+const PROXYSOCKETS = [];
 
 
 // --- Helpers
@@ -62,6 +63,8 @@ describe('restify-client proxy tests', function () {
                     srvSocket.pipe(socket);
                     socket.pipe(srvSocket);
                 });
+                PROXYSOCKETS.push(srvSocket);
+                PROXYSOCKETS.push(socket);
             });
 
             PROXYSERVER.listen(PORT, '127.0.0.1', function () {
@@ -79,6 +82,12 @@ describe('restify-client proxy tests', function () {
 
     after(function (callback) {
         try {
+            // TODO(mmarchini): Could the hanging sockets be a bug? Investigate
+            for (const socket of PROXYSOCKETS) {
+                if (socket.destroyed === false) {
+                    socket.destroy();
+                }
+            }
             PROXYSERVER.close(callback);
         } catch (e) {
             /* eslint-disable no-console */
