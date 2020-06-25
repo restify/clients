@@ -1,9 +1,12 @@
 language: node_js
 node_js:
-    - "6"                    # Maintenance LTS release
-    - "8"                    # Maintenance LTS release
-    - "10"                   # Active LTS release
-    - "node"                 # Latest stable release
+    - "6"                    # EOL, remove on next major
+    - "8"                    # EOL, remove on next major
+    - "10"                   # Maintenance LTS release
+    - "12"                   # Active LTS release
+    # TODO(mmarchini): Tests are failing on v14. Need to make the package/tests
+    # compatible before re-enabling it.
+    # - "node"                 # Latest stable release
 cache:
    npm: false
 script:
