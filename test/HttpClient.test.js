@@ -45,4 +45,27 @@ describe('HttpClient', function () {
         assert.strictEqual(CLIENT.url.hostname, 'www.restify.com');
         assert.strictEqual(CLIENT.url.port, '3000');
     });
+
+    it('should fill default User Agent when none is given', function () {
+        CLIENT = clients.createHttpClient();
+        assert.strictEqual(CLIENT.headers['user-agent'].slice(0, 8),
+                           'restify/');
+    });
+
+    it('should keep User Agent from headers if none is given', function () {
+        const userAgent = 'The Acme Browser 0.42';
+        CLIENT = clients.createHttpClient({
+            headers: {'user-agent': userAgent}
+        });
+        assert.strictEqual(CLIENT.headers['user-agent'], userAgent);
+    });
+
+    it('should use given User Agent', function () {
+        const userAgent = 'The Acme Browser 0.42';
+        CLIENT = clients.createHttpClient({
+            headers: {'user-agent': 'Not The Acme Browser 0.00'},
+            userAgent
+        });
+        assert.strictEqual(CLIENT.headers['user-agent'], userAgent);
+    });
 });
