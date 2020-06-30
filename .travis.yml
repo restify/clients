@@ -1,7 +1,5 @@
 language: node_js
 node_js:
-    - "6"                    # EOL, remove on next major
-    - "8"                    # EOL, remove on next major
     - "10"                   # Maintenance LTS release
     - "12"                   # Active LTS release
     # TODO(mmarchini): Tests are failing on v14. Need to make the package/tests
