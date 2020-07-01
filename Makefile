@@ -120,12 +120,12 @@ clean: ## Cleans unit test coverage files and node_modules.
 
 .PHONY: release-dry
 release-dry: $(NODE_MODULES) $(UNLEASH) ## Dry run of `release` target
-	@$(UNLEASH) -d --type=$(shell $(CONVENTIONAL_RECOMMENDED_BUMP) -p angular)
+	@$(UNLEASH) -d --type=$(shell $(CONVENTIONAL_RECOMMENDED_BUMP) -p conventionalcommits)
 
 
 .PHONY: release
 release: $(NODE_MODULES) $(UNLEASH) security ## Versions, tags, and updates changelog based on commit messages
-	@$(UNLEASH) --type=$(shell $(CONVENTIONAL_RECOMMENDED_BUMP) -p angular) --no-publish
+	@$(UNLEASH) --type=$(shell $(CONVENTIONAL_RECOMMENDED_BUMP) -p conventionalcommits) --no-publish
 	@$(NPM) publish
 
 

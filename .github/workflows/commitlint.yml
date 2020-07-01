@@ -1,0 +1,19 @@
+---
+name: Conventional Commit Linter
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  name: Lint
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js v12
+      uses: actions/setup-node@v1
+      with:
+        node-version: v12
+    - run: npm install
+    - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}

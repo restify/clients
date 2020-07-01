@@ -45,9 +45,11 @@
     "test": "make test"
   },
   "devDependencies": {
+    "@commitlint/cli": "^9.0.1",
+    "@commitlint/config-conventional": "^9.0.1",
     "chai": "^4.2.0",
-    "conventional-changelog-angular": "^5.0.0",
-    "conventional-recommended-bump": "^4.0.0",
+    "conventional-changelog-conventionalcommits": "^4.3.0",
+    "conventional-recommended-bump": "^6.0.9",
     "coveralls": "^3.0.2",
     "eslint": "^4.19.1",
     "jscs": "^3.0.7",
