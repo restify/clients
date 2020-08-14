@@ -85,7 +85,7 @@ describe('StringClient', function () {
         }, function (err, req, res, text) {
             assert.ifError(err);
             assert.deepStrictEqual(
-                _.pick(req._headers, Object.keys(headers)),
+                _.pick(req.getHeaders(), Object.keys(headers)),
                 _.omit(headers, 'undefined')
             );
             assert.deepStrictEqual(
