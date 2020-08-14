@@ -4,6 +4,7 @@
 
 var assert = require('chai').assert;
 var errors = require('restify-errors');
+const http = require('http');
 
 
 
@@ -49,7 +50,9 @@ var HTTP_CODES = [
     { name: 'UnprocessableEntityError', code: 422 },
     { name: 'LockedError', code: 423 },
     { name: 'FailedDependencyError', code: 424 },
-    { name: 'UnorderedCollectionError', code: 425 },
+    { name: http.STATUS_CODES[425] === 'Too Early'
+      ? 'TooEarlyError'
+      : 'UnorderedCollectionError', code: 425 },
     { name: 'UpgradeRequiredError', code: 426 },
     { name: 'PreconditionRequiredError', code: 428 },
     { name: 'TooManyRequestsError', code: 429 },
