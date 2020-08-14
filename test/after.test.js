@@ -64,7 +64,6 @@ describe('`after` event', function () {
             assert.ok(req);
             assert.ok(req.socket);
             assert.ok(res);
-            assert.ok(res.socket);
             assert.equal(res.statusCode, 200);
             assert.ifError(err);
             return done();
@@ -77,7 +76,6 @@ describe('`after` event', function () {
             assert.ok(req);
             assert.ok(req.socket);
             assert.ok(res);
-            assert.ok(res.socket);
             assert.equal(res.statusCode, 500);
             assert.ok(err);
             return done();
@@ -141,7 +139,6 @@ describe('`after` event', function () {
             assert.ok(req);
             assert.ok(req.socket);
             assert.ok(res);
-            assert.ok(res.socket);
             assert.equal(res.statusCode, 200);
             assert.ifError(err);
             return done();
@@ -154,7 +151,6 @@ describe('`after` event', function () {
             assert.ok(req);
             assert.ok(req.socket);
             assert.ok(res);
-            assert.ok(res.socket);
             assert.equal(res.statusCode, 500);
             assert.ok(err);
             return done();
@@ -224,7 +220,6 @@ describe('`after` event', function () {
             assert.ok(req);
             assert.ok(req.socket);
             assert.ok(res);
-            assert.ok(res.socket);
             assert.equal(res.statusCode, 200);
             assert.ifError(err);
             return done();
@@ -243,7 +238,6 @@ describe('`after` event', function () {
             assert.ok(req);
             assert.ok(req.socket);
             assert.ok(res);
-            assert.ok(res.socket);
             assert.equal(res.statusCode, 500);
             assert.ok(err);
             return done();
