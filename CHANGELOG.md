@@ -1,4 +1,11 @@
 <a name="3.0.0"></a>
+### [3.0.1](https://www.github.com/restify/clients/compare/v3.0.0...v3.0.1) (2020-09-04)
+
+
+### Bug Fixes
+
+* **ci:** fix syntax errors on commitlint ([9b7c69f](https://www.github.com/restify/clients/commit/9b7c69f6d694f8b14809be8a70e1caa6f6fa2062))
+
 ## 3.0.0 (2020-07-01)
 
 
@@ -30,4 +37,3 @@
 
 <a name="2.6.5"></a>
 ### 2.6.5 (2019-05-13)
-
