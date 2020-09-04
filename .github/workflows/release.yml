@@ -1,0 +1,26 @@
+on:
+  push:
+    branches:
+      - master
+
+name: releaser
+jobs:
+  releaser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: GoogleCloudPlatform/release-please-action@v1.6.3
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: node
+          package-name: restify-clients
+
+      - uses: actions/checkout@v2
+        if: ${{ steps.release.outputs.release_created }}
+      - uses: mmarchini-oss/npm-otp-publish@v0
+        if: ${{ steps.release.outputs.release_created }}
+        with:
+          npm_token: ${{ secrets.NPM_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          version_url: https://github.com/${{ github.repository }}/releases/tag/${{ steps.release.outputs.tag_name }}
+          github_actor: ${{ github.actor }}
