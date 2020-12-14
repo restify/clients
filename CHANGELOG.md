@@ -1,4 +1,15 @@
 <a name="3.0.0"></a>
+## [5.0.0](https://www.github.com/restify/clients/compare/v4.0.0...v5.0.0) (2020-12-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* to all dependencies of `restify-clients`. The `engine`
+
+### Features
+
+* drop engine field on package.json ([735467c](https://www.github.com/restify/clients/commit/735467c75e55c997c829885000f34715d1e1ddbd))
+
 ## [4.0.0](https://www.github.com/restify/clients/compare/v3.0.0...v4.0.0) (2020-09-04)
 
 
