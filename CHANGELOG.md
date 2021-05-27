@@ -6,6 +6,13 @@
 
 * drop engine field on package.json ([9d72b11](https://www.github.com/restify/clients/commit/9d72b11f6b511eb5292d15a8aeb6bba747a01c96))
 
+## [4.1.0](https://www.github.com/restify/clients/compare/v4.0.0...v4.1.0) (2021-05-27)
+
+
+### Features
+
+* drop engine field on package.json ([9d72b11](https://www.github.com/restify/clients/commit/9d72b11f6b511eb5292d15a8aeb6bba747a01c96))
+
 ## [4.0.0](https://www.github.com/restify/clients/compare/v3.0.0...v4.0.0) (2020-09-04)
 
 
