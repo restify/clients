@@ -2,6 +2,10 @@ on:
   push:
     branches:
       - master
+      # For previous major branches, like v2.x, v3.x, etc.
+      # If branch doesn't exist and you need a release on that major, create
+      # one from the latest tag for that major
+      - v*.x
 
 name: releaser
 jobs:
@@ -17,10 +21,13 @@ jobs:
 
       - uses: actions/checkout@v2
         if: ${{ steps.release.outputs.release_created }}
-      - uses: mmarchini-oss/npm-otp-publish@v0
-        if: ${{ steps.release.outputs.release_created }}
+      - uses: actions/setup-node@v1
         with:
-          npm_token: ${{ secrets.NPM_TOKEN }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          version_url: https://github.com/${{ github.repository }}/releases/tag/${{ steps.release.outputs.tag_name }}
-          github_actor: ${{ github.actor }}
+          node-version: 14
+        if: ${{ steps.release.outputs.release_created }}
+      - run: npm i
+        if: ${{ steps.release.outputs.release_created }}
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        if: ${{ steps.release.outputs.release_created }}
