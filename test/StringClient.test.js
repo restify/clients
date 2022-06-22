@@ -3,6 +3,7 @@
 // core modules
 var crypto = require('crypto');
 var fs = require('fs');
+var http = require('http');
 var path = require('path');
 
 // external files
@@ -558,5 +559,27 @@ describe('StringClient', function () {
                 'StringClient error message contains "invalid encoding"');
         }
         return done();
+    });
+
+    it('exercise callback when server closes socket',
+            function (done) {
+
+        var server = http.createServer(function (req, res) {
+            res.writeHead(200);
+
+            res.write('[');
+            setTimeout(function () {
+                res.socket.destroy();
+            }, 1000);
+        });
+
+        server.listen(8080, function () {
+            const client = clients.createStringClient({
+                url: 'http://localhost:8080'
+            });
+            client.get('/', function () {
+                server.close(done);
+            });
+        });
     });
 });
