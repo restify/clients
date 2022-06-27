@@ -1,4 +1,11 @@
 <a name="3.0.0"></a>
+### [4.1.1](https://www.github.com/restify/clients/compare/v4.1.0...v4.1.1) (2022-06-27)
+
+
+### Bug Fixes
+
+* add event handler for res close event ([#239](https://www.github.com/restify/clients/issues/239)) ([8b883a6](https://www.github.com/restify/clients/commit/8b883a6cc34172f6a3e41531d9255f4f4752022c))
+
 ## [4.1.0](https://www.github.com/restify/clients/compare/v4.0.0...v4.1.0) (2021-05-27)
 
 
