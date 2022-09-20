@@ -1,4 +1,11 @@
 <a name="3.0.0"></a>
+## [4.2.0](https://www.github.com/restify/clients/compare/v4.1.1...v4.2.0) (2022-09-20)
+
+
+### Features
+
+* add ability to specify dns hints ([#242](https://www.github.com/restify/clients/issues/242)) ([adb83f8](https://www.github.com/restify/clients/commit/adb83f866b07a2387c73bce676ce536d5d56c0be))
+
 ### [4.1.1](https://www.github.com/restify/clients/compare/v4.1.0...v4.1.1) (2022-06-27)
 
 
