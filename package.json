@@ -74,7 +74,7 @@
     "once": "^1.4.0",
     "qs": "^6.6.0",
     "restify-errors": "^8.0.2",
-    "semver": "^5.6.0",
+    "semver": "^7.5.2",
     "tunnel-agent": "^0.6.0",
     "uuid": "^3.3.2"
   },
