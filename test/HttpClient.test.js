@@ -46,6 +46,35 @@ describe('HttpClient', function () {
         assert.strictEqual(CLIENT.url.port, '3000');
     });
 
+    it('should parse proxy url strings', function () {
+        CLIENT = clients.createHttpClient({
+            url: 'http://www.restify.com',
+            proxy: 'proxy.example.com:4321',
+            noProxy: ''
+        });
+
+        assert.deepEqual(CLIENT.proxy, {
+            protocol: 'http:',
+            host: 'proxy.example.com',
+            port: 4321
+        });
+    });
+
+    it('should parse proxy url auth', function () {
+        CLIENT = clients.createHttpClient({
+            url: 'http://www.restify.com',
+            proxy: 'http://user%40name:p%3Aword@proxy.example.com:4321',
+            noProxy: ''
+        });
+
+        assert.deepEqual(CLIENT.proxy, {
+            protocol: 'http:',
+            host: 'proxy.example.com',
+            port: 4321,
+            proxyAuth: 'user@name:p:word'
+        });
+    });
+
     it('should fill default User Agent when none is given', function () {
         CLIENT = clients.createHttpClient();
         assert.strictEqual(CLIENT.headers['user-agent'].slice(0, 8),

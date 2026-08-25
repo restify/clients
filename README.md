@@ -145,7 +145,7 @@ var client = restify.createJsonClient({
 |version|String|semver string to set the accept-version|
 |followRedirects|Boolean|Follow redirects from server|
 |maxRedirects|Number|Maximum number of redirects to follow|
-|proxy|String|An HTTP proxy URL string (or parsed URL object) to use for requests. If not specified, then the `https_proxy` or `http_proxy` environment variables are used. Pass `proxy: false` to explicitly disable using a proxy (i.e. to ensure a proxy URL is not picked up from environment variables). See the [Proxy](#proxy) section below.|
+|proxy|String or Object|An HTTP proxy URL string or tunnel-agent proxy options object to use for requests. If not specified, then the `https_proxy` or `http_proxy` environment variables are used. Pass `proxy: false` to explicitly disable using a proxy (i.e. to ensure a proxy URL is not picked up from environment variables). See the [Proxy](#proxy) section below.|
 |noProxy|String|A comma-separated list of hosts for which to not use a proxy. If not specified, then then `NO_PROXY` environment variable is used. One can pass `noProxy: ''` to explicitly set this empty and ensure a possible environment variable is not used. See the [Proxy](#proxy) section below.|
 
 
@@ -383,7 +383,7 @@ common in many tools (e.g., `curl`).
 
 ```javascript
 restify.createClient({
-  proxy: <proxy url string or object>,
+  proxy: <proxy url string or tunnel-agent proxy options>,
   noProxy: <boolean>
 });
 ```
@@ -394,9 +394,9 @@ The `proxy` option to `createClient` specifies the proxy URL, for example:
 proxy: 'http://user:password@example.com:4321'
 ```
 
-Or a proxy object can be given. (Warning: the `proxyAuth` field is not what
-a simple `require('url').parse()` will produce if your proxy URL has auth
-info.)
+Or a tunnel-agent proxy options object can be given. (Warning: the
+`proxyAuth` field is not what `new URL()` will produce if your proxy URL has
+auth info.)
 
 ```javascript
 proxy: {
@@ -663,4 +663,3 @@ commit messages found in the git history since the last release.
 Copyright (c) 2015 Alex Liu
 
 Licensed under the MIT license.
-
