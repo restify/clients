@@ -7,7 +7,7 @@
 var assert = require('chai').assert;
 var http = require('http');
 var net = require('net');
-var url = require('url');
+var URL = require('url').URL;
 
 var clients = require('../lib');
 
@@ -65,9 +65,10 @@ describe('restify-client proxy tests', function () {
 
             PROXYSERVER.on('connect', function (req, socket) {
                 PROXIED.push({url: req.url, headers: req.headers});
-                var serverUrl = url.parse('https://' + req.url);
+                var serverUrl = new URL('https://' + req.url);
+                var port = serverUrl.port || 443;
 
-                var srvSocket = net.connect(serverUrl.port, serverUrl.hostname,
+                var srvSocket = net.connect(port, serverUrl.hostname,
                 function () {
                     socket.write('HTTP/1.1 200 Connection Established\r\n' +
                         'Proxy-agent: Node-Proxy\r\n' +

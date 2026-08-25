@@ -132,6 +132,11 @@ function sendSignature(req, res, next) {
     }
 }
 
+function sendBasicAuth(req, res, next) {
+    res.send(req.authorization.basic || {});
+    next();
+}
+
 function sendWhitespace(req, res, next) {
     // override contentType as otherwise the string is json-ified to
     // include quotes. Don't want that for this test.
@@ -228,6 +233,7 @@ describe('restify-client tests', function () {
             SERVER.use(restify.plugins.bodyParser());
 
             SERVER.get('/signed', sendSignature);
+            SERVER.get('/auth/basic', sendBasicAuth);
             SERVER.get('/whitespace/:count', sendWhitespace);
 
             SERVER.get('/json/boom', function (req, res, next) {
@@ -1238,6 +1244,21 @@ describe('restify-client tests', function () {
         client.get('/json/mcavage', function (err, req, res, obj) {
             assert.ifError(err);
             assert.deepEqual(obj, {hello: 'mcavage'});
+            done();
+        });
+    });
+
+    it('sends basic auth from url credentials', function (done) {
+        var client = clients.createJsonClient(
+            'http://user%40name:p%3Aword@127.0.0.1:' + PORT);
+        client.agent = false;
+
+        client.get('/auth/basic', function (err, req, res, obj) {
+            assert.ifError(err);
+            assert.deepEqual(obj, {
+                username: 'user@name',
+                password: 'p:word'
+            });
             done();
         });
     });
