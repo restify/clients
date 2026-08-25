@@ -66,14 +66,23 @@ var KEY = '-----BEGIN PRIVATE KEY-----\n' +
 
 // --- Helpers
 
+function bodyParam(req, name) {
+    if (req.body && typeof (req.body) === 'object' &&
+            Object.prototype.hasOwnProperty.call(req.body, name)) {
+        return req.body[name];
+    }
+
+    return req.params[name];
+}
+
 function sendJson(req, res, next) {
-    res.send({hello: req.params.hello || req.params.name || null});
+    res.send({hello: bodyParam(req, 'hello') || req.params.name || null});
     next();
 }
 
 
 function sendText(req, res, next) {
-    var text = 'hello ' + (req.params.hello || req.params.name || '');
+    var text = 'hello ' + (bodyParam(req, 'hello') || req.params.name || '');
 
     if (req.headers.range) {
         var matched = req.headers.range.match(/bytes=([0-9]+)-([0-9]*)/);
@@ -96,7 +105,19 @@ function sendText(req, res, next) {
 
 function sendRedirect(req, res, next) {
     var statusCode = parseInt(req.params.status_code, 10);
-    var path = '/' + req.params.path;
+    var loop = req.params.path.match(/^loop([0-9]+)$/);
+    var path;
+
+    // Restify 12's router caps one route param at 100 chars. A nested
+    // encoded redirect target can make :path too long and return 404 before
+    // the client reaches maxRedirects, so use a short loop token here.
+    if (loop) {
+        path = '/redirect/' + statusCode + '/loop' +
+            (parseInt(loop[1], 10) - 1);
+    } else {
+        path = '/' + decodeURIComponent(req.params.path);
+    }
+
     res.redirect(statusCode, path, next);
 }
 
@@ -158,8 +179,10 @@ function sendJsonNull(req, res, next) {
 }
 
 function sendJsonString(req, res, next) {
+    var hello = typeof (req.body) === 'undefined' ? req.params : req.body;
+
     res.header('content-type', 'application/json');
-    res.send({ hello: req.params });
+    res.send({ hello: hello });
     return next();
 }
 
@@ -169,7 +192,7 @@ function getLog(name, stream, level) {
         name: name || process.argv[1],
         stream: stream || process.stdout,
         src: true,
-        serializers: restify.bunyan.serializers
+        serializers: clients.bunyan.serializers
     }));
 }
 
@@ -192,17 +215,17 @@ describe('restify-client tests', function () {
     before(function (callback) {
         try {
             SERVER = restify.createServer({
-                dtrace: dtrace,
+                dtrace: false,
                 log: getLog('server'),
                 handleUncaughtExceptions: false
             });
 
-            SERVER.use(restify.acceptParser(['json', 'text/plain']));
-            SERVER.use(restify.jsonp()); // Added for GH-778
-            SERVER.use(restify.dateParser());
-            SERVER.use(restify.authorizationParser());
-            SERVER.use(restify.queryParser());
-            SERVER.use(restify.bodyParser());
+            SERVER.use(restify.plugins.acceptParser(['json', 'text/plain']));
+            SERVER.use(restify.plugins.jsonp()); // Added for GH-778
+            SERVER.use(restify.plugins.dateParser());
+            SERVER.use(restify.plugins.authorizationParser());
+            SERVER.use(restify.plugins.queryParser());
+            SERVER.use(restify.plugins.bodyParser());
 
             SERVER.get('/signed', sendSignature);
             SERVER.get('/whitespace/:count', sendWhitespace);
@@ -1146,8 +1169,9 @@ describe('restify-client tests', function () {
             key: KEY
         });
 
-        server.get('/ping', function (req, res) {
+        server.get('/ping', function (req, res, next) {
             res.end('pong');
+            next();
         });
         server.listen(8443);
 
@@ -1177,8 +1201,9 @@ describe('restify-client tests', function () {
             key: KEY
         });
 
-        server.get('/ping', function (req, res) {
+        server.get('/ping', function (req, res, next) {
             res.end('pong');
+            next();
         });
         server.listen(8443);
 
@@ -1375,13 +1400,10 @@ describe('restify-client tests', function () {
     });
 
     function build302RedirectUrl(numOfRedirects, targetUrl) {
-        var url = targetUrl;
-
-        for (var i = 0; i < numOfRedirects; i++) {
-            url = 'redirect/302/' + encodeURIComponent(url);
-        }
-
-        return url;
+        // Keep the redirect target as one URL segment. A 6-deep chain with
+        // encoded "/" values can fail this Restify route before the client
+        // reaches its redirect limit.
+        return 'redirect/302/loop' + numOfRedirects;
     }
 
     it('should respect default (5) maxRedirects', function (done) {
@@ -1497,7 +1519,7 @@ describe('restify-client tests', function () {
                 var testTitle = method.toUpperCase() + ' ' + code + ' ';
 
                 it(testTitle + ' text', function (done) {
-                    STR_CLIENT[method]('/redirect/' + code + '/str%2Fmcavage',
+                    STR_CLIENT[method]('/redirect/' + code + '/str%252Fmcavage',
                         function (err, req, res, data) {
                         assert.ifError(err);
                         assert.ok(req);
@@ -1509,8 +1531,8 @@ describe('restify-client tests', function () {
                 });
 
                 it(testTitle + ' json', function (done) {
-                    JSON_CLIENT[method]('/redirect/' + code + '/json%2Fmcavage',
-                        function (err, req, res, obj) {
+                    JSON_CLIENT[method]('/redirect/' + code +
+                        '/json%252Fmcavage', function (err, req, res, obj) {
                         assert.ifError(err);
                         assert.ok(req);
                         assert.ok(res);
@@ -1525,7 +1547,7 @@ describe('restify-client tests', function () {
 
                 it(testTitle + ' text', function (done) {
                     var body = 'hello=foo';
-                    STR_CLIENT[method]('/redirect/' + code + '/str%2Fmcavage',
+                    STR_CLIENT[method]('/redirect/' + code + '/str%252Fmcavage',
                         body, function (err, req, res, data) {
                         assert.ifError(err);
                         assert.ok(req);
@@ -1538,8 +1560,9 @@ describe('restify-client tests', function () {
 
                 it(testTitle + ' json', function (done) {
                     var data = { hello: 'foo' };
-                    JSON_CLIENT[method]('/redirect/' + code + '/json%2Fmcavage',
-                        data, function (err, req, res, obj) {
+                    JSON_CLIENT[method]('/redirect/' + code +
+                        '/json%252Fmcavage', data,
+                        function (err, req, res, obj) {
                         assert.ifError(err);
                         assert.ok(req);
                         assert.ok(res);
@@ -1551,7 +1574,7 @@ describe('restify-client tests', function () {
 
             // do not assert body on head requests
             it('HEAD ' + code + ' text', function (done) {
-                STR_CLIENT.head('/redirect/' + code + '/str%2Fmcavage',
+                STR_CLIENT.head('/redirect/' + code + '/str%252Fmcavage',
                     function (err, req, res, data) {
                     assert.ifError(err);
                     assert.ok(req);
@@ -1562,7 +1585,7 @@ describe('restify-client tests', function () {
             });
 
             it('HEAD ' + code + ' json', function (done) {
-                JSON_CLIENT.head('/redirect/' + code + '/json%2Fmcavage',
+                JSON_CLIENT.head('/redirect/' + code + '/json%252Fmcavage',
                     function (err, req, res, data) {
                     assert.ifError(err);
                     assert.ok(req);
@@ -1582,7 +1605,7 @@ describe('restify-client tests', function () {
             var testTitle = method.toUpperCase() + ' 307 ';
 
             it(testTitle + ' text', function (done) {
-                STR_CLIENT[method]('/redirect/307/str%2Fmcavage',
+                STR_CLIENT[method]('/redirect/307/str%252Fmcavage',
                     function (err, req, res, data) {
                     assert.ifError(err);
                     assert.ok(req);
@@ -1594,7 +1617,7 @@ describe('restify-client tests', function () {
             });
 
             it(testTitle + ' json', function (done) {
-                JSON_CLIENT[method]('/redirect/307/json%2Fmcavage',
+                JSON_CLIENT[method]('/redirect/307/json%252Fmcavage',
                     function (err, req, res, obj) {
                     assert.ifError(err);
                     assert.ok(req);
@@ -1610,7 +1633,7 @@ describe('restify-client tests', function () {
 
             it(testTitle + ' text', function (done) {
                 var body = 'hello=foo';
-                STR_CLIENT[method]('/redirect/307/str%2Fmcavage', body,
+                STR_CLIENT[method]('/redirect/307/str%252Fmcavage', body,
                     function (err, req, res, data) {
                     assert.ifError(err);
                     assert.ok(req);
@@ -1623,7 +1646,7 @@ describe('restify-client tests', function () {
 
             it(testTitle + ' json', function (done) {
                 var data = { hello: 'foo' };
-                JSON_CLIENT[method]('/redirect/307/json%2Fmcavage', data,
+                JSON_CLIENT[method]('/redirect/307/json%252Fmcavage', data,
                     function (err, req, res, obj) {
                     assert.ifError(err);
                     assert.ok(req);
@@ -1636,7 +1659,7 @@ describe('restify-client tests', function () {
 
         // do not assert body on head requests
         it('HEAD 307 text', function (done) {
-            STR_CLIENT.head('/redirect/307/str%2Fmcavage',
+            STR_CLIENT.head('/redirect/307/str%252Fmcavage',
                 function (err, req, res, data) {
                 assert.ifError(err);
                 assert.ok(req);
@@ -1647,7 +1670,7 @@ describe('restify-client tests', function () {
         });
 
         it('HEAD 307 json', function (done) {
-            JSON_CLIENT.head('/redirect/307/json%2Fmcavage',
+            JSON_CLIENT.head('/redirect/307/json%252Fmcavage',
                 function (err, req, res, data) {
                 assert.ifError(err);
                 assert.ok(req);

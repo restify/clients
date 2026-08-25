@@ -31,7 +31,7 @@ function getLog(name, stream, level) {
         name: name || process.argv[1],
         stream: stream || process.stdout,
         src: true,
-        serializers: restify.bunyan.serializers
+        serializers: clients.bunyan.serializers
     }));
 }
 
