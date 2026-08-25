@@ -10,7 +10,6 @@ var bunyan = require('bunyan');
 var crypto = require('crypto');
 var format = require('util').format;
 var restify = require('restify');
-var uuid   = require('uuid');
 
 var clients = require('../lib');
 var auditor = require('../lib/helpers/auditor');
@@ -614,7 +613,8 @@ describe('restify-client tests', function () {
 
 
     it('Check error (404)', function (done) {
-        JSON_CLIENT.get('/' + uuid(), function (err, req, res, obj) {
+        JSON_CLIENT.get('/' + crypto.randomUUID(), function (err, req, res,
+            obj) {
             assert.ok(err);
             assert.ok(err.message);
             assert.equal(err.statusCode, 404);
@@ -786,7 +786,8 @@ describe('restify-client tests', function () {
     });
 
     it('Check error (404)', function (done) {
-        STR_CLIENT.get('/' + uuid(), function (err, req, res, message) {
+        STR_CLIENT.get('/' + crypto.randomUUID(), function (err, req, res,
+            message) {
             assert.ok(err);
             assert.ok(err.message);
             assert.equal(err.statusCode, 404);
