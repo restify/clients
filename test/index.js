@@ -25,43 +25,9 @@ var RAW_CLIENT;
 var SAFE_STRINGIFY_CLIENT;
 var SERVER;
 
-// Self-signed cert valid until year 2117 with
-// CN=does.not.exist.com/emailAddress=support@restify.com
-var CERTIFICATE = '-----BEGIN CERTIFICATE-----\n' +
-    'MIIDDDCCAnWgAwIBAgIJAPKmGJ2jaQDGMA0GCSqGSIb3DQEBCwUAMIGdMQswCQYD\n' +
-    'VQQGEwJVUzERMA8GA1UECAwITmV3IFlvcmsxETAPBgNVBAcMCE5ldyBZb3JrMRAw\n' +
-    'DgYDVQQKDAdSZXN0aWZ5MRUwEwYDVQQLDAxSZXN0aWZ5IHRlYW0xGzAZBgNVBAMM\n' +
-    'EmRvZXMubm90LmV4aXN0LmNvbTEiMCAGCSqGSIb3DQEJARYTc3VwcG9ydEByZXN0\n' +
-    'aWZ5LmNvbTAgFw0xNzAyMjAwOTM5MjBaGA8yMTE3MDEyNzA5MzkyMFowgZ0xCzAJ\n' +
-    'BgNVBAYTAlVTMREwDwYDVQQIDAhOZXcgWW9yazERMA8GA1UEBwwITmV3IFlvcmsx\n' +
-    'EDAOBgNVBAoMB1Jlc3RpZnkxFTATBgNVBAsMDFJlc3RpZnkgdGVhbTEbMBkGA1UE\n' +
-    'AwwSZG9lcy5ub3QuZXhpc3QuY29tMSIwIAYJKoZIhvcNAQkBFhNzdXBwb3J0QHJl\n' +
-    'c3RpZnkuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDWTKNlj7l5vLfP\n' +
-    'Som+Jep4SH7HiMen8XS+1AGt3aPZcZltCIEG6sw476axSKMY7OsLjT+kh0CnVHUg\n' +
-    'omL5914bQ/qC8tNhDIAq6K3tBzrpC63mXsA0of7AmjzX67uWga1h1yPJblxIJCiP\n' +
-    'Zbnp1mqOoL6uEFt7LW4paodYZ7IiEwIDAQABo1AwTjAdBgNVHQ4EFgQUiJpUOX0/\n' +
-    'eByG4CXweHQSnxMdHfMwHwYDVR0jBBgwFoAUiJpUOX0/eByG4CXweHQSnxMdHfMw\n' +
-    'DAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOBgQCAOvadZfRO9t8Yo3/0ZIxJ\n' +
-    'nMRLOdnT/zQU9b2Lw5zz4bN+eiQJNGtgeqv8Wuh96v4T+v8GHoyG7v39gC6MMowd\n' +
-    'k+ptCNcj4UITWG9Wwr/YY15h+eOZXnRNolZDf9Ba1+EE6RxqT7ujckNSB0kOXets\n' +
-    'NVyLhnmxQt4jDzmvdR7C+A==\n' +
-    '-----END CERTIFICATE-----';
-var KEY = '-----BEGIN PRIVATE KEY-----\n' +
-    'MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBANZMo2WPuXm8t89K\n' +
-    'ib4l6nhIfseIx6fxdL7UAa3do9lxmW0IgQbqzDjvprFIoxjs6wuNP6SHQKdUdSCi\n' +
-    'Yvn3XhtD+oLy02EMgCrore0HOukLreZewDSh/sCaPNfru5aBrWHXI8luXEgkKI9l\n' +
-    'uenWao6gvq4QW3stbilqh1hnsiITAgMBAAECgYEAu9sO2Xb2VlsynkpvGPrP4YVb\n' +
-    'bbrfmr81YhsjJbDHc1P79PKheNjXEYozi/Fq1+zH1qaJhcbyzDxjOKphLVLFcHIH\n' +
-    'Dv8UD1r+qRYMGrhtEp5drHx3LnRPzIMD4iUuU+IUD8MbccJKHwLVXymD4HWAknw/\n' +
-    'boxrXTy0SlYcBTQtpcECQQD31apWmR29g6Sr67Djg2dsZ0WWt0roEt+UQIEw78mL\n' +
-    'dktlldvFKPbNyx7GKSxFjvnap503JJx/vomeMNUQ89mxAkEA3VwfkVmhrtYBg+YR\n' +
-    'KbvAtFoI6OLjz5Xow62M+Q3Mg61aFxCDcp+RMnuyT3e9/xP1iaYMRvniyWDGNSI6\n' +
-    'lGAlAwJAYmDXiB6ptpPuJyydAAMmZ9qqvgQuYOc1ByV/4wwcZhbkIQQWxDHZnqFV\n' +
-    'qvWnFEmIFurYNo567R6WhEwAGAWkUQJABkoFw5VuWI9P/7Vbq3ngIb+lHSjFHDLA\n' +
-    'KD8YEENqGhukwZ8AfRM3ht2o1UUrqsGgakbDdojG/r23I+9TBsAsjQJBAITHdSJp\n' +
-    'J1c1NopSISDLPFjAengkkh5O8ZRk5fKomA9AcbyeLCEIraW1qWjXLyEvdMA42fa9\n' +
-    '8O3F+9khYj53znU=\n' +
-    '-----END PRIVATE KEY-----';
+var tlsCredentials = require('./helpers/tls');
+var CERTIFICATE = tlsCredentials.CERTIFICATE;
+var KEY = tlsCredentials.KEY;
 
 
 // --- Helpers
