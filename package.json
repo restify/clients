@@ -30,6 +30,9 @@
     "url": "https://github.com/restify/clients.git"
   },
   "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "files": [
     "lib"
   ],
@@ -67,14 +70,12 @@
     "backoff": "^2.5.0",
     "bunyan": "^1.8.12",
     "fast-safe-stringify": "^2.0.6",
-    "keep-alive-agent": "0.0.1",
     "lodash": "^4.17.15",
     "lru-cache": "^5.1.1",
     "mime": "^2.4.0",
     "once": "^1.4.0",
     "qs": "^6.6.0",
     "restify-errors": "^8.0.2",
-    "semver": "^5.6.0",
     "tunnel-agent": "^0.6.0",
     "uuid": "^3.3.2"
   },
