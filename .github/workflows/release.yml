@@ -19,13 +19,13 @@ jobs:
           release-type: node
           package-name: restify-clients
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: ${{ steps.release.outputs.release_created }}
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 22
         if: ${{ steps.release.outputs.release_created }}
-      - run: npm i
+      - run: npm install
         if: ${{ steps.release.outputs.release_created }}
       - run: npm publish --token=${{secrets.NPM_TOKEN}}
         if: ${{ steps.release.outputs.release_created }}

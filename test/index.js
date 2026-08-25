@@ -1416,7 +1416,8 @@ describe('restify-client tests', function () {
             assert.deepEqual(err.name, 'RestError');
             assert.deepEqual(err.message, 'Invalid JSON in response');
             assert.deepEqual(err.cause().name, 'SyntaxError');
-            assert.include(err.cause().message, 'Unexpected end of');
+            assert.match(err.cause().message,
+                /Unexpected end of|Unterminated string/);
             assert.equal(200, res.statusCode);
             assert.equal(data, '{"foo":"bar}');
             assert.equal(res.body, '{"foo":"bar}');

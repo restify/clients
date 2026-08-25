@@ -23,6 +23,18 @@ const PROXYSOCKETS = [];
 
 // --- Helpers
 
+function ignoreProxySocketError(err) {
+    if (err.code === 'EPIPE' || err.code === 'ECONNRESET') {
+        return;
+    }
+
+    if (err.message === 'This socket has been ended by the other party') {
+        return;
+    }
+
+    throw err;
+}
+
 function stripProcessEnv() {
     // Ensure envvars don't get in the way.
     [
@@ -63,6 +75,8 @@ describe('restify-client proxy tests', function () {
                     srvSocket.pipe(socket);
                     socket.pipe(srvSocket);
                 });
+                srvSocket.on('error', ignoreProxySocketError);
+                socket.on('error', ignoreProxySocketError);
                 PROXYSOCKETS.push(srvSocket);
                 PROXYSOCKETS.push(socket);
             });
