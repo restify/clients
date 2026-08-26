@@ -1,0 +1,72 @@
+---
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install node v26
+        uses: actions/setup-node@v4
+        with:
+          node-version: v26.x
+      - name: install dependencies
+        run: |
+          make clean
+          yarn
+      - name: check lint
+        run: make lint
+      - name: check codestyle
+        run: make codestyle
+  test:
+    name: test node ${{ matrix.node-version }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        node-version:
+          - 22.x
+          - 24.x
+          - 26.x
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v7
+      - name: use node ${{ matrix.node-version }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: |
+          make clean
+          yarn
+      - name: Run tests and coverage
+        run: make coverage
+      - name: Coveralls Parallel
+        uses: coverallsapp/github-action@v2.2.3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage/lcov.info
+          parallel: true
+          flag-name: run-${{ matrix.node-version }}-${{ matrix.os }}
+
+  coverage:
+    name: coverage
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2.2.3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
