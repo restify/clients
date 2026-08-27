@@ -16,9 +16,7 @@
 * update node version in release.yml ([ed653f6](https://github.com/restify/clients/commit/ed653f61a9250fb65d58d86160bd6e76bab949f8))
 * update release.yml ([3ab9583](https://github.com/restify/clients/commit/3ab9583f152491a2af53a1568ec970b7ecaa11df))
 * update restify version to ^12.0.0 ([94173d3](https://github.com/restify/clients/commit/94173d3a03fa5a1558859e135fc035c406955fa3))
-* update restify version to 12.0.0 ([184d8d8](https://github.com/restify/clients/commit/184d8d84358e8177262d08700124c27c43320628))
 * upgrade Node.js to 26 ([0036b0f](https://github.com/restify/clients/commit/0036b0f3534f8d4108f370e2b1f0023a60f176e9))
-* upgrade restify ([ce45407](https://github.com/restify/clients/commit/ce454076859c8bcb3338943fb7657c26727520cd))
 
 ## [4.2.0](https://www.github.com/restify/clients/compare/v4.1.1...v4.2.0) (2022-09-20)
 
