@@ -1,4 +1,23 @@
 <a name="3.0.0"></a>
+## [5.0.0](https://github.com/restify/clients/compare/v4.2.0...v5.0.0) (2026-08-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade restify
+* upgrade Node.js to 26
+
+### Features
+
+* replace travis with github actions ([#247](https://github.com/restify/clients/issues/247)) ([bffde57](https://github.com/restify/clients/commit/bffde57b1f6aad7d2870b99edea4b7a7410e865e))
+* replace url.parse with WHATWG URL ([1008cde](https://github.com/restify/clients/commit/1008cdede273d6ff6a626c75c9e071a262c9e6f9))
+* replace uuid with crypto ([4b18286](https://github.com/restify/clients/commit/4b1828662244bdcc63595f8ad744fba566b63ff5))
+* update node matrix in travis.yml ([09cb2b4](https://github.com/restify/clients/commit/09cb2b479ca275b38ce5ae546f0cb8e10be1a7fc))
+* update node version in release.yml ([ed653f6](https://github.com/restify/clients/commit/ed653f61a9250fb65d58d86160bd6e76bab949f8))
+* update release.yml ([3ab9583](https://github.com/restify/clients/commit/3ab9583f152491a2af53a1568ec970b7ecaa11df))
+* update restify version to ^12.0.0 ([94173d3](https://github.com/restify/clients/commit/94173d3a03fa5a1558859e135fc035c406955fa3))
+* upgrade Node.js to 26 ([0036b0f](https://github.com/restify/clients/commit/0036b0f3534f8d4108f370e2b1f0023a60f176e9))
+
 ## [4.2.0](https://www.github.com/restify/clients/compare/v4.1.1...v4.2.0) (2022-09-20)
 
 
