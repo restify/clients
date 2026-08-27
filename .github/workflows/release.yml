@@ -8,16 +8,20 @@ on:
       - v*.x
 
 name: releaser
+
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   releaser:
     runs-on: ubuntu-latest
     steps:
-      - uses: GoogleCloudPlatform/release-please-action@v1.6.3
+      - uses: googleapis/release-please-action@v5
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
-          package-name: restify-clients
 
       - uses: actions/checkout@v4
         if: ${{ steps.release.outputs.release_created }}
