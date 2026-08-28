@@ -1,4 +1,11 @@
 <a name="3.0.0"></a>
+## [6.0.0](https://github.com/restify/clients/compare/v5.0.0...v6.0.0) (2026-08-28)
+
+
+### Miscellaneous Chores
+
+* force version bump to 6.0.0 past blocked npm release ([#250](https://github.com/restify/clients/issues/250)) ([9c37cde](https://github.com/restify/clients/commit/9c37cde35aa8a2bc3eca2cbaf64902ae61510ecb))
+
 ## [5.0.0](https://github.com/restify/clients/compare/v4.2.0...v5.0.0) (2026-08-27)
 
 
