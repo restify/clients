@@ -1,12 +1,5 @@
 <a name="3.0.0"></a>
-## [6.0.0](https://github.com/restify/clients/compare/v5.0.0...v6.0.0) (2026-08-28)
-
-
-### Miscellaneous Chores
-
-* force version bump to 6.0.0 past blocked npm release ([#250](https://github.com/restify/clients/issues/250)) ([9c37cde](https://github.com/restify/clients/commit/9c37cde35aa8a2bc3eca2cbaf64902ae61510ecb))
-
-## [5.0.0](https://github.com/restify/clients/compare/v4.2.0...v5.0.0) (2026-08-27)
+## [6.0.0](https://github.com/restify/clients/compare/v4.2.0...v6.0.0) (2026-08-28)
 
 
 ### ⚠ BREAKING CHANGES
@@ -24,6 +17,12 @@
 * update release.yml ([3ab9583](https://github.com/restify/clients/commit/3ab9583f152491a2af53a1568ec970b7ecaa11df))
 * update restify version to ^12.0.0 ([94173d3](https://github.com/restify/clients/commit/94173d3a03fa5a1558859e135fc035c406955fa3))
 * upgrade Node.js to 26 ([0036b0f](https://github.com/restify/clients/commit/0036b0f3534f8d4108f370e2b1f0023a60f176e9))
+
+### Miscellaneous Chores
+
+* force version bump to 6.0.0 past blocked npm release ([#250](https://github.com/restify/clients/issues/250)) ([9c37cde](https://github.com/restify/clients/commit/9c37cde35aa8a2bc3eca2cbaf64902ae61510ecb))
+
+> **Note:** `5.0.0` was never released as part of this history. A `restify-clients@5.0.0` was published to npm on 2020-12-14, but that publish was never intended and does not correspond to any commit in this repository's history. Because npm permanently blocks reusing a version number once it has been published, the changes above were released as `6.0.0` instead of `5.0.0`.
 
 ## [4.2.0](https://www.github.com/restify/clients/compare/v4.1.1...v4.2.0) (2022-09-20)
 
