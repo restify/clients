@@ -2,6 +2,7 @@
 
 // external files
 var assert = require('chai').assert;
+var proxyquire = require('proxyquire');
 
 // local files
 var clients = require('../lib');
@@ -10,6 +11,51 @@ var clients = require('../lib');
 describe('HttpClient', function () {
 
     var CLIENT;
+
+
+    it('should invoke callbacks with reserved once state properties',
+    function () {
+        var callbackCalls = 0;
+        var wrappedCallback;
+        var fakeCall = {
+            setStrategy: function () {},
+            failAfter: function () {},
+            on: function () {},
+            start: function () {
+                assert.isFalse(wrappedCallback.called);
+                assert.isUndefined(wrappedCallback.value);
+                wrappedCallback(null, {id: 'request'});
+                wrappedCallback(new Error('second call'), {id: 'other'});
+            }
+        };
+        var fakeBackoff = {
+            call: function (_rawRequest, _opts, wrapped) {
+                wrappedCallback = wrapped;
+                return fakeCall;
+            },
+            ExponentialStrategy: function () {}
+        };
+        var HttpClient = proxyquire('../lib/HttpClient', {
+            backoff: fakeBackoff
+        });
+        var client = {
+            audit: {},
+            _keep_alive: false,
+            emit: function () {}
+        };
+        function decoratedCallback(err, request) {
+            assert.isNull(err);
+            assert.deepEqual(request, {id: 'request'});
+            callbackCalls += 1;
+        }
+        decoratedCallback.called = true;
+        decoratedCallback.value = 'consumer-owned';
+        HttpClient.prototype.request.call(client, {
+            retry: {minTimeout: 1, maxTimeout: 1, retries: 1}
+        }, decoratedCallback);
+        assert.strictEqual(callbackCalls, 1);
+        assert.isTrue(wrappedCallback.called);
+    });
 
 
     it('should throw on url without protocol', function () {
