@@ -27,8 +27,6 @@ JSCS		:= $(NODE_BIN)/jscs
 MOCHA		:= $(NODE_BIN)/mocha
 NYC		:= $(NODE_BIN)/nyc
 COVERALLS	:= $(NODE_BIN)/coveralls
-UNLEASH		:= $(NODE_BIN)/unleash
-CONVENTIONAL_RECOMMENDED_BUMP := $(NODE_BIN)/conventional-recommended-bump
 
 
 #
@@ -116,17 +114,6 @@ report-coverage: $(NODE_MODULES) $(NYC) ## Run unit tests with coverage reportin
 .PHONY: clean
 clean: ## Cleans unit test coverage files and node_modules.
 	@rm -rf $(NODE_MODULES) $(COVERAGE) $(COVERAGE_RES) $(YARN_LOCK) $(PACKAGE_LOCK)
-
-
-.PHONY: release-dry
-release-dry: $(NODE_MODULES) $(UNLEASH) ## Dry run of `release` target
-	@$(UNLEASH) -d --type=$(shell $(CONVENTIONAL_RECOMMENDED_BUMP) -p conventionalcommits)
-
-
-.PHONY: release
-release: $(NODE_MODULES) $(UNLEASH) security ## Versions, tags, and updates changelog based on commit messages
-	@$(UNLEASH) --type=$(shell $(CONVENTIONAL_RECOMMENDED_BUMP) -p conventionalcommits) --no-publish
-	@$(NPM) publish
 
 
 .PHONY: security
