@@ -27,7 +27,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/restify/clients.git"
+    "url": "git+https://github.com/restify/clients.git"
   },
   "license": "MIT",
   "engines": {
@@ -51,8 +51,6 @@
     "@commitlint/cli": "^9.0.1",
     "@commitlint/config-conventional": "^9.0.1",
     "chai": "^4.2.0",
-    "conventional-changelog-conventionalcommits": "^4.3.0",
-    "conventional-recommended-bump": "^6.0.9",
     "coveralls": "^3.0.2",
     "eslint": "^4.19.1",
     "jscs": "^3.0.7",
@@ -62,8 +60,7 @@
     "nyc": "^14.1.1",
     "proxyquire": "^2.0.1",
     "restify": "^12.0.0",
-    "sinon": "^6.1.3",
-    "unleash": "^2.0.1"
+    "sinon": "^6.1.3"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",

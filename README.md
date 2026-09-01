@@ -642,21 +642,14 @@ If you have style errors, you can auto fix whitespace issues by running:
 make codestyle-fix
 ```
 
-### Cutting a release
+### Releasing
 
-In order to release a new version of the restify-clients module:
+Releases are automated with [release-please](https://github.com/googleapis/release-please#readme):
 
-```sh
-make release
-```
-
-This will run the release target, which will:
-
-1. Automatically update the changelog.
-2. Automatically bump the version number appropriate, using the conventional
-commit messages found in the git history since the last release.
-3. Push the git tags up to origin
-4. Call `npm publish`
+1. Merge conventional-commit-style PRs (`fix:`, `feat:`, etc.) into `master`.
+2. `release-please` opens or updates a Release PR with the version bump and changelog.
+3. Review and merge the Release PR when ready to ship.
+4. `release-please` tags the release and dispatches the `npm-publish` workflow, which validates and publishes the package to npm.
 
 ## License
 
