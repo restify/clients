@@ -72,7 +72,7 @@
     "mime": "^2.4.0",
     "once": "^1.4.0",
     "qs": "^6.6.0",
-    "restify-errors": "^8.0.2",
+    "restify-errors": "^9.0.1",
     "tunnel-agent": "^0.6.0"
   },
   "optionalDependencies": {
