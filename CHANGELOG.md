@@ -1,4 +1,11 @@
 <a name="3.0.0"></a>
+## [6.0.1](https://github.com/restify/clients/compare/v6.0.0...v6.0.1) (2026-09-03)
+
+
+### Bug Fixes
+
+* **deps:** bump restify-errors to ^9.0.1 ([#254](https://github.com/restify/clients/issues/254)) ([8e98ad1](https://github.com/restify/clients/commit/8e98ad12cc99a6dfe4beade3db0e104ff9861019))
+
 ## [6.0.0](https://github.com/restify/clients/compare/v4.2.0...v6.0.0) (2026-08-28)
 
 
