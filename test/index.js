@@ -1425,8 +1425,8 @@ describe('restify-client tests', function () {
             assert.ok(err);
             assert.deepEqual(err.name, 'RestError');
             assert.deepEqual(err.message, 'Invalid JSON in response');
-            assert.deepEqual(err.cause().name, 'SyntaxError');
-            assert.match(err.cause().message,
+            assert.deepEqual(err.cause.name, 'SyntaxError');
+            assert.match(err.cause.message,
                 /Unexpected end of|Unterminated string/);
             assert.equal(200, res.statusCode);
             assert.equal(data, '{"foo":"bar}');
@@ -1442,7 +1442,7 @@ describe('restify-client tests', function () {
             assert.deepEqual(err.name, 'InternalServerError');
             // should include original unparsed JSON payload
             assert.include(err.message, '{"foo":"bar}');
-            assert.isUndefined(err.cause());
+            assert.isUndefined(err.cause);
             assert.deepEqual(res.statusCode, 500);
             assert.deepEqual(data, '{"foo":"bar}');
             assert.deepEqual(res.body, '{"foo":"bar}');
@@ -1477,8 +1477,8 @@ describe('restify-client tests', function () {
             assert.ok(err);
             assert.deepEqual(err.name, 'RestError');
             assert.deepEqual(err.message, 'Invalid JSON in response');
-            assert.deepEqual(err.cause().name, 'SyntaxError');
-            assert.include(err.cause().message, 'Unexpected end of');
+            assert.deepEqual(err.cause.name, 'SyntaxError');
+            assert.include(err.cause.message, 'Unexpected end of');
             assert.strictEqual(res.statusCode, 200);
             // raw res.body is unparsed JSON
             assert.deepEqual(res.body, ' ');
